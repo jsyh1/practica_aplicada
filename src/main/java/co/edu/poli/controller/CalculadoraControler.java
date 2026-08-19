@@ -1,6 +1,8 @@
 package co.edu.poli.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -13,6 +15,8 @@ public class CalculadoraControler {
     private Label lblError;
 
     private String operador;
+
+
 
     // =========================
     // OPERADORES
@@ -117,6 +121,21 @@ public class CalculadoraControler {
         txtValor1.positionCaret(
             txtValor1.getText().length()
         );
+    }
+
+    // =========================
+    // NUMEROS 
+    // =========================
+    @FXML
+    private void seleccionarNumero(ActionEvent event) {
+
+    Button boton = (Button) event.getSource();
+
+    String numero = boton.getText();
+
+    lblError.setText("");
+
+    agregarTexto(numero);
     }
 
     // =========================
