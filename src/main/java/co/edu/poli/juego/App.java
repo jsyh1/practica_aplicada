@@ -23,10 +23,10 @@ public class App extends Application {
         //Nombre de la ventana
         stage.setTitle("All Ten");
         //Logo
-        stage.getIcons().add(
-        new Image(App.class.getResourceAsStream("/co/edu/poli/juego/img/logo.jpg"))
+        //stage.getIcons().add(
+        //new Image(App.class.getResourceAsStream("/co/edu/poli/juego/img/logo.jpg"))
         
-        );
+        //);
         
 
         stage.setScene(scene);
@@ -36,9 +36,11 @@ public class App extends Application {
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
-
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(
+            App.class.getResource("/co/edu/poli/juego/" + fxml + ".fxml")
+        );
+
         return fxmlLoader.load();
     }
 
