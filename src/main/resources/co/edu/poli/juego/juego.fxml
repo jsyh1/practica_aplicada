@@ -13,7 +13,7 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="All Ten" textFill="#d30f0f" />
+    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="All Ten" />
 <TextField fx:id="txtValor1" editable="false" maxWidth="250.0" promptText="Ingrese un valor" />
 
 <Label fx:id="lblError" style="-fx-text-fill: red;" text="" />
@@ -40,9 +40,10 @@
 
 <HBox alignment="CENTER" spacing="10.0">
 
-    <Button onAction="#seleccionarParentesisAbierto" prefHeight="40.0" prefWidth="50.0" text="(" />
+    <Button onAction="#seleccionarParentesisAbierto" text="(" />
 
-    <Button onAction="#seleccionarParentesisCerrado" prefHeight="40.0" prefWidth="50.0" text=")" />
+    <Button onAction="#seleccionarParentesisCerrado" text=")" />
+      <Button text="⌫" />
 
 </HBox>
 
