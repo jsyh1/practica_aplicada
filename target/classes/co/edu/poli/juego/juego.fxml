@@ -7,72 +7,50 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER"
-      spacing="15.0"
-      xmlns="http://javafx.com/javafx/8.0.171"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="co.edu.poli.controller.CalculadoraControler">
+<VBox alignment="CENTER" prefHeight="387.0" prefWidth="292.0" spacing="15.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.poli.controller.CalculadoraControler">
 
     <padding>
-        <Insets top="20.0"
-                right="20.0"
-                bottom="20.0"
-                left="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label text="Calculadora"
-           style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-<TextField fx:id="txtValor1"
-           promptText="Ingrese un valor"
-           editable="false"
-           maxWidth="250.0"/>
+    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="All Ten" />
+<TextField fx:id="txtValor1" editable="false" maxWidth="250.0" promptText="Ingrese un valor" />
 
-<Label fx:id="lblError"
-       text=""
-       style="-fx-text-fill: red;"/>
+<Label fx:id="lblError" style="-fx-text-fill: red;" text="" />
 
-<HBox alignment="CENTER"
-      spacing="10.0">
+<HBox alignment="CENTER" spacing="10.0">
 
-    <Button text="+"
-            onAction="#seleccionarSuma"/>
+    <Button onAction="#seleccionarSuma" text="+" />
 
-    <Button text="-"
-            onAction="#seleccionarResta"/>
+    <Button onAction="#seleccionarResta" text="-" />
 
-    <Button text="×"
-            onAction="#seleccionarMultiplicacion"/>
+    <Button onAction="#seleccionarMultiplicacion" text="×" />
 
-    <Button text="÷"
-            onAction="#seleccionarDivision"/>
+    <Button onAction="#seleccionarDivision" text="÷" />
 
 </HBox>
+   <HBox alignment="CENTER" spacing="10.0">
+      <children>
+         <Button alignment="CENTER" onAction="#seleccionarNumero" text="1" textAlignment="CENTER" />
+         <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="2" />
+         <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="3" />
+         <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="4" />
+      </children>
+   </HBox>
 
-<HBox alignment="CENTER"
-      spacing="10.0">
+<HBox alignment="CENTER" spacing="10.0">
 
-    <Button text="("
-            onAction="#seleccionarParentesisAbierto"
-            prefWidth="50.0"
-            prefHeight="40.0"/>
+    <Button onAction="#seleccionarParentesisAbierto" prefHeight="40.0" prefWidth="50.0" text="(" />
 
-    <Button text=")"
-            onAction="#seleccionarParentesisCerrado"
-            prefWidth="50.0"
-            prefHeight="40.0"/>
+    <Button onAction="#seleccionarParentesisCerrado" prefHeight="40.0" prefWidth="50.0" text=")" />
 
 </HBox>
 
 
-    <Button text="Calcular"
-            prefWidth="150.0"
-            prefHeight="40.0"/>
+    <Button prefHeight="25.0" prefWidth="53.0" text="=" />
 
-    <Label text="Resultado:"
-           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Resultado:" />
 
-    <Label fx:id="lblResultado"
-           text="---"
-           style="-fx-font-size: 20px;"/>
+    <Label fx:id="lblResultado" style="-fx-font-size: 20px;" text="---" />
 
 </VBox>
