@@ -1,4 +1,4 @@
-package co.edu.poli.juego;
+package co.edu.poli.vista;
 
 import java.io.IOException;
 
