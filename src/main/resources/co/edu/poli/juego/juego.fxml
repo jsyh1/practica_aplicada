@@ -27,7 +27,7 @@
 
     <Button onAction="#seleccionarResta" text="-" />
 
-    <Button onAction="#seleccionarMultiplicacion" text="×" />
+    <Button onAction="#seleccionarMultiplicacion" text="*" />
 
     <Button onAction="#seleccionarDivision" text="÷" />
 
@@ -46,12 +46,12 @@
     <Button onAction="#seleccionarParentesisAbierto" text="(" />
 
     <Button onAction="#seleccionarParentesisCerrado" text=")" />
-      <Button text="⌫" />
+      <Button mnemonicParsing="false" onAction="#borrarUltimo" text="⌫" />
 
 </HBox>
 
 
-    <Button prefHeight="25.0" prefWidth="53.0" text="=" />
+    <Button prefHeight="25.0" prefWidth="53.0" mnemonicParsing="false" onAction="#resultado" text="=" />
 
 
 </VBox>

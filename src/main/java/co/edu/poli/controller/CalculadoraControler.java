@@ -1,252 +1,281 @@
 package co.edu.poli.controller;
 
+import co.edu.poli.servicios.Fraccion;
+import co.edu.poli.servicios.Operadores;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+/**
+ * Controlador principal de la calculadora.
+ *
+ * Gestiona la interacción entre la interfaz gráfica y los servicios
+ * encargados de realizar las operaciones matemáticas.
+ *
+ * Permite:
+ * - Ingresar números.
+ * - Seleccionar operadores matemáticos.
+ * - Ingresar paréntesis.
+ * - Eliminar el último carácter ingresado.
+ * - Calcular expresiones matemáticas.
+ * - Mostrar resultados enteros o en forma de fracción.
+ * - Mostrar mensajes de error.
+ */
 public class CalculadoraControler {
 
+    /**
+     * Campo de texto donde se ingresa la expresión matemática
+     * y se muestra el resultado.
+     */
     @FXML
     private TextField txtValor1;
 
+    /**
+     * Etiqueta utilizada para mostrar mensajes de error
+     * al usuario.
+     */
     @FXML
     private Label lblError;
 
+    /**
+     * Etiqueta destinada a mostrar el resultado de la operación.
+     */
+    @FXML
+    private Label lblResultado;
+
+    /**
+     * Almacena temporalmente el operador seleccionado.
+     */
     private String operador;
-
-
 
     // =========================
     // OPERADORES
     // =========================
 
+    /**
+     * Selecciona el operador de suma y lo agrega a la expresión.
+     *
+     * @param event evento generado al presionar el botón de suma
+     */
     @FXML
-    private void seleccionarSuma() {
+    private void seleccionarSuma(ActionEvent event) {
+
         operador = "+";
-        //mostrarOperador();
+
+        Button boton = (Button) event.getSource();
+
+        String suma = boton.getText();
+
+        lblError.setText("");
+
+        agregarTexto(suma);
     }
 
+    /**
+     * Selecciona el operador de resta y lo agrega a la expresión.
+     *
+     * @param event evento generado al presionar el botón de resta
+     */
     @FXML
-    private void seleccionarResta() {
+    private void seleccionarResta(ActionEvent event) {
+
         operador = "-";
-       // mostrarOperador();
+
+        Button boton = (Button) event.getSource();
+
+        String resta = boton.getText();
+
+        lblError.setText("");
+
+        agregarTexto(resta);
     }
 
+    /**
+     * Selecciona el operador de multiplicación y lo agrega a la expresión.
+     *
+     * @param event evento generado al presionar el botón
+     *              de multiplicación
+     */
     @FXML
-    private void seleccionarMultiplicacion() {
-        operador = "×";
-       // mostrarOperador();
+    private void seleccionarMultiplicacion(ActionEvent event) {
+
+        operador = "*";
+
+        Button boton = (Button) event.getSource();
+
+        String multiplicacion = boton.getText();
+
+        lblError.setText("");
+
+        agregarTexto(multiplicacion);
     }
 
+    /**
+     * Selecciona el operador de división y lo agrega a la expresión.
+     *
+     * @param event evento generado al presionar el botón de división
+     */
     @FXML
-    private void seleccionarDivision() {
+    private void seleccionarDivision(ActionEvent event) {
+
         operador = "÷";
-        //mostrarOperador();
+
+        Button boton = (Button) event.getSource();
+
+        String divicion = boton.getText();
+
+        lblError.setText("");
+
+        agregarTexto(divicion);
     }
 
     // =========================
     // PARENTESIS
     // =========================
 
+    /**
+     * Agrega un paréntesis de apertura a la expresión matemática.
+     *
+     * @param event evento generado al presionar el botón
+     *              de paréntesis de apertura
+     */
     @FXML
-    private void seleccionarParentesisAbierto() {
+    private void seleccionarParentesisAbierto(ActionEvent event) {
 
-//        String expresion = txtValor1.getText();
-//
-//        // Puede abrir al inicio
-//        if (expresion.isEmpty()) {
-//            lblError.setText("");
-//            agregarTexto("(");
-//            return;
-//        }
-//
-//        // Puede abrir después de un operador
-//        if (terminaEnOperador()) {
-//            lblError.setText("");
-//            agregarTexto("(");
-//            return;
-//        }
-//
-//        // Puede abrir otro paréntesis después de '('
-//        if (expresion.endsWith("(")) {
-//            lblError.setText("");
-//            agregarTexto("(");
-//            return;
-//        }
-//
-//        // No puede abrir después de un número
-//        // ni después de un paréntesis cerrado
-//        lblError.setText(
-//            "No se puede abrir un paréntesis en esta posición."
-//        );
+        Button boton = (Button) event.getSource();
+
+        String pAbierto = boton.getText();
+
+        lblError.setText("");
+
+        agregarTexto(pAbierto);
     }
 
+    /**
+     * Agrega un paréntesis de cierre a la expresión matemática.
+     *
+     * @param event evento generado al presionar el botón
+     *              de paréntesis de cierre
+     */
     @FXML
-    private void seleccionarParentesisCerrado() {
-//
-//        String expresion = txtValor1.getText();
-//
-//        // Debe existir un paréntesis abierto
-//        if (!parentesisValidos()) {
-//            lblError.setText(
-//                "No hay un paréntesis abierto para cerrar."
-//            );
-//            return;
-//        }
-//
-//        // Debe haber un número o ')' antes
-//        if (!terminaEnNumero()) {
-//            lblError.setText(
-//                "El paréntesis no puede cerrarse en esta posición."
-//            );
-//            return;
-//        }
-//
-//        lblError.setText("");
-//        agregarTexto(")");
+    private void seleccionarParentesisCerrado(ActionEvent event) {
+
+        Button boton = (Button) event.getSource();
+
+        String pCerrado = boton.getText();
+
+        lblError.setText("");
+
+        agregarTexto(pCerrado);
     }
 
     // =========================
     // AGREGAR TEXTO
     // =========================
 
-//    private void agregarTexto(String texto) {
-//
-//        String actual = txtValor1.getText();
-//
-//        txtValor1.setText(actual + texto);
-//
-//        txtValor1.positionCaret(
-//            txtValor1.getText().length()
-//        );
-//    }
+    /**
+     * Agrega un texto al final de la expresión matemática.
+     *
+     * Después de agregar el texto, posiciona el cursor al final
+     * del contenido del campo de texto.
+     *
+     * @param texto texto que se desea agregar a la expresión
+     */
+    private void agregarTexto(String texto) {
 
-    // =========================
-    // NUMEROS 
-    // =========================
-    @FXML
-    private void seleccionarNumero(ActionEvent event) {
+        String actual = txtValor1.getText();
 
-//    Button boton = (Button) event.getSource();
-//
-//    String numero = boton.getText();
-//
-//    lblError.setText("");
-//
-//    agregarTexto(numero);
+        txtValor1.setText(actual + texto);
+
+        txtValor1.positionCaret(
+                txtValor1.getText().length());
     }
 
     // =========================
-    // MOSTRAR OPERADOR
+    // NUMEROS
     // =========================
 
-//    private void mostrarOperador() {
-//
-//        String texto = txtValor1.getText();
-//
-//        // No se puede seleccionar un operador
-//        // si la expresión está vacía
-//        if (texto.isEmpty()) {
-//
-//            lblError.setText(
-//                "Debe ingresar un número antes de seleccionar un operador."
-//            );
-//
-//            return;
-//        }
-//
-//        // No se puede poner operador después de otro operador
-//        if (terminaEnOperador()) {
-//
-//            lblError.setText(
-//                "No se pueden colocar dos operadores seguidos."
-//            );
-//
-//            return;
-//        }
-//
-//        // No se puede poner operador inmediatamente
-//        // después de un paréntesis abierto
-//        if (texto.endsWith("(")) {
-//
-//            lblError.setText(
-//                "Debe ingresar un número después del paréntesis."
-//            );
-//
-//            return;
-//        }
-//
-//        lblError.setText("");
-//
-//        agregarTexto(operador);
-//   }
+    /**
+     * Obtiene el número del botón presionado y lo agrega
+     * a la expresión matemática.
+     *
+     * @param event evento generado al presionar un botón numérico
+     */
+    @FXML
+    private void seleccionarNumero(ActionEvent event) {
+
+        Button boton = (Button) event.getSource();
+
+        String numero = boton.getText();
+
+        lblError.setText("");
+
+        agregarTexto(numero);
+    }
 
     // =========================
-    // VALIDAR OPERADOR
-    // =========================
-//
-//    private boolean terminaEnOperador() {
-//
-//        String expresion = txtValor1.getText();
-//
-//        if (expresion.isEmpty()) {
-//            return false;
-//        }
-//
-//        char ultimo = expresion.charAt(
-//            expresion.length() - 1
-//        );
-//
-//        return ultimo == '+'
-//            || ultimo == '-'
-//            || ultimo == '×'
-//            || ultimo == '÷';
-//    }
-
-    // =========================
-    // VALIDAR NUMERO O PARENTESIS
+    // BORRAR
     // =========================
 
-//    private boolean terminaEnNumero() {
-//
-//        String expresion = txtValor1.getText();
-//
-//        if (expresion.isEmpty()) {
-//            return false;
-//        }
-//
-//        char ultimo = expresion.charAt(
-//            expresion.length() - 1
-//        );
-//
-//        return Character.isDigit(ultimo)
-//            || ultimo == ')';
-//    }
+    /**
+     * Elimina el último carácter de la expresión matemática.
+     *
+     * Si el campo de texto está vacío, no realiza ninguna acción.
+     * También limpia cualquier mensaje de error mostrado.
+     */
+    @FXML
+    private void borrarUltimo() {
+
+        String actual = txtValor1.getText();
+
+        if (!actual.isEmpty()) {
+
+            txtValor1.setText(
+                    actual.substring(0, actual.length() - 1));
+        }
+
+        lblError.setText("");
+    }
 
     // =========================
-    // VALIDAR PARENTESIS
+    // CALCULAR
     // =========================
 
-//    private boolean parentesisValidos() {
-//
-//        int abiertos = 0;
-//        int cerrados = 0;
-//
-//        String expresion = txtValor1.getText();
-//
-//        for (int i = 0; i < expresion.length(); i++) {
-//
-//            if (expresion.charAt(i) == '(') {
-//                abiertos++;
-//            }
-//
-//            if (expresion.charAt(i) == ')') {
-//                cerrados++;
-//            }
-//        }
-//
-//        return abiertos > cerrados;
-//    }
+    /**
+     * Calcula la expresión matemática ingresada por el usuario.
+     *
+     * Utiliza la clase {@link Operadores} para procesar la expresión
+     * y obtener el resultado. Posteriormente utiliza la clase
+     * {@link Fraccion} para convertir los resultados decimales
+     * a su representación fraccionaria cuando sea necesario.
+     *
+     * Si la expresión contiene un error matemático o de sintaxis,
+     * se muestra el mensaje correspondiente en la etiqueta de error.
+     *
+     * @throws IllegalArgumentException si la expresión matemática
+     *                                  es inválida
+     * @throws ArithmeticException      si se intenta realizar una
+     *                                  división entre cero
+     */
+    @FXML
+    private void resultado() {
+
+        try {
+
+            Operadores op = new Operadores(txtValor1.getText());
+
+            double resultado = op.calcular();
+
+            String str = Fraccion.convertir(resultado);
+
+            txtValor1.setText(str);
+            lblError.setText("");
+
+        } catch (IllegalArgumentException | ArithmeticException e) {
+
+            lblError.setText(e.getMessage());
+        }
+    }
 }
