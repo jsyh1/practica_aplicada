@@ -115,16 +115,33 @@ public class OperadoresTest {
     }
 
     /**
-     * Prueba números negativos.
+     * Prueba que no se permita comenzar una ecuación
+     * con un número negativo.
      */
     @Test
     public void probarNumeroNegativo() {
 
         Operadores op = new Operadores("-10+5");
 
-        double resultado = op.calcular();
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> op.calcular()
+        );
+    }
 
-        assertEquals(-5, resultado);
+    /**
+     * Prueba que no se permita una operación cuyo resultado
+     * sea un número negativo.
+     */
+    @Test
+    public void probarResultadoNegativo() {
+
+        Operadores op = new Operadores("5-10");
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> op.calcular()
+        );
     }
 
     /**
@@ -169,4 +186,3 @@ public class OperadoresTest {
         );
     }
 }
-

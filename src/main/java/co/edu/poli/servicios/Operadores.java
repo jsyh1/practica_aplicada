@@ -2,15 +2,19 @@ package co.edu.poli.servicios;
 
 /**
  * Clase encargada de procesar y resolver ecuaciones matemáticas.
- * 
- * Soporta:
- * - Suma (+)
- * - Resta (-)
- * - Multiplicación (*)
- * - División (/)
- * - Paréntesis ()
- * 
- * Respeta la prioridad de operaciones matemáticas.
+ *
+ * <p>Soporta las siguientes operaciones:</p>
+ * <ul>
+ *     <li>Suma (+)</li>
+ *     <li>Resta (-)</li>
+ *     <li>Multiplicación (*)</li>
+ *     <li>División (/)</li>
+ *     <li>Paréntesis ()</li>
+ * </ul>
+ *
+ * <p>Respeta la prioridad de las operaciones matemáticas.</p>
+ *
+ * <p>No permite el uso de números negativos.</p>
  */
 public class Operadores {
 
@@ -31,7 +35,8 @@ public class Operadores {
      * Procesa la ecuación y retorna el resultado.
      *
      * @return resultado de la ecuación
-     * @throws IllegalArgumentException si la ecuación es inválida
+     * @throws IllegalArgumentException si la ecuación está vacía,
+     *                                  es inválida o contiene números negativos
      * @throws ArithmeticException si se intenta dividir entre cero
      */
     public double calcular() {
@@ -46,11 +51,17 @@ public class Operadores {
             throw new IllegalArgumentException("Ecuación inválida");
         }
 
+        if (resultado < 0) {
+            throw new IllegalArgumentException(
+                    "No se permiten números negativos"
+            );
+        }
+
         return resultado;
     }
 
     /**
-     * Procesa sumas y restas.
+     * Procesa las operaciones de suma y resta.
      *
      * @return resultado de la expresión
      */
@@ -63,14 +74,17 @@ public class Operadores {
             char operador = ecuacion.charAt(posicion);
 
             if (operador == '+') {
+
                 posicion++;
                 resultado += termino();
 
             } else if (operador == '-') {
+
                 posicion++;
                 resultado -= termino();
 
             } else {
+
                 break;
             }
         }
@@ -79,9 +93,10 @@ public class Operadores {
     }
 
     /**
-     * Procesa multiplicaciones y divisiones.
+     * Procesa las operaciones de multiplicación y división.
      *
      * @return resultado del término
+     * @throws ArithmeticException si se intenta dividir entre cero
      */
     private double termino() {
 
@@ -92,21 +107,26 @@ public class Operadores {
             char operador = ecuacion.charAt(posicion);
 
             if (operador == '*') {
+
                 posicion++;
                 resultado *= factor();
 
             } else if (operador == '/') {
+
                 posicion++;
 
                 double divisor = factor();
 
                 if (divisor == 0) {
-                    throw new ArithmeticException("No se puede dividir entre cero");
+                    throw new ArithmeticException(
+                            "No se puede dividir entre cero"
+                    );
                 }
 
                 resultado /= divisor;
 
             } else {
+
                 break;
             }
         }
@@ -117,7 +137,11 @@ public class Operadores {
     /**
      * Procesa números y expresiones dentro de paréntesis.
      *
+     * <p>No permite números negativos.</p>
+     *
      * @return resultado del factor
+     * @throws IllegalArgumentException si se intenta utilizar
+     *                                  un número negativo
      */
     private double factor() {
 
@@ -147,15 +171,19 @@ public class Operadores {
             return resultado;
         }
 
-        // Números negativos
+        // No permitir números negativos
         if (caracter == '-') {
-            posicion++;
-            return -factor();
+
+            throw new IllegalArgumentException(
+                    "No se permiten números negativos"
+            );
         }
 
         // Números positivos
         if (caracter == '+') {
+
             posicion++;
+
             return factor();
         }
 
@@ -165,7 +193,8 @@ public class Operadores {
     /**
      * Lee un número de la ecuación.
      *
-     * @return número encontrado
+     * @return número encontrado en la ecuación
+     * @throws IllegalArgumentException si no se encuentra un número
      */
     private double numero() {
 
@@ -181,11 +210,13 @@ public class Operadores {
                 posicion++;
 
             } else {
+
                 break;
             }
         }
 
         if (inicio == posicion) {
+
             throw new IllegalArgumentException(
                     "Se esperaba un número en la posición " + posicion
             );
