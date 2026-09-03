@@ -18,15 +18,13 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("juego"), 480, 480);
+        scene = new Scene(loadFXML("juego"));
 
         //Nombre de la ventana
         stage.setTitle("All Ten");
         //Logo
-        //stage.getIcons().add(
-        //new Image(App.class.getResourceAsStream("/co/edu/poli/juego/img/logo.jpg"))
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("/co/edu/poli/juego/img/logo.jpg")));  
         
-        //);
         
 
         stage.setScene(scene);
