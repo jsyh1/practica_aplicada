@@ -4,102 +4,140 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="387.0" prefWidth="292.0" spacing="15.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.poli.controller.CalculadoraControler">
-    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Puntaje:" />
+<StackPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.poli.controller.CalculadoraControler">
 
-    <Label fx:id="lblResultado" style="-fx-font-size: 20px;" text="---" />
-    
-    <GridPane hgap="5.0" vgap="5.0">
-    <children>
+    <VBox alignment="CENTER" prefWidth="320.0" spacing="14.0">
 
-        <Label text="1" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </padding>
 
-        <Label text="2" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <!-- Encabezado -->
+        <VBox alignment="CENTER_LEFT" spacing="2.0">
+            <Label text="All Ten" />
+            <Label text="Reto de hoy" />
+            <Label text="Puntaje:" />
+            <Label fx:id="lblResultado" text="---" />
+        </VBox>
 
-        <Label text="3" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+        <!-- Casillas 1-10 (número + placeholder, sin fx:id nuevo) -->
+        <GridPane hgap="10.0" prefHeight="210.0" prefWidth="148.0" vgap="10.0">
+            <children>
 
-        <Label text="4" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="1)" />
+                    <Label prefHeight="17.0" prefWidth="110.0" text="Text field" />
+                </VBox>
 
-        <Label text="5" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+                <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="2)" />
+                    <Label prefHeight="17.0" prefWidth="132.0" text="Text field" />
+                </VBox>
 
-        <Label text="6" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <Label text="3)" />
+                    <Label prefHeight="17.0" prefWidth="110.0" text="Text field" />
+                </VBox>
 
-        <Label text="7" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <VBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <Label text="4)" />
+                    <Label prefHeight="17.0" prefWidth="131.0" text="Text field" />
+                </VBox>
 
-        <Label text="8" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="2">
+                    <Label text="5)" />
+                    <Label prefHeight="17.0" prefWidth="109.0" text="Text field" />
+                </VBox>
 
-        <Label text="9" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                <VBox GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <Label text="6)" />
+                    <Label prefHeight="17.0" prefWidth="132.0" text="Text field" />
+                </VBox>
 
-        <Label text="10" prefWidth="50.0" prefHeight="40.0"
-               alignment="CENTER" style="-fx-border-color: black;"
-               GridPane.columnIndex="4" GridPane.rowIndex="1"/>
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="3">
+                    <Label text="7)" />
+                    <Label prefHeight="17.0" prefWidth="108.0" text="Text field" />
+                </VBox>
 
-    </children>
-</GridPane>
+                <VBox GridPane.columnIndex="1" GridPane.rowIndex="3">
+                    <Label text="8)" />
+                    <Label prefHeight="17.0" prefWidth="135.0" text="Text field" />
+                </VBox>
 
-    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="All Ten" />
-<TextField fx:id="txtValor1" editable="false" maxWidth="250.0" promptText="Ingrese un valor" />
+                <VBox GridPane.columnIndex="0" GridPane.rowIndex="4">
+                    <Label text="9)" />
+                    <Label prefHeight="17.0" prefWidth="108.0" text="Text field" />
+                </VBox>
 
-<Label fx:id="lblError" style="-fx-text-fill: red;" text="" />
+                <VBox GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <Label text="10)" />
+                    <Label prefHeight="17.0" prefWidth="132.0" text="Text field" />
+                </VBox>
 
-<HBox alignment="CENTER" spacing="10.0">
+            </children>
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+        </GridPane>
 
-    <Button onAction="#seleccionarSuma" text="+" />
+        <!-- Expresión / resultado en curso -->
+        <TextField fx:id="txtValor1" editable="false" maxWidth="Infinity" promptText="Ingrese un valor" />
 
-    <Button onAction="#seleccionarResta" text="-" />
+        <Label fx:id="lblError" text="" />
 
-    <Button onAction="#seleccionarMultiplicacion" text="*" />
+        <!-- Fila 1: números -->
+        <HBox alignment="CENTER" spacing="10.0">
+            <children>
+                <Button alignment="CENTER" onAction="#seleccionarNumero" text="1" textAlignment="CENTER" />
+                <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="2" />
+                <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="3" />
+                <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="4" />
+            </children>
+        </HBox>
 
-    <Button onAction="#seleccionarDivision" text="÷" />
+        <!-- Fila 2: paréntesis y borrado -->
+        <HBox alignment="CENTER" spacing="10.0">
 
-</HBox>
-   <HBox alignment="CENTER" spacing="10.0">
-      <children>
-         <Button alignment="CENTER" onAction="#seleccionarNumero" text="1" textAlignment="CENTER" />
-         <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="2" />
-         <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="3" />
-         <Button mnemonicParsing="false" onAction="#seleccionarNumero" text="4" />
-      </children>
-   </HBox>
+            <Button onAction="#seleccionarParentesisAbierto" text="(" />
 
-<HBox alignment="CENTER" spacing="10.0">
+            <Button onAction="#seleccionarParentesisCerrado" text=")" />
 
-    <Button onAction="#seleccionarParentesisAbierto" text="(" />
+            <Button mnemonicParsing="false" onAction="#borrarUltimo" text="⌫" />
 
-    <Button onAction="#seleccionarParentesisCerrado" text=")" />
-      <Button mnemonicParsing="false" onAction="#borrarUltimo" text="⌫" />
-      <Button mnemonicParsing="false" onAction="#borrarTodo" text="↶✕" />
+            <Button mnemonicParsing="false" onAction="#borrarTodo" text="↶" />
 
-</HBox>
+        </HBox>
 
+        <!-- Fila 3: operadores -->
+        <HBox alignment="CENTER" spacing="10.0">
 
-    <Button mnemonicParsing="false" onAction="#resultado" prefHeight="25.0" prefWidth="53.0" text="=" />
+            <Button onAction="#seleccionarSuma" text="+" />
 
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
+            <Button onAction="#seleccionarResta" text="-" />
 
+            <Button onAction="#seleccionarMultiplicacion" text="*" />
 
-</VBox>
+            <Button onAction="#seleccionarDivision" text="÷" />
+
+        </HBox>
+
+        <!-- Comprobar -->
+        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#resultado" text="Comprobar" />
+
+    </VBox>
+</StackPane>
