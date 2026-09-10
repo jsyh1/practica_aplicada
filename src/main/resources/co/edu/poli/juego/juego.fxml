@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <StackPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.poli.controller.CalculadoraControler">
 
@@ -20,12 +21,20 @@
         </padding>
 
         <!-- Encabezado -->
-        <VBox alignment="CENTER_LEFT" spacing="2.0">
-            <Label text="All Ten" />
-            <Label text="Reto de hoy" />
-            <Label text="Puntaje:" />
-            <Label fx:id="lblResultado" text="---" />
-        </VBox>
+        <HBox spacing="10.0" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox alignment="CENTER_LEFT" prefHeight="74.0" prefWidth="204.0" spacing="2.0" HBox.hgrow="ALWAYS">
+                    <Label text="All Ten">
+                  <font>
+                     <Font size="23.0" />
+                  </font></Label>
+                    <Label text="Reto de hoy" />
+                    <Label text="Puntaje:" />
+                    <Label fx:id="lblResultado" text="0/10" />
+                </VBox>
+                <Button alignment="CENTER" mnemonicParsing="false" prefHeight="20.0" prefWidth="32.0" text="☰" />
+            </children>
+        </HBox>
 
         <!-- Casillas 1-10 (número + placeholder, sin fx:id nuevo) -->
         <GridPane hgap="10.0" prefHeight="210.0" prefWidth="148.0" vgap="10.0">
