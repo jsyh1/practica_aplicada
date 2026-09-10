@@ -7,6 +7,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 /**
  * Controlador principal de la calculadora.
@@ -38,13 +40,12 @@ public class CalculadoraControler {
 	 * Etiqueta destinada a mostrar el resultado de la operación.
 	 */
 	@FXML
-	private Label lblResultado;
+	private Label lblPuntaje;
 
 	/**
 	 * Almacena temporalmente el operador seleccionado.
 	 */
 	private String operador;
-	
 
 	// =========================
 	// OPERADORES
@@ -236,8 +237,8 @@ public class CalculadoraControler {
 	 */
 	@FXML
 	private void borrarTodo(ActionEvent event) {
-	    txtValor1.setText("");
-	    lblError.setText("");
+		txtValor1.setText("");
+		lblError.setText("");
 	}
 
 	// =========================
@@ -278,4 +279,46 @@ public class CalculadoraControler {
 			lblError.setText(e.getMessage());
 		}
 	}
+	
+
+	/**
+	 * Inicia el mecanismo disponible para compartir la información
+	 * mostrada en la aplicación.
+	 *
+	 * Si existe información para compartir, esta se copia al
+	 * portapapeles del sistema.
+	 *
+	 * Si ocurre un error o no existe un mecanismo compatible,
+	 * se informa al usuario sin detener la aplicación.
+	 */
+	@FXML
+	private void btnCompartir() {
+
+	    try {
+
+	        String resultado = txtValor1.getText();
+
+	        if (resultado == null || resultado.isEmpty()) {
+
+	            lblError.setText("No hay información para compartir");
+	            return;
+	        }
+
+	        String mensaje = "🧮 Resultado: " + resultado;
+
+	        ClipboardContent contenido = new ClipboardContent();
+	        contenido.putString(mensaje);
+
+	        Clipboard.getSystemClipboard().setContent(contenido);
+
+	        lblError.setText("Información preparada para compartir");
+
+	    } catch (Exception e) {
+
+	        lblError.setText(
+	                "No existe un mecanismo compatible para compartir"
+	        );
+	    }
+	}
+	
 }
