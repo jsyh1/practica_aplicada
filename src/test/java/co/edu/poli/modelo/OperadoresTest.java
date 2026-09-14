@@ -1,4 +1,4 @@
-package co.edu.poli.servicios;
+package co.edu.poli.modelo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

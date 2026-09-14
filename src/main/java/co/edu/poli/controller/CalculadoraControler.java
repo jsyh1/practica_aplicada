@@ -1,7 +1,7 @@
 package co.edu.poli.controller;
 
-import co.edu.poli.servicios.Fraccion;
-import co.edu.poli.servicios.Operadores;
+import co.edu.poli.modelo.Fraccion;
+import co.edu.poli.modelo.Operadores;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

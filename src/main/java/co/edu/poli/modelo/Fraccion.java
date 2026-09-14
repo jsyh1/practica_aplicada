@@ -1,4 +1,4 @@
-package co.edu.poli.servicios;
+package co.edu.poli.modelo;
 
 public class Fraccion {
 

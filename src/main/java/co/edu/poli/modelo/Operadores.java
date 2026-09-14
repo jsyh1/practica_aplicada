@@ -1,4 +1,4 @@
-package co.edu.poli.servicios;
+package co.edu.poli.modelo;
 
 /**
  * Clase encargada de procesar y resolver ecuaciones matemáticas.
