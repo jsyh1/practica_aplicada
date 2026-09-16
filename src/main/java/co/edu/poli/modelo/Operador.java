@@ -16,7 +16,7 @@ package co.edu.poli.modelo;
  *
  * <p>No permite el uso de números negativos.</p>
  */
-public class Operadores {
+public class Operador {
 
     private String ecuacion;
     private int posicion;
@@ -26,7 +26,7 @@ public class Operadores {
      *
      * @param ecuacion ecuación que se desea resolver
      */
-    public Operadores(String ecuacion) {
+    public Operador(String ecuacion) {
         this.ecuacion = ecuacion.replace(" ", "");
         this.posicion = 0;
     }

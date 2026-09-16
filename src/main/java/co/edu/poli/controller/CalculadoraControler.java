@@ -1,7 +1,7 @@
 package co.edu.poli.controller;
 
 import co.edu.poli.modelo.Fraccion;
-import co.edu.poli.modelo.Operadores;
+import co.edu.poli.modelo.Operador;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -248,7 +248,7 @@ public class CalculadoraControler {
 	/**
 	 * Calcula la expresión matemática ingresada por el usuario.
 	 *
-	 * Utiliza la clase {@link Operadores} para procesar la expresión y obtener el
+	 * Utiliza la clase {@link Operador} para procesar la expresión y obtener el
 	 * resultado. Posteriormente utiliza la clase {@link Fraccion} para convertir
 	 * los resultados decimales a su representación fraccionaria cuando sea
 	 * necesario.
@@ -265,7 +265,7 @@ public class CalculadoraControler {
 
 		try {
 
-			Operadores op = new Operadores(txtValor1.getText());
+			Operador op = new Operador(txtValor1.getText());
 
 			double resultado = op.calcular();
 

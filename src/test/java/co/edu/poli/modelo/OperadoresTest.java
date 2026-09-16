@@ -16,7 +16,7 @@ public class OperadoresTest {
     @Test
     public void probarSuma() {
 
-        Operadores op = new Operadores("10+5");
+        Operador op = new Operador("10+5");
 
         double resultado = op.calcular();
 
@@ -29,7 +29,7 @@ public class OperadoresTest {
     @Test
     public void probarResta() {
 
-        Operadores op = new Operadores("10-5");
+        Operador op = new Operador("10-5");
 
         double resultado = op.calcular();
 
@@ -42,7 +42,7 @@ public class OperadoresTest {
     @Test
     public void probarMultiplicacion() {
 
-        Operadores op = new Operadores("10*5");
+        Operador op = new Operador("10*5");
 
         double resultado = op.calcular();
 
@@ -55,7 +55,7 @@ public class OperadoresTest {
     @Test
     public void probarDivision() {
 
-        Operadores op = new Operadores("10/5");
+        Operador op = new Operador("10/5");
 
         double resultado = op.calcular();
 
@@ -68,7 +68,7 @@ public class OperadoresTest {
     @Test
     public void probarPrioridadMultiplicacion() {
 
-        Operadores op = new Operadores("10+5*2");
+        Operador op = new Operador("10+5*2");
 
         double resultado = op.calcular();
 
@@ -81,7 +81,7 @@ public class OperadoresTest {
     @Test
     public void probarParentesis() {
 
-        Operadores op = new Operadores("(10+5)*2");
+        Operador op = new Operador("(10+5)*2");
 
         double resultado = op.calcular();
 
@@ -94,7 +94,7 @@ public class OperadoresTest {
     @Test
     public void probarEcuacionCompleta() {
 
-        Operadores op = new Operadores("(10+5)*2-8/4");
+        Operador op = new Operador("(10+5)*2-8/4");
 
         double resultado = op.calcular();
 
@@ -107,7 +107,7 @@ public class OperadoresTest {
     @Test
     public void probarParentesisAnidados() {
 
-        Operadores op = new Operadores("((10+5)*2)");
+        Operador op = new Operador("((10+5)*2)");
 
         double resultado = op.calcular();
 
@@ -121,7 +121,7 @@ public class OperadoresTest {
     @Test
     public void probarNumeroNegativo() {
 
-        Operadores op = new Operadores("-10+5");
+        Operador op = new Operador("-10+5");
 
         assertThrows(
             IllegalArgumentException.class,
@@ -136,7 +136,7 @@ public class OperadoresTest {
     @Test
     public void probarResultadoNegativo() {
 
-        Operadores op = new Operadores("5-10");
+        Operador op = new Operador("5-10");
 
         assertThrows(
             IllegalArgumentException.class,
@@ -150,7 +150,7 @@ public class OperadoresTest {
     @Test
     public void probarDivisionPorCero() {
 
-        Operadores op = new Operadores("10/0");
+        Operador op = new Operador("10/0");
 
         assertThrows(
             ArithmeticException.class,
@@ -164,7 +164,7 @@ public class OperadoresTest {
     @Test
     public void probarParentesisSinCerrar() {
 
-        Operadores op = new Operadores("(10+5");
+        Operador op = new Operador("(10+5");
 
         assertThrows(
             IllegalArgumentException.class,
@@ -178,7 +178,7 @@ public class OperadoresTest {
     @Test
     public void probarEcuacionVacia() {
 
-        Operadores op = new Operadores("");
+        Operador op = new Operador("");
 
         assertThrows(
             IllegalArgumentException.class,
