@@ -1,5 +1,5 @@
 package co.edu.poli.servicios;
 
-public class db {
+public class ConexionDB {
 
 }

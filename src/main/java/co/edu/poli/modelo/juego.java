@@ -1,5 +1,5 @@
 package co.edu.poli.modelo;
 
-public class partida {
+public class juego {
 
 }
