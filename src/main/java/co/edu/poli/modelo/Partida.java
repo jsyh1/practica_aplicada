@@ -4,57 +4,125 @@ import java.time.LocalDate;
 
 public class Partida {
 
-	private String resultado;
-	private LocalDate fechaPartida;
-	private long tiempoEjecucion;
-	private int puntaje;
-	
-	
-	public Partida(String resultado, LocalDate fechaPartida, long tiempoEjecucion, int puntaje) {
-		this.resultado = resultado;
-		this.fechaPartida = fechaPartida;
-		this.tiempoEjecucion = tiempoEjecucion;
-		this.puntaje = puntaje;
-	}
+    private int id;
 
+    private int jugadorId;
 
-	public String getResultado() {
-		return resultado;
-	}
+    private String resultado;
 
+    private LocalDate fechaPartida;
 
-	public void setResultado(String resultado) {
-		this.resultado = resultado;
-	}
+    private long tiempoEjecucion;
 
+    private int puntaje;
 
-	public LocalDate getFechaPartida() {
-		return fechaPartida;
-	}
+    // Guarda el momento exacto en que comienza la partida.
+    // No se guarda en la base de datos.
+    private long inicioPartida;
 
+    /**
+     * Constructor utilizado para crear una nueva partida.
+     * El id lo genera automáticamente la base de datos.
+     */
+    public Partida(int jugadorId, String resultado,
+                   LocalDate fechaPartida,
+                   long tiempoEjecucion, int puntaje) {
 
-	public void setFechaPartida(LocalDate fechaPartida) {// crear clase en servicios para manejar esta fecha
-		this.fechaPartida = fechaPartida;
-	}
+        this.jugadorId = jugadorId;
+        this.resultado = resultado;
+        this.fechaPartida = fechaPartida;
+        this.tiempoEjecucion = tiempoEjecucion;
+        this.puntaje = puntaje;
+    }
 
+    /**
+     * Constructor utilizado cuando la partida
+     * ya existe en la base de datos.
+     */
+    public Partida(int id, int jugadorId, String resultado,
+                   LocalDate fechaPartida,
+                   long tiempoEjecucion, int puntaje) {
 
-	public long getTiempoEjecucion() {
-		return tiempoEjecucion;
-	}
+        this.id = id;
+        this.jugadorId = jugadorId;
+        this.resultado = resultado;
+        this.fechaPartida = fechaPartida;
+        this.tiempoEjecucion = tiempoEjecucion;
+        this.puntaje = puntaje;
+    }
 
+    public int getId() {
+        return id;
+    }
 
-	public void setTiempoEjecucion(long tiempoEjecucion) {//crear clase en servicios para manejar este tiempo de ejecucion
-		this.tiempoEjecucion = tiempoEjecucion;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
+    public int getJugadorId() {
+        return jugadorId;
+    }
 
-	public int getPuntaje() {
-		return puntaje;
-	}
+    public void setJugadorId(int jugadorId) {
+        this.jugadorId = jugadorId;
+    }
 
+    public String getResultado() {
+        return resultado;
+    }
 
-	public void setPuntaje(int puntaje) {
-		this.puntaje = puntaje;
-	}
-	
+    public void setResultado(String resultado) {
+        this.resultado = resultado;
+    }
+
+    public LocalDate getFechaPartida() {
+        return fechaPartida;
+    }
+
+    public void setFechaPartida(LocalDate fechaPartida) {
+        this.fechaPartida = fechaPartida;
+    }
+
+    public long getTiempoEjecucion() {
+        return tiempoEjecucion;
+    }
+
+    public void setTiempoEjecucion(long tiempoEjecucion) {
+        this.tiempoEjecucion = tiempoEjecucion;
+    }
+
+    public int getPuntaje() {
+        return puntaje;
+    }
+
+    public void setPuntaje(int puntaje) {
+        this.puntaje = puntaje;
+    }
+
+    /**
+     * Genera y establece la fecha actual de la partida.
+     */
+    public void generarFechaPartida() {
+        this.fechaPartida = LocalDate.now();
+    }
+
+    /**
+     * Inicia el contador de tiempo de la partida.
+     */
+    public void iniciarTiempo() {
+        this.inicioPartida = System.currentTimeMillis();
+    }
+
+    /**
+     * Calcula el tiempo transcurrido desde el inicio de la partida.
+     *
+     * @return tiempo de ejecución en segundos
+     */
+    public long obtenerTiempoEjecucion() {
+
+        this.tiempoEjecucion =
+                (System.currentTimeMillis() - inicioPartida) / 1000;
+
+        return this.tiempoEjecucion;
+    }
 }
