@@ -1,6 +1,8 @@
 module co.edu.poli.juego {
     requires javafx.controls;
     requires javafx.fxml;
+	requires java.sql;
+	requires io.github.cdimascio.dotenv.java;
 
     opens co.edu.poli.vista to javafx.fxml;
     opens co.edu.poli.controller to javafx.fxml;
