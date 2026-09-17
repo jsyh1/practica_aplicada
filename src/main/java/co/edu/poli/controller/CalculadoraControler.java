@@ -2,6 +2,7 @@ package co.edu.poli.controller;
 
 import co.edu.poli.modelo.Fraccion;
 import co.edu.poli.modelo.Operador;
+import co.edu.poli.modelo.juego;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -9,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.HBox;
 
 /**
  * Controlador principal de la calculadora.
@@ -39,13 +41,114 @@ public class CalculadoraControler {
 	/**
 	 * Etiqueta destinada a mostrar el resultado de la operación.
 	 */
-	@FXML
-	private Label lblPuntaje;
+
 
 	/**
 	 * Almacena temporalmente el operador seleccionado.
 	 */
 	private String operador;
+	private Button primerNumero;
+	private Button segundoNumero;
+
+	// botones de numeros de partida
+
+	@FXML
+	private HBox contenedorNumeros;
+
+	@FXML
+	private Label lblResultado1;
+
+	@FXML
+	private Label lblResultado2;
+
+	@FXML
+	private Label lblResultado3;
+
+	@FXML
+	private Label lblResultado4;
+
+	@FXML
+	private Label lblResultado5;
+
+	@FXML
+	private Label lblResultado6;
+
+	@FXML
+	private Label lblResultado7;
+
+	@FXML
+	private Label lblResultado8;
+
+	@FXML
+	private Label lblResultado9;
+
+	@FXML
+	private Label lblResultado10;
+
+	@FXML
+	private Label lblResultado;
+	
+	@FXML
+	private Button btnSuma;
+
+	@FXML
+	private Button btnResta;
+
+	@FXML
+	private Button btnMultiplicacion;
+
+	@FXML
+	private Button btnDivision;
+
+	@FXML
+	private Button btnParentesisAbre;
+
+	@FXML
+	private Button btnParentesisCierra;
+
+	@FXML
+	private Button btnBorrarUltimo;
+
+	@FXML
+	private Button btnBorrarTodo;
+
+	@FXML
+	private Button btnIgual;
+
+	private juego partida;
+
+	private int[] numerosOriginales;
+	private int puntaje = 0;
+
+	@FXML
+	public void initialize() {
+		puntaje = 0;
+		lblResultado.setText("0/10");
+
+		partida = new juego(new String[9], new int[4]);
+
+		numerosOriginales = partida.generarNumeros();
+		String[] simbolos = partida.generarSimbolos();
+
+		for (int numero : numerosOriginales) {
+
+			Button boton = new Button(String.valueOf(numero));
+
+			boton.setOnAction(this::seleccionarNumero);
+
+			contenedorNumeros.getChildren().add(boton);
+		}
+
+		btnSuma.setText(simbolos[0]);
+		btnResta.setText(simbolos[1]);
+		btnMultiplicacion.setText(simbolos[2]);
+		btnDivision.setText(simbolos[3]);
+		btnParentesisAbre.setText(simbolos[4]);
+		btnParentesisCierra.setText(simbolos[5]);
+		btnIgual.setText(simbolos[6]);
+		btnBorrarUltimo.setText(simbolos[7]);
+		btnBorrarTodo.setText(simbolos[8]);
+	}
 
 	// =========================
 	// OPERADORES
@@ -61,13 +164,11 @@ public class CalculadoraControler {
 
 		operador = "+";
 
-		Button boton = (Button) event.getSource();
-
-		String suma = boton.getText();
-
 		lblError.setText("");
 
-		agregarTexto(suma);
+		if (primerNumero != null) {
+			txtValor1.setText(primerNumero.getText() + operador);
+		}
 	}
 
 	/**
@@ -80,13 +181,11 @@ public class CalculadoraControler {
 
 		operador = "-";
 
-		Button boton = (Button) event.getSource();
-
-		String resta = boton.getText();
-
 		lblError.setText("");
 
-		agregarTexto(resta);
+		if (primerNumero != null) {
+			txtValor1.setText(primerNumero.getText() + operador);
+		}
 	}
 
 	/**
@@ -99,13 +198,11 @@ public class CalculadoraControler {
 
 		operador = "*";
 
-		Button boton = (Button) event.getSource();
-
-		String multiplicacion = boton.getText();
-
 		lblError.setText("");
 
-		agregarTexto(multiplicacion);
+		if (primerNumero != null) {
+			txtValor1.setText(primerNumero.getText() + operador);
+		}
 	}
 
 	/**
@@ -116,15 +213,13 @@ public class CalculadoraControler {
 	@FXML
 	private void seleccionarDivision(ActionEvent event) {
 
-		operador = "÷";
-
-		Button boton = (Button) event.getSource();
-
-		String divicion = boton.getText();
+		operador = "/";
 
 		lblError.setText("");
 
-		agregarTexto(divicion);
+		if (primerNumero != null) {
+			txtValor1.setText(primerNumero.getText() + operador);
+		}
 	}
 
 	// =========================
@@ -200,11 +295,20 @@ public class CalculadoraControler {
 
 		Button boton = (Button) event.getSource();
 
-		String numero = boton.getText();
-
 		lblError.setText("");
 
-		agregarTexto(numero);
+		if (primerNumero == null) {
+
+			primerNumero = boton;
+
+			txtValor1.setText(boton.getText());
+
+		} else if (segundoNumero == null && boton != primerNumero) {
+
+			segundoNumero = boton;
+
+			txtValor1.setText(primerNumero.getText() + operador + segundoNumero.getText());
+		}
 	}
 
 	// =========================
@@ -220,16 +324,30 @@ public class CalculadoraControler {
 	@FXML
 	private void borrarUltimo() {
 
-		String actual = txtValor1.getText();
+	    String actual = txtValor1.getText();
 
-		if (!actual.isEmpty()) {
+	    if (actual.isEmpty()) {
+	        return;
+	    }
 
-			txtValor1.setText(actual.substring(0, actual.length() - 1));
-		}
+	    // Borrar el último carácter visualmente
+	    txtValor1.setText(actual.substring(0, actual.length() - 1));
 
-		lblError.setText("");
+	    // Si había un segundo número seleccionado, se deselecciona
+	    if (segundoNumero != null) {
+	        segundoNumero = null;
+	    }
+	    // Si no hay segundo número, se elimina el operador
+	    else if (operador != null) {
+	        operador = null;
+	    }
+	    // Si no hay operador, se elimina el primer número
+	    else if (primerNumero != null) {
+	        primerNumero = null;
+	    }
+
+	    lblError.setText("");
 	}
-
 	/**
 	 * Borra todo el contenido del campo de texto y limpia el mensaje de error.
 	 *
@@ -237,8 +355,33 @@ public class CalculadoraControler {
 	 */
 	@FXML
 	private void borrarTodo(ActionEvent event) {
+
+	    txtValor1.setText("");
+	    lblError.setText("");
+
+	    primerNumero = null;
+	    segundoNumero = null;
+	    operador = null;
+	}
+
+	private void reiniciarNumeros() {
+
+		contenedorNumeros.getChildren().clear();
+
+		for (int numero : numerosOriginales) {
+
+			Button boton = new Button(String.valueOf(numero));
+
+			boton.setOnAction(this::seleccionarNumero);
+
+			contenedorNumeros.getChildren().add(boton);
+		}
+
+		primerNumero = null;
+		segundoNumero = null;
+		operador = null;
+
 		txtValor1.setText("");
-		lblError.setText("");
 	}
 
 	// =========================
@@ -260,65 +403,126 @@ public class CalculadoraControler {
 	 * @throws ArithmeticException      si se intenta realizar una división entre
 	 *                                  cero
 	 */
+
 	@FXML
 	private void resultado() {
 
-		try {
+	    if (primerNumero == null || segundoNumero == null || operador == null) {
+	        lblError.setText("Seleccione dos números y un operador");
+	        return;
+	    }
 
-			Operador op = new Operador(txtValor1.getText());
+	    try {
 
-			double resultado = op.calcular();
+	        String expresion = primerNumero.getText() + operador + segundoNumero.getText();
 
-			String str = Fraccion.convertir(resultado);
+	        Operador op = new Operador(expresion);
+	        double resultado = op.calcular();
 
-			txtValor1.setText(str);
-			lblError.setText("");
+	        String resultadoTexto = Fraccion.convertir(resultado);
 
-		} catch (IllegalArgumentException | ArithmeticException e) {
+	        // Crear el botón con CUALQUIER resultado válido
+	        Button botonResultado = new Button(resultadoTexto);
+	        botonResultado.setOnAction(this::seleccionarNumero);
 
-			lblError.setText(e.getMessage());
-		}
+	        // Eliminar los dos números utilizados
+	        contenedorNumeros.getChildren().remove(primerNumero);
+	        contenedorNumeros.getChildren().remove(segundoNumero);
+
+	        // Agregar el resultado
+	        contenedorNumeros.getChildren().add(botonResultado);
+
+	        // Limpiar expresión
+	        txtValor1.setText("");
+	        lblError.setText("");
+
+	        // Limpiar selección
+	        primerNumero = null;
+	        segundoNumero = null;
+	        operador = null;
+
+	        /*
+	         * SOLAMENTE cuando queda un botón
+	         * se valida si el resultado final está entre 1 y 10.
+	         */
+	        if (contenedorNumeros.getChildren().size() == 1) {
+
+	            if (resultado >= 1 &&
+	                resultado <= 10 &&
+	                resultado == Math.floor(resultado)) {
+
+	                int resultadoFinal = (int) resultado;
+
+	                // Resultado correcto
+	                puntaje++;
+	                lblResultado.setText(puntaje + "/10");
+
+	                marcarResultado(resultadoFinal);
+
+	                reiniciarNumeros();
+
+	            } else {
+
+	                // Resultado final incorrecto
+	                lblError.setText("No es un número correcto para resultado");
+
+	                reiniciarNumeros();
+	            }
+	        }
+
+	    } catch (IllegalArgumentException | ArithmeticException e) {
+
+	        // Por ejemplo: resultado negativo no permitido
+	        lblError.setText(e.getMessage());
+	    }
 	}
-	
+
+	private void marcarResultado(int resultado) {
+
+		Label[] etiquetas = { lblResultado1, lblResultado2, lblResultado3, lblResultado4, lblResultado5, lblResultado6,
+				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
+
+		etiquetas[resultado - 1].setText(String.valueOf(resultado));
+
+		etiquetas[resultado - 1].setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+	}
 
 	/**
-	 * Inicia el mecanismo disponible para compartir la información
-	 * mostrada en la aplicación.
+	 * Inicia el mecanismo disponible para compartir la información mostrada en la
+	 * aplicación.
 	 *
-	 * Si existe información para compartir, esta se copia al
-	 * portapapeles del sistema.
+	 * Si existe información para compartir, esta se copia al portapapeles del
+	 * sistema.
 	 *
-	 * Si ocurre un error o no existe un mecanismo compatible,
-	 * se informa al usuario sin detener la aplicación.
+	 * Si ocurre un error o no existe un mecanismo compatible, se informa al usuario
+	 * sin detener la aplicación.
 	 */
 	@FXML
 	private void btnCompartir() {
 
-	    try {
+		try {
 
-	        String resultado = txtValor1.getText();
+			String resultado = txtValor1.getText();
 
-	        if (resultado == null || resultado.isEmpty()) {
+			if (resultado == null || resultado.isEmpty()) {
 
-	            lblError.setText("No hay información para compartir");
-	            return;
-	        }
+				lblError.setText("No hay información para compartir");
+				return;
+			}
 
-	        String mensaje = "🧮 Resultado: " + resultado;
+			String mensaje = "🧮 Resultado: " + resultado;
 
-	        ClipboardContent contenido = new ClipboardContent();
-	        contenido.putString(mensaje);
+			ClipboardContent contenido = new ClipboardContent();
+			contenido.putString(mensaje);
 
-	        Clipboard.getSystemClipboard().setContent(contenido);
+			Clipboard.getSystemClipboard().setContent(contenido);
 
-	        lblError.setText("Información preparada para compartir");
+			lblError.setText("Información preparada para compartir");
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        lblError.setText(
-	                "No existe un mecanismo compatible para compartir"
-	        );
-	    }
+			lblError.setText("No existe un mecanismo compatible para compartir");
+		}
 	}
-	
+
 }
