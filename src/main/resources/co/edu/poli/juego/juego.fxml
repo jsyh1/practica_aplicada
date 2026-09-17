@@ -29,6 +29,7 @@
                      <Font size="23.0" />
                   </font></Label>
                     <Label text="Reto de hoy" />
+               <Label fx:id="lblFecha" />
                     <Label text="Puntaje:" />
                     <Label fx:id="lblResultado" text="0/10" />
                 </VBox>
@@ -111,54 +112,38 @@
 
 <!-- Fila 1: números -->
 
-<HBox fx:id="contenedorNumeros"
-      alignment="CENTER"
-      spacing="10.0" />
+<HBox fx:id="contenedorNumeros" alignment="CENTER" spacing="10.0" />
 
         <!-- Fila 2: paréntesis y borrado -->
         <HBox alignment="CENTER" spacing="10.0">
 
-<Button fx:id="btnParentesisAbre"
-        onAction="#seleccionarParentesisAbierto"
-        text="(" />
+<Button fx:id="btnParentesisAbre" onAction="#seleccionarParentesisAbierto" text="(" />
 
-<Button fx:id="btnParentesisCierra"
-        onAction="#seleccionarParentesisCerrado"
-        text=")" />
+<Button fx:id="btnParentesisCierra" onAction="#seleccionarParentesisCerrado" text=")" />
 
 
-            <Button mnemonicParsing="false" fx:id="btnBorrarUltimo" onAction="#borrarUltimo" text="⌫" />
+            <Button fx:id="btnBorrarUltimo" mnemonicParsing="false" onAction="#borrarUltimo" text="⌫" />
 
-            <Button mnemonicParsing="false" fx:id="btnBorrarTodo" onAction="#borrarTodo" text="↶" />
+            <Button fx:id="btnBorrarTodo" mnemonicParsing="false" onAction="#borrarTodo" text="↶" />
 
         </HBox>
 
         <!-- Fila 3: operadores -->
         <HBox alignment="CENTER" spacing="10.0">
 
-            <Button fx:id="btnSuma"
-        onAction="#seleccionarSuma"
-        text="+" />
+            <Button fx:id="btnSuma" onAction="#seleccionarSuma" text="+" />
 
-<Button fx:id="btnResta"
-        onAction="#seleccionarResta"
-        text="-" />
+<Button fx:id="btnResta" onAction="#seleccionarResta" text="-" />
 
-<Button fx:id="btnMultiplicacion"
-        onAction="#seleccionarMultiplicacion"
-        text="*" />
+<Button fx:id="btnMultiplicacion" onAction="#seleccionarMultiplicacion" text="*" />
 
-<Button fx:id="btnDivision"
-        onAction="#seleccionarDivision"
-        text="÷" />
+<Button fx:id="btnDivision" onAction="#seleccionarDivision" text="÷" />
 
         </HBox>
 
         <!-- Comprobar -->
 
-<Button fx:id="btnIgual"
-        onAction="#resultado"
-        text="=" />
+<Button fx:id="btnIgual" onAction="#resultado" text="=" />
 
     </VBox>
 </StackPane>

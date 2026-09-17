@@ -1,7 +1,11 @@
 package co.edu.poli.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import co.edu.poli.modelo.Fraccion;
 import co.edu.poli.modelo.Operador;
+import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.juego;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -54,6 +58,9 @@ public class CalculadoraControler {
 
 	@FXML
 	private HBox contenedorNumeros;
+
+	@FXML
+	private Label lblFecha;
 
 	@FXML
 	private Label lblResultado1;
@@ -115,10 +122,13 @@ public class CalculadoraControler {
 	@FXML
 	private Button btnIgual;
 
+	
+
 	private juego partida;
 
 	private int[] numerosOriginales;
 	private int puntaje = 0;
+    private Partida partidaActual;
 
 	@FXML
 	public void initialize() {
@@ -129,6 +139,15 @@ public class CalculadoraControler {
 
 		numerosOriginales = partida.generarNumeros();
 		String[] simbolos = partida.generarSimbolos();
+
+
+		//Mostrar fecha Actual
+		partidaActual = new Partida(0, "", LocalDate.now(), 0, 0);
+    	partidaActual.generarFechaPartida();
+		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String fechaTexto = partidaActual.getFechaPartida().format(formato);
+		lblFecha.setText(fechaTexto);
+
 
 		for (int numero : numerosOriginales) {
 
@@ -149,6 +168,8 @@ public class CalculadoraControler {
 		btnBorrarUltimo.setText(simbolos[7]);
 		btnBorrarTodo.setText(simbolos[8]);
 	}
+
+
 
 	// =========================
 	// OPERADORES
