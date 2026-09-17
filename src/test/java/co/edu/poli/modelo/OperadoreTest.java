@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Pruebas unitarias para la clase Operadores.
  */
-public class OperadoresTest {
+public class OperadoreTest {
 
     /**
      * Prueba la suma de dos números.
