@@ -32,6 +32,9 @@ public class DaoScoreImplementado implements PartidaDAO {
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
+        	System.out.println("ID jugador que recibe la partida: "
+        	        + objeto.getJugadorId());
+
             ps.setInt(1, objeto.getJugadorId());
 
             ps.setDouble(

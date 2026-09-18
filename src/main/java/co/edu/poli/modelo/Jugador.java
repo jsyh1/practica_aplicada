@@ -1,6 +1,6 @@
 package co.edu.poli.modelo;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * Representa un jugador registrado en el sistema.
@@ -12,7 +12,7 @@ public class Jugador {
 
     private int id;
 
-    private LocalDateTime fechaPartida;
+    private LocalDate fechaPartida;
 
     /**
      * Constructor del jugador.
@@ -20,7 +20,7 @@ public class Jugador {
      * @param id identificador del jugador
      * @param fechaPartida fecha y hora de registro de la partida
      */
-    public Jugador(int id, LocalDateTime fechaPartida) {
+    public Jugador(int id, LocalDate fechaPartida) {
         this.id = id;
         this.fechaPartida = fechaPartida;
     }
@@ -33,11 +33,11 @@ public class Jugador {
         this.id = id;
     }
 
-    public LocalDateTime getFechaPartida() {
+    public LocalDate getFechaPartida() {
         return fechaPartida;
     }
 
-    public void setFechaPartida(LocalDateTime fechaPartida) {
+    public void setFechaPartida(LocalDate fechaPartida) {
         this.fechaPartida = fechaPartida;
     }
 }

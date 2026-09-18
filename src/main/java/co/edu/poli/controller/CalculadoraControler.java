@@ -134,13 +134,17 @@ public class CalculadoraControler {
 	private int puntaje = 0;
 	private Partida partidaActual;
 	private Jugador jugadorActual;
-	
+
 	@FXML
 	public void initialize() {
-		DaoJugadorImplementado jugador = new  DaoJugadorImplementado();
-		
-		jugadorActual.setFechaPartida(null);
-		
+		DaoJugadorImplementado j = new DaoJugadorImplementado();
+
+		jugadorActual = new Jugador(0, LocalDate.now());
+
+		if (j.crear(jugadorActual)) {
+
+			System.out.println("Jugador creado con ID: " + jugadorActual.getId());
+		}
 		puntaje = 0;
 		lblResultado.setText("0/10");
 
@@ -150,7 +154,7 @@ public class CalculadoraControler {
 		String[] simbolos = partida.generarSimbolos();
 
 		// Mostrar fecha Actual
-		partidaActual = new Partida(0, "", LocalDate.now(), 0, 0);
+		partidaActual = new Partida(jugadorActual.getId(), "", LocalDate.now(), 0, 0);
 		partidaActual.generarFechaPartida();
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String fechaTexto = partidaActual.getFechaPartida().format(formato);
