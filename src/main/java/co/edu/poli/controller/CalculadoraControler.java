@@ -2,7 +2,7 @@ package co.edu.poli.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
+import java.util.List;
 import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoScoreImplementado;
 import co.edu.poli.dao.PartidaDAO;
@@ -14,6 +14,7 @@ import co.edu.poli.modelo.juego;
 import co.edu.poli.servicios.ConexionDB;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -154,8 +155,18 @@ public class CalculadoraControler {
 		String[] simbolos = partida.generarSimbolos();
 
 		// Mostrar fecha Actual
-		partidaActual = new Partida(jugadorActual.getId(), "", LocalDate.now(), 0, 0);
+		partidaActual = new Partida(jugadorActual.getId(), "0", LocalDate.now(), 0, 0);
+
 		partidaActual.generarFechaPartida();
+		partidaActual.iniciarTiempo();
+
+		DaoScoreImplementado daoPartida = new DaoScoreImplementado();
+
+		boolean partidaCreada = daoPartida.crear(partidaActual);
+
+		if (!partidaCreada) {
+			lblError.setText("No se pudo crear la partida");
+		}
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String fechaTexto = partidaActual.getFechaPartida().format(formato);
 		lblFecha.setText(fechaTexto);
@@ -215,6 +226,27 @@ public class CalculadoraControler {
 
 		if (primerNumero != null) {
 			txtValor1.setText(primerNumero.getText() + operador);
+		}
+	}
+
+	private void finalizarPartida() {
+
+		partidaActual.setTiempoEjecucion(partidaActual.obtenerTiempoEjecucion());
+
+		partidaActual.setPuntaje(puntaje);
+
+		DaoScoreImplementado dao = new DaoScoreImplementado();
+
+		boolean actualizada = dao.actualizar(partidaActual);
+
+		if (actualizada) {
+			System.out.println("Partida finalizada. ID: " + partidaActual.getId());
+
+			System.out.println("Puntaje final: " + puntaje);
+
+			System.out.println("Tiempo: " + partidaActual.getTiempoEjecucion() + " segundos");
+		} else {
+			lblError.setText("No se pudo finalizar la partida");
 		}
 	}
 
@@ -484,21 +516,29 @@ public class CalculadoraControler {
 
 					// Resultado correcto
 					puntaje++;
+
 					lblResultado.setText(puntaje + "/10");
 
 					marcarResultado(resultadoFinal);
 
-					reiniciarNumeros();
-
-					DaoScoreImplementado dao = new DaoScoreImplementado();
-
 					partidaActual.setResultado(String.valueOf(resultadoFinal));
 					partidaActual.setPuntaje(puntaje);
 
-					boolean guardada = dao.crear(partidaActual);
+					if (puntaje == 10) {
 
-					if (!guardada) {
-						lblError.setText("No se pudo guardar la partida");
+						finalizarPartida();
+
+					} else {
+
+						DaoScoreImplementado dao = new DaoScoreImplementado();
+
+						boolean actualizada = dao.actualizar(partidaActual);
+
+						if (!actualizada) {
+							lblError.setText("No se pudo actualizar la partida");
+						}
+
+						reiniciarNumeros();
 					}
 				} else {
 
@@ -514,6 +554,61 @@ public class CalculadoraControler {
 			// Por ejemplo: resultado negativo no permitido
 			lblError.setText(e.getMessage());
 		}
+	}
+
+	@FXML
+	private void consultarPartida() {
+
+	    DaoScoreImplementado dao = new DaoScoreImplementado();
+
+	    List<Partida> partidas = dao.ultimasPartidas(5);
+
+	    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	    alert.setTitle("Consulta de partidas");
+	    alert.setHeaderText("Partidas registradas");
+
+	    if (partidas.isEmpty()) {
+
+	        alert.setContentText("No hay partidas registradas.");
+
+	    } else {
+
+	        StringBuilder texto = new StringBuilder();
+
+	        for (Partida p : partidas) {
+
+	            texto.append("ID: ")
+	                 .append(p.getId())
+	                 .append("\n");
+
+	            texto.append("Jugador: ")
+	                 .append(p.getJugadorId())
+	                 .append("\n");
+
+	            texto.append("Fecha: ")
+	                 .append(p.getFechaPartida())
+	                 .append("\n");
+
+	            texto.append("Resultado: ")
+	                 .append(p.getResultado())
+	                 .append("\n");
+
+	            texto.append("Puntaje: ")
+	                 .append(p.getPuntaje())
+	                 .append("\n");
+
+	            texto.append("Tiempo: ")
+	                 .append(p.getTiempoEjecucion())
+	                 .append(" segundos")
+	                 .append("\n");
+
+	            texto.append("----------------------------\n");
+	        }
+
+	        alert.setContentText(texto.toString());
+	    }
+
+	    alert.showAndWait();
 	}
 
 	private void marcarResultado(int resultado) {

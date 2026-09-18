@@ -1,3 +1,4 @@
+
 package co.edu.poli.dao;
 
 import java.sql.Connection;
@@ -6,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Time;
+import java.sql.Statement;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,234 +17,240 @@ import co.edu.poli.servicios.ConexionDB;
 
 public class DaoScoreImplementado implements PartidaDAO {
 
-    private final Connection conexion;
+	private final Connection conexion;
 
-    public DaoScoreImplementado() {
-        conexion = ConexionDB.getInstancia().getConexion();
-    }
+	public DaoScoreImplementado() {
+		conexion = ConexionDB.getInstancia().getConexion();
+		
+		
+	}
+	@Override
+	public List<Partida> ultimasPartidas(int cantidad) {
 
-    @Override
-    public boolean crear(Partida objeto) {
+	    List<Partida> partidas = new ArrayList<>();
 
-        String sql = """
-                INSERT INTO partida
-                (jugador_id, resultado, fecha, tiempo, puntaje)
-                VALUES (?, ?, ?, ?, ?)
-                """;
+	    String sql = """
+	            SELECT *
+	            FROM partida
+	            ORDER BY id DESC
+	            LIMIT ?
+	            """;
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+	    try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-        	System.out.println("ID jugador que recibe la partida: "
-        	        + objeto.getJugadorId());
+	        ps.setInt(1, cantidad);
 
-            ps.setInt(1, objeto.getJugadorId());
+	        try (ResultSet rs = ps.executeQuery()) {
 
-            ps.setDouble(
-                2,
-                Double.parseDouble(objeto.getResultado())
-            );
+	            while (rs.next()) {
 
-            ps.setTimestamp(
-                3,
-                Timestamp.valueOf(
-                    objeto.getFechaPartida().atStartOfDay()
-                )
-            );
+	                Partida partida = new Partida(
+	                        rs.getInt("id"),
+	                        rs.getInt("jugador_id"),
+	                        String.valueOf(rs.getDouble("resultado")),
+	                        rs.getTimestamp("fecha")
+	                                .toLocalDateTime()
+	                                .toLocalDate(),
+	                        rs.getTime("tiempo")
+	                                .toLocalTime()
+	                                .toSecondOfDay(),
+	                        rs.getInt("puntaje")
+	                );
 
-            ps.setTime(
-                4,
-                Time.valueOf(
-                    LocalTime.ofSecondOfDay(
-                        objeto.getTiempoEjecucion()
-                    )
-                )
-            );
+	                partidas.add(partida);
+	            }
+	        }
 
-            ps.setInt(5, objeto.getPuntaje());
+	    } catch (SQLException e) {
+	        System.out.println("Error al consultar últimas partidas: "
+	                + e.getMessage());
+	    }
 
-            return ps.executeUpdate() > 0;
+	    return partidas;
+	}
+	@Override
+	public boolean crear(Partida objeto) {
 
-        } catch (SQLException | NumberFormatException e) {
+		String sql = """
+				INSERT INTO partida
+				(jugador_id, resultado, fecha, tiempo, puntaje)
+				VALUES (?, ?, ?, ?, ?)
+				""";
 
-            System.out.println(
-                "Error al crear partida: " + e.getMessage()
-            );
+		try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            return false;
-        }
-    }
+			System.out.println("ID jugador que recibe la partida: " + objeto.getJugadorId());
 
-    @Override
-    public List<Partida> listar() {
+			ps.setInt(1, objeto.getJugadorId());
 
-        List<Partida> partidas = new ArrayList<>();
+			ps.setDouble(2, Double.parseDouble(objeto.getResultado()));
 
-        String sql = "SELECT * FROM partida";
+			ps.setTimestamp(3, Timestamp.valueOf(objeto.getFechaPartida().atStartOfDay()));
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+			ps.setTime(4, Time.valueOf(LocalTime.ofSecondOfDay(objeto.getTiempoEjecucion())));
 
-            while (rs.next()) {
+			ps.setInt(5, objeto.getPuntaje());
 
-                Partida partida = new Partida(
+			int filas = ps.executeUpdate();
 
-                    rs.getInt("id"),
+			if (filas > 0) {
 
-                    rs.getInt("jugador_id"),
+				try (ResultSet rs = ps.getGeneratedKeys()) {
 
-                    String.valueOf(
-                        rs.getDouble("resultado")
-                    ),
+					if (rs.next()) {
 
-                    rs.getTimestamp("fecha")
-                        .toLocalDateTime()
-                        .toLocalDate(),
+						int idGenerado = rs.getInt(1);
 
-                    rs.getTime("tiempo")
-                        .toLocalTime()
-                        .toSecondOfDay(),
+						objeto.setId(idGenerado);
 
-                    rs.getInt("puntaje")
-                );
+						System.out.println("Partida creada con ID: " + idGenerado);
+					}
+				}
 
-                partidas.add(partida);
-            }
+				return true;
+			}
 
-        } catch (SQLException e) {
+		} catch (SQLException | NumberFormatException e) {
 
-            System.out.println(
-                "Error al listar partidas: " + e.getMessage()
-            );
-        }
+			System.out.println("Error al crear partida: " + e.getMessage());
+		}
 
-        return partidas;
-    }
+		return false;
+	}
 
-    @Override
-    public Partida buscarPorId(int id) {
+	@Override
+	public List<Partida> listar() {
 
-        String sql = """
-                SELECT *
-                FROM partida
-                WHERE id = ?
-                """;
+		List<Partida> partidas = new ArrayList<>();
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+		String sql = "SELECT * FROM partida";
 
-            ps.setInt(1, id);
+		try (PreparedStatement ps = conexion.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
-            try (ResultSet rs = ps.executeQuery()) {
+			while (rs.next()) {
 
-                if (rs.next()) {
+				Partida partida = new Partida(
 
-                    return new Partida(
+						rs.getInt("id"),
 
-                        rs.getInt("id"),
+						rs.getInt("jugador_id"),
 
-                        rs.getInt("jugador_id"),
+						String.valueOf(rs.getDouble("resultado")),
 
-                        String.valueOf(
-                            rs.getDouble("resultado")
-                        ),
+						rs.getTimestamp("fecha").toLocalDateTime().toLocalDate(),
 
-                        rs.getTimestamp("fecha")
-                            .toLocalDateTime()
-                            .toLocalDate(),
+						rs.getTime("tiempo").toLocalTime().toSecondOfDay(),
 
-                        rs.getTime("tiempo")
-                            .toLocalTime()
-                            .toSecondOfDay(),
+						rs.getInt("puntaje"));
 
-                        rs.getInt("puntaje")
-                    );
-                }
-            }
+				partidas.add(partida);
+			}
 
-        } catch (SQLException e) {
+		} catch (SQLException e) {
 
-            System.out.println(
-                "Error al buscar partida: " + e.getMessage()
-            );
-        }
+			System.out.println("Error al listar partidas: " + e.getMessage());
+		}
 
-        return null;
-    }
+		return partidas;
+	}
 
-    @Override
-    public boolean actualizar(Partida objeto) {
+	@Override
+	public Partida buscarPorId(int id) {
 
-        String sql = """
-                UPDATE partida
-                SET jugador_id = ?,
-                    resultado = ?,
-                    fecha = ?,
-                    tiempo = ?,
-                    puntaje = ?
-                WHERE id = ?
-                """;
+		String sql = """
+				SELECT *
+				FROM partida
+				WHERE id = ?
+				""";
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+		try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-            ps.setInt(1, objeto.getJugadorId());
+			ps.setInt(1, id);
 
-            ps.setDouble(
-                2,
-                Double.parseDouble(objeto.getResultado())
-            );
+			try (ResultSet rs = ps.executeQuery()) {
 
-            ps.setTimestamp(
-                3,
-                Timestamp.valueOf(
-                    objeto.getFechaPartida().atStartOfDay()
-                )
-            );
+				if (rs.next()) {
 
-            ps.setTime(
-                4,
-                Time.valueOf(
-                    LocalTime.ofSecondOfDay(
-                        objeto.getTiempoEjecucion()
-                    )
-                )
-            );
+					return new Partida(
 
-            ps.setInt(5, objeto.getPuntaje());
+							rs.getInt("id"),
 
-            ps.setInt(6, objeto.getId());
+							rs.getInt("jugador_id"),
 
-            return ps.executeUpdate() > 0;
+							String.valueOf(rs.getDouble("resultado")),
 
-        } catch (SQLException | NumberFormatException e) {
+							rs.getTimestamp("fecha").toLocalDateTime().toLocalDate(),
 
-            System.out.println(
-                "Error al actualizar partida: " + e.getMessage()
-            );
+							rs.getTime("tiempo").toLocalTime().toSecondOfDay(),
 
-            return false;
-        }
-    }
+							rs.getInt("puntaje"));
+				}
+			}
 
-    @Override
-    public boolean eliminar(int id) {
+		} catch (SQLException e) {
 
-        String sql = """
-                DELETE FROM partida
-                WHERE id = ?
-                """;
+			System.out.println("Error al buscar partida: " + e.getMessage());
+		}
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+		return null;
+	}
 
-            ps.setInt(1, id);
+	@Override
+	public boolean actualizar(Partida objeto) {
 
-            return ps.executeUpdate() > 0;
+		String sql = """
+				UPDATE partida
+				SET jugador_id = ?,
+				    resultado = ?,
+				    fecha = ?,
+				    tiempo = ?,
+				    puntaje = ?
+				WHERE id = ?
+				""";
 
-        } catch (SQLException e) {
+		try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-            System.out.println(
-                "Error al eliminar partida: " + e.getMessage()
-            );
+			ps.setInt(1, objeto.getJugadorId());
 
-            return false;
-        }
-    }
+			ps.setDouble(2, Double.parseDouble(objeto.getResultado()));
+
+			ps.setTimestamp(3, Timestamp.valueOf(objeto.getFechaPartida().atStartOfDay()));
+
+			ps.setTime(4, Time.valueOf(LocalTime.ofSecondOfDay(objeto.getTiempoEjecucion())));
+
+			ps.setInt(5, objeto.getPuntaje());
+
+			ps.setInt(6, objeto.getId());
+
+			return ps.executeUpdate() > 0;
+
+		} catch (SQLException | NumberFormatException e) {
+
+			System.out.println("Error al actualizar partida: " + e.getMessage());
+
+			return false;
+		}
+	}
+
+	@Override
+	public boolean eliminar(int id) {
+
+		String sql = """
+				DELETE FROM partida
+				WHERE id = ?
+				""";
+
+		try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+			ps.setInt(1, id);
+
+			return ps.executeUpdate() > 0;
+
+		} catch (SQLException e) {
+
+			System.out.println("Error al eliminar partida: " + e.getMessage());
+
+			return false;
+		}
+	}
 }
