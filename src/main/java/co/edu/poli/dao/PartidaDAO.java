@@ -1,5 +1,7 @@
 package co.edu.poli.dao;
 
+import java.util.List;
+
 import co.edu.poli.modelo.Partida;
 
 /**
@@ -10,5 +12,5 @@ import co.edu.poli.modelo.Partida;
  */
 
 public interface PartidaDAO extends DAO<Partida> {
-
+	List<Partida> ultimasPartidas(int cantidad);
 }
