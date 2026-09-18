@@ -47,7 +47,7 @@ public class ConexionDB {
 	 * la conexión con la base de datos.
 	 * </p>
 	 */
-	private ConexionDB() {
+	public ConexionDB() {
 		conectar();
 	}
 
