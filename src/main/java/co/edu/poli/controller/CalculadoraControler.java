@@ -3,10 +3,15 @@ package co.edu.poli.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import co.edu.poli.dao.DaoJugadorImplementado;
+import co.edu.poli.dao.DaoScoreImplementado;
+import co.edu.poli.dao.PartidaDAO;
 import co.edu.poli.modelo.Fraccion;
+import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Operador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.juego;
+import co.edu.poli.servicios.ConexionDB;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -36,6 +41,8 @@ public class CalculadoraControler {
 	@FXML
 	private TextField txtValor1;
 
+	ConexionDB db = new ConexionDB();
+
 	/**
 	 * Etiqueta utilizada para mostrar mensajes de error al usuario.
 	 */
@@ -45,7 +52,6 @@ public class CalculadoraControler {
 	/**
 	 * Etiqueta destinada a mostrar el resultado de la operación.
 	 */
-
 
 	/**
 	 * Almacena temporalmente el operador seleccionado.
@@ -94,7 +100,7 @@ public class CalculadoraControler {
 
 	@FXML
 	private Label lblResultado;
-	
+
 	@FXML
 	private Button btnSuma;
 
@@ -122,16 +128,19 @@ public class CalculadoraControler {
 	@FXML
 	private Button btnIgual;
 
-	
-
 	private juego partida;
 
 	private int[] numerosOriginales;
 	private int puntaje = 0;
-    private Partida partidaActual;
-
+	private Partida partidaActual;
+	private Jugador jugadorActual;
+	
 	@FXML
 	public void initialize() {
+		DaoJugadorImplementado jugador = new  DaoJugadorImplementado();
+		
+		jugadorActual.setFechaPartida(null);
+		
 		puntaje = 0;
 		lblResultado.setText("0/10");
 
@@ -140,14 +149,12 @@ public class CalculadoraControler {
 		numerosOriginales = partida.generarNumeros();
 		String[] simbolos = partida.generarSimbolos();
 
-
-		//Mostrar fecha Actual
+		// Mostrar fecha Actual
 		partidaActual = new Partida(0, "", LocalDate.now(), 0, 0);
-    	partidaActual.generarFechaPartida();
+		partidaActual.generarFechaPartida();
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String fechaTexto = partidaActual.getFechaPartida().format(formato);
 		lblFecha.setText(fechaTexto);
-
 
 		for (int numero : numerosOriginales) {
 
@@ -168,8 +175,6 @@ public class CalculadoraControler {
 		btnBorrarUltimo.setText(simbolos[7]);
 		btnBorrarTodo.setText(simbolos[8]);
 	}
-
-
 
 	// =========================
 	// OPERADORES
@@ -345,30 +350,31 @@ public class CalculadoraControler {
 	@FXML
 	private void borrarUltimo() {
 
-	    String actual = txtValor1.getText();
+		String actual = txtValor1.getText();
 
-	    if (actual.isEmpty()) {
-	        return;
-	    }
+		if (actual.isEmpty()) {
+			return;
+		}
 
-	    // Borrar el último carácter visualmente
-	    txtValor1.setText(actual.substring(0, actual.length() - 1));
+		// Borrar el último carácter visualmente
+		txtValor1.setText(actual.substring(0, actual.length() - 1));
 
-	    // Si había un segundo número seleccionado, se deselecciona
-	    if (segundoNumero != null) {
-	        segundoNumero = null;
-	    }
-	    // Si no hay segundo número, se elimina el operador
-	    else if (operador != null) {
-	        operador = null;
-	    }
-	    // Si no hay operador, se elimina el primer número
-	    else if (primerNumero != null) {
-	        primerNumero = null;
-	    }
+		// Si había un segundo número seleccionado, se deselecciona
+		if (segundoNumero != null) {
+			segundoNumero = null;
+		}
+		// Si no hay segundo número, se elimina el operador
+		else if (operador != null) {
+			operador = null;
+		}
+		// Si no hay operador, se elimina el primer número
+		else if (primerNumero != null) {
+			primerNumero = null;
+		}
 
-	    lblError.setText("");
+		lblError.setText("");
 	}
+
 	/**
 	 * Borra todo el contenido del campo de texto y limpia el mensaje de error.
 	 *
@@ -377,12 +383,12 @@ public class CalculadoraControler {
 	@FXML
 	private void borrarTodo(ActionEvent event) {
 
-	    txtValor1.setText("");
-	    lblError.setText("");
+		txtValor1.setText("");
+		lblError.setText("");
 
-	    primerNumero = null;
-	    segundoNumero = null;
-	    operador = null;
+		primerNumero = null;
+		segundoNumero = null;
+		operador = null;
 	}
 
 	private void reiniciarNumeros() {
@@ -428,74 +434,82 @@ public class CalculadoraControler {
 	@FXML
 	private void resultado() {
 
-	    if (primerNumero == null || segundoNumero == null || operador == null) {
-	        lblError.setText("Seleccione dos números y un operador");
-	        return;
-	    }
+		if (primerNumero == null || segundoNumero == null || operador == null) {
+			lblError.setText("Seleccione dos números y un operador");
+			return;
+		}
 
-	    try {
+		try {
 
-	        String expresion = primerNumero.getText() + operador + segundoNumero.getText();
+			String expresion = primerNumero.getText() + operador + segundoNumero.getText();
 
-	        Operador op = new Operador(expresion);
-	        double resultado = op.calcular();
+			Operador op = new Operador(expresion);
+			double resultado = op.calcular();
 
-	        String resultadoTexto = Fraccion.convertir(resultado);
+			String resultadoTexto = Fraccion.convertir(resultado);
 
-	        // Crear el botón con CUALQUIER resultado válido
-	        Button botonResultado = new Button(resultadoTexto);
-	        botonResultado.setOnAction(this::seleccionarNumero);
+			// Crear el botón con CUALQUIER resultado válido
+			Button botonResultado = new Button(resultadoTexto);
+			botonResultado.setOnAction(this::seleccionarNumero);
 
-	        // Eliminar los dos números utilizados
-	        contenedorNumeros.getChildren().remove(primerNumero);
-	        contenedorNumeros.getChildren().remove(segundoNumero);
+			// Eliminar los dos números utilizados
+			contenedorNumeros.getChildren().remove(primerNumero);
+			contenedorNumeros.getChildren().remove(segundoNumero);
 
-	        // Agregar el resultado
-	        contenedorNumeros.getChildren().add(botonResultado);
+			// Agregar el resultado
+			contenedorNumeros.getChildren().add(botonResultado);
 
-	        // Limpiar expresión
-	        txtValor1.setText("");
-	        lblError.setText("");
+			// Limpiar expresión
+			txtValor1.setText("");
+			lblError.setText("");
 
-	        // Limpiar selección
-	        primerNumero = null;
-	        segundoNumero = null;
-	        operador = null;
+			// Limpiar selección
+			primerNumero = null;
+			segundoNumero = null;
+			operador = null;
 
-	        /*
-	         * SOLAMENTE cuando queda un botón
-	         * se valida si el resultado final está entre 1 y 10.
-	         */
-	        if (contenedorNumeros.getChildren().size() == 1) {
+			/*
+			 * SOLAMENTE cuando queda un botón se valida si el resultado final está entre 1
+			 * y 10.
+			 */
+			if (contenedorNumeros.getChildren().size() == 1) {
 
-	            if (resultado >= 1 &&
-	                resultado <= 10 &&
-	                resultado == Math.floor(resultado)) {
+				if (resultado >= 1 && resultado <= 10 && resultado == Math.floor(resultado)) {
 
-	                int resultadoFinal = (int) resultado;
+					int resultadoFinal = (int) resultado;
 
-	                // Resultado correcto
-	                puntaje++;
-	                lblResultado.setText(puntaje + "/10");
+					// Resultado correcto
+					puntaje++;
+					lblResultado.setText(puntaje + "/10");
 
-	                marcarResultado(resultadoFinal);
+					marcarResultado(resultadoFinal);
 
-	                reiniciarNumeros();
+					reiniciarNumeros();
 
-	            } else {
+					DaoScoreImplementado dao = new DaoScoreImplementado();
 
-	                // Resultado final incorrecto
-	                lblError.setText("No es un número correcto para resultado");
+					partidaActual.setResultado(String.valueOf(resultadoFinal));
+					partidaActual.setPuntaje(puntaje);
 
-	                reiniciarNumeros();
-	            }
-	        }
+					boolean guardada = dao.crear(partidaActual);
 
-	    } catch (IllegalArgumentException | ArithmeticException e) {
+					if (!guardada) {
+						lblError.setText("No se pudo guardar la partida");
+					}
+				} else {
 
-	        // Por ejemplo: resultado negativo no permitido
-	        lblError.setText(e.getMessage());
-	    }
+					// Resultado final incorrecto
+					lblError.setText("No es un número correcto para resultado");
+
+					reiniciarNumeros();
+				}
+			}
+
+		} catch (IllegalArgumentException | ArithmeticException e) {
+
+			// Por ejemplo: resultado negativo no permitido
+			lblError.setText(e.getMessage());
+		}
 	}
 
 	private void marcarResultado(int resultado) {
