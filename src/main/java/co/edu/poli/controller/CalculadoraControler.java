@@ -135,7 +135,8 @@ public class CalculadoraControler {
 	private int puntaje = 0;
 	private Partida partidaActual;
 	private Jugador jugadorActual;
-
+	private boolean partidaFinalizada = false;
+	
 	@FXML
 	public void initialize() {
 		DaoJugadorImplementado j = new DaoJugadorImplementado();
@@ -230,6 +231,8 @@ public class CalculadoraControler {
 	}
 
 	private void finalizarPartida() {
+		
+	    partidaFinalizada = true;
 
 		partidaActual.setTiempoEjecucion(partidaActual.obtenerTiempoEjecucion());
 
@@ -241,11 +244,16 @@ public class CalculadoraControler {
 
 		if (actualizada) {
 			System.out.println("Partida finalizada. ID: " + partidaActual.getId());
+			
+	        System.out.println("Partida finalizada. ID: "
+	                + partidaActual.getId());
 
 			System.out.println("Puntaje final: " + puntaje);
 
 			System.out.println("Tiempo: " + partidaActual.getTiempoEjecucion() + " segundos");
 		} else {
+			
+	        partidaFinalizada = false;
 			lblError.setText("No se pudo finalizar la partida");
 		}
 	}
@@ -354,6 +362,11 @@ public class CalculadoraControler {
 	 */
 	@FXML
 	private void seleccionarNumero(ActionEvent event) {
+		
+	    if (partidaFinalizada) {
+	        lblError.setText("La partida ya terminó");
+	        return;
+	    }
 
 		Button boton = (Button) event.getSource();
 
@@ -419,6 +432,8 @@ public class CalculadoraControler {
 	@FXML
 	private void borrarTodo(ActionEvent event) {
 
+		reiniciarNumeros();
+		
 		txtValor1.setText("");
 		lblError.setText("");
 
@@ -470,6 +485,11 @@ public class CalculadoraControler {
 	@FXML
 	private void resultado() {
 
+		if (partidaFinalizada) {
+		    lblError.setText("La partida ya terminó");
+		    return;
+		}
+		
 		if (primerNumero == null || segundoNumero == null || operador == null) {
 			lblError.setText("Seleccione dos números y un operador");
 			return;
@@ -524,7 +544,7 @@ public class CalculadoraControler {
 					partidaActual.setResultado(String.valueOf(resultadoFinal));
 					partidaActual.setPuntaje(puntaje);
 
-					if (puntaje == 10) {
+					if (puntaje == 10) {//este no puede ser la condicion para acabar la partida , la partida se debe acabar cuando halla encontrado los 10 numeros no obtenido sierto puntaje
 
 						finalizarPartida();
 
