@@ -3,15 +3,17 @@ package co.edu.poli.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoScoreImplementado;
-import co.edu.poli.dao.PartidaDAO;
 import co.edu.poli.modelo.Fraccion;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Operador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.juego;
 import co.edu.poli.servicios.ConexionDB;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -21,6 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 
 /**
  * Controlador principal de la calculadora.
@@ -68,6 +71,9 @@ public class CalculadoraControler {
 
 	@FXML
 	private Label lblFecha;
+
+	@FXML
+	private Label lblTiempo;	
 
 	@FXML
 	private Label lblResultado1;
@@ -128,6 +134,8 @@ public class CalculadoraControler {
 
 	@FXML
 	private Button btnIgual;
+
+	
 
 	private juego partida;
 
@@ -190,11 +198,33 @@ public class CalculadoraControler {
 		btnIgual.setText(simbolos[6]);
 		btnBorrarUltimo.setText(simbolos[7]);
 		btnBorrarTodo.setText(simbolos[8]);
+
+		// Iniciar el temporizador para actualizar el tiempo transcurrido
+		Timeline cronometro = new Timeline(new KeyFrame(Duration.seconds(1), evento -> actualizarCronometro()));
+		cronometro.setCycleCount(Timeline.INDEFINITE);
+		cronometro.play();
+	}
+	// =========================
+	// CRONOMETRO
+	// =========================
+
+	private void actualizarCronometro() {
+
+    long segundosTotales = partidaActual.obtenerTiempoEjecucion();
+
+    long minutos = segundosTotales / 60;
+    long segundos = segundosTotales % 60;
+
+    String tiempoTexto = String.format("%02d:%02d", minutos, segundos);
+
+    lblTiempo.setText(tiempoTexto);
 	}
 
 	// =========================
 	// OPERADORES
 	// =========================
+
+	
 
 	/**
 	 * Selecciona el operador de suma y lo agrega a la expresión.
