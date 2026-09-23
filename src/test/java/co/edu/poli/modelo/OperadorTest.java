@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Pruebas unitarias para la clase Operadores.
  */
-public class OperadoreTest {
+public class OperadorTest {
 
     /**
      * Prueba la suma de dos números.
@@ -179,6 +179,106 @@ public class OperadoreTest {
     public void probarEcuacionVacia() {
 
         Operador op = new Operador("");
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> op.calcular()
+        );
+    }
+
+    /**
+     * Prueba la multiplicación implícita entre un número
+     * y un paréntesis: 2(2) debe interpretarse como 2*2.
+     */
+    @Test
+    public void probarMultiplicacionImplicitaNumeroAntesDeParentesis() {
+
+        Operador op = new Operador("2(2)");
+
+        double resultado = op.calcular();
+
+        assertEquals(4, resultado);
+    }
+
+    /**
+     * Prueba la multiplicación implícita entre un número
+     * y una suma dentro de paréntesis: 3(2+1) debe interpretarse
+     * como 3*(2+1).
+     */
+    @Test
+    public void probarMultiplicacionImplicitaConSumaDentroDeParentesis() {
+
+        Operador op = new Operador("3(2+1)");
+
+        double resultado = op.calcular();
+
+        assertEquals(9, resultado);
+    }
+
+    /**
+     * Prueba la multiplicación implícita entre dos paréntesis:
+     * (2+1)(3) debe interpretarse como (2+1)*3.
+     */
+    @Test
+    public void probarMultiplicacionImplicitaEntreDosParentesis() {
+
+        Operador op = new Operador("(2+1)(3)");
+
+        double resultado = op.calcular();
+
+        assertEquals(9, resultado);
+    }
+
+    /**
+     * Prueba la multiplicación implícita entre un paréntesis
+     * y un número: (2+1)5 debe interpretarse como (2+1)*5.
+     */
+    @Test
+    public void probarMultiplicacionImplicitaNumeroDespuesDeParentesis() {
+
+        Operador op = new Operador("(2+1)5");
+
+        double resultado = op.calcular();
+
+        assertEquals(15, resultado);
+    }
+
+    /**
+     * Prueba que la multiplicación explícita siga funcionando igual
+     * después de agregar el soporte de multiplicación implícita.
+     */
+    @Test
+    public void probarMultiplicacionExplicitaSigueFuncionando() {
+
+        Operador op = new Operador("2*2");
+
+        double resultado = op.calcular();
+
+        assertEquals(4, resultado);
+    }
+
+    /**
+     * Prueba que la multiplicación implícita respete la precedencia
+     * de operaciones: 2+3(4) debe ser 2+(3*4)=14, nunca (2+3)*4=20.
+     */
+    @Test
+    public void probarMultiplicacionImplicitaNoAlteraPrecedencia() {
+
+        Operador op = new Operador("2+3(4)");
+
+        double resultado = op.calcular();
+
+        assertEquals(14, resultado);
+    }
+
+    /**
+     * Prueba que una expresión no válida siga lanzando la excepción
+     * correspondiente aunque contenga multiplicación implícita.
+     */
+    @Test
+    public void probarExpresionInvalidaConMultiplicacionImplicita() {
+
+        Operador op = new Operador("2(2+)");
 
         assertThrows(
             IllegalArgumentException.class,
