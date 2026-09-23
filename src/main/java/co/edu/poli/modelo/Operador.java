@@ -27,9 +27,25 @@ public class Operador {
      * @param ecuacion ecuación que se desea resolver
      */
     public Operador(String ecuacion) {
-        this.ecuacion = ecuacion.replace(" ", "");
+        String sinEspacios = ecuacion.replace(" ", "");
+        this.ecuacion = normalizar(sinEspacios);
         this.posicion = 0;
     }
+
+    private String normalizar(String expresion) {
+
+        String resultado = expresion;
+
+        // Caso 1: número o ')' seguido de '(' -> 2(2) | (2+1)(3)
+        resultado = resultado.replaceAll("(?<=[0-9)])(?=\\()", "*");
+
+        // Caso 2: ')' seguido de número -> (2+1)5
+        resultado = resultado.replaceAll("(?<=\\))(?=[0-9])", "*");
+
+        return resultado;
+    }
+
+
 
     /**
      * Procesa la ecuación y retorna el resultado.
