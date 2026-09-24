@@ -602,7 +602,7 @@ public class CalculadoraControler {
 					partidaActual.setResultado(String.valueOf(resultadoFinal));
 					partidaActual.setPuntaje(puntaje);
 
-					if (puntaje == 10) {//este no puede ser la condicion para acabar la partida , la partida se debe acabar cuando halla encontrado los 10 numeros no obtenido sierto puntaje
+					if (todosLosNumerosEncontrados()) {
 
 						finalizarPartida();
 
@@ -689,14 +689,43 @@ public class CalculadoraControler {
 	    alert.showAndWait();
 	}
 
+	/**
+	 * Marca el resultado indicado en verde.
+	 *
+	 * @param resultado número del resultado encontrado.
+	 */
 	private void marcarResultado(int resultado) {
 
-		Label[] etiquetas = { lblResultado1, lblResultado2, lblResultado3, lblResultado4, lblResultado5, lblResultado6,
-				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
+	    Label[] etiquetas = {
+	        lblResultado1, lblResultado2, lblResultado3, lblResultado4,
+	        lblResultado5, lblResultado6, lblResultado7, lblResultado8,
+	        lblResultado9, lblResultado10
+	    };
 
-		etiquetas[resultado - 1].setText(String.valueOf(resultado));
+	    etiquetas[resultado - 1].setText(String.valueOf(resultado));
+	    etiquetas[resultado - 1].setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+	}
+	/**
+	 * Comprueba si todos los números han sido encontrados.
+	 *
+	 * @return true si las diez etiquetas están marcadas en verde;
+	 *         false en caso contrario.
+	 */
+	private boolean todosLosNumerosEncontrados() {
 
-		etiquetas[resultado - 1].setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+	    Label[] etiquetas = {
+	        lblResultado1, lblResultado2, lblResultado3, lblResultado4,
+	        lblResultado5, lblResultado6, lblResultado7, lblResultado8,
+	        lblResultado9, lblResultado10
+	    };
+
+	    for (Label etiqueta : etiquetas) {
+	        if (!etiqueta.getStyle().contains("-fx-text-fill: green")) {
+	            return false;
+	        }
+	    }
+
+	    return true;
 	}
 
 	/**
