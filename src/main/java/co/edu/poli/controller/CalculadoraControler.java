@@ -134,6 +134,9 @@ public class CalculadoraControler {
 
 	@FXML
 	private Button btnIgual;
+	
+	@FXML
+	private Button btnReglas;
 
 	
 
@@ -218,6 +221,31 @@ public class CalculadoraControler {
     String tiempoTexto = String.format("%02d:%02d", minutos, segundos);
 
     lblTiempo.setText(tiempoTexto);
+	}
+	// =========================
+	// CRONOMETRO
+	// =========================
+	@FXML
+	private void mostrarReglas() {
+
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle("Reglas");
+    alert.setHeaderText("Reglas del juego");
+
+    String texto =
+        "Con los 4 números de la ronda, arma una expresión matemática "
+        + "distinta para lograr cada resultado del 1 al 10.\n\n"
+        + "Reglas:\n"
+        + "• Usa cada uno de los 4 números exactamente una vez por expresión.\n"
+        + "• Puedes usar +, -, *, ÷ y paréntesis.\n"
+        + "• Se permiten fracciones y resultados negativos intermedios.\n"
+        + "• Puedes unir dos números para formar uno de varias cifras "
+        + "(ej: 1 y 2 → 12).\n\n"
+        + "Completas la ronda cuando encuentres los 10 resultados "
+        + "(1 al 10) usando siempre los mismos 4 números.";
+
+    	alert.setContentText(texto);
+    	alert.showAndWait();
 	}
 
 	// =========================

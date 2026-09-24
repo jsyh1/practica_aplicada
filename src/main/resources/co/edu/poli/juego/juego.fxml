@@ -36,6 +36,8 @@
                 </VBox>
                 <Button alignment="CENTER" mnemonicParsing="false" prefHeight="20.0" prefWidth="32.0" text="☰" />
                 <Button text="Consultar partida" onAction="#consultarPartida"/>
+                <Button fx:id="btnReglas" alignment="CENTER" mnemonicParsing="false" prefHeight="20.0" prefWidth="32.0" text="i" onAction="#mostrarReglas"/>
+                
             </children>
         </HBox>
 
