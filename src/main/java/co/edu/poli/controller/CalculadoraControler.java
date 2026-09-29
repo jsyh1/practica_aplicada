@@ -10,6 +10,7 @@ import co.edu.poli.modelo.Fraccion;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Operador;
 import co.edu.poli.modelo.Partida;
+import co.edu.poli.modelo.Resultado;
 import co.edu.poli.modelo.juego;
 import co.edu.poli.servicios.ConexionDB;
 import javafx.animation.KeyFrame;
@@ -73,7 +74,7 @@ public class CalculadoraControler {
 	private Label lblFecha;
 
 	@FXML
-	private Label lblTiempo;	
+	private Label lblTiempo;
 
 	@FXML
 	private Label lblResultado1;
@@ -134,11 +135,9 @@ public class CalculadoraControler {
 
 	@FXML
 	private Button btnIgual;
-	
+
 	@FXML
 	private Button btnReglas;
-
-	
 
 	private juego partida;
 
@@ -147,29 +146,37 @@ public class CalculadoraControler {
 	private Partida partidaActual;
 	private Jugador jugadorActual;
 	private boolean partidaFinalizada = false;
-	
+
 	@FXML
 	public void initialize() {
-		DaoJugadorImplementado j = new DaoJugadorImplementado();
+
+		DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
 
 		jugadorActual = new Jugador(0, LocalDate.now());
 
-		if (j.crear(jugadorActual)) {
+		if (daoJugador.crear(jugadorActual)) {
 
 			System.out.println("Jugador creado con ID: " + jugadorActual.getId());
 		}
+
 		puntaje = 0;
+
 		lblResultado.setText("0/10");
 
 		partida = new juego(new String[9], new int[4]);
 
 		numerosOriginales = partida.generarNumeros();
+
 		String[] simbolos = partida.generarSimbolos();
 
-		// Mostrar fecha Actual
-		partidaActual = new Partida(jugadorActual.getId(), "0", LocalDate.now(), 0, 0);
+		// Crear la partida asociada al jugador
+		partidaActual = new Partida(jugadorActual, LocalDate.now(), 0, 0);
+
+		// El jugador conoce su partida
+		jugadorActual.agregarPartida(partidaActual);
 
 		partidaActual.generarFechaPartida();
+
 		partidaActual.iniciarTiempo();
 
 		DaoScoreImplementado daoPartida = new DaoScoreImplementado();
@@ -177,10 +184,14 @@ public class CalculadoraControler {
 		boolean partidaCreada = daoPartida.crear(partidaActual);
 
 		if (!partidaCreada) {
+
 			lblError.setText("No se pudo crear la partida");
 		}
+
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
 		String fechaTexto = partidaActual.getFechaPartida().format(formato);
+
 		lblFecha.setText(fechaTexto);
 
 		for (int numero : numerosOriginales) {
@@ -202,9 +213,10 @@ public class CalculadoraControler {
 		btnBorrarUltimo.setText(simbolos[7]);
 		btnBorrarTodo.setText(simbolos[8]);
 
-		// Iniciar el temporizador para actualizar el tiempo transcurrido
 		Timeline cronometro = new Timeline(new KeyFrame(Duration.seconds(1), evento -> actualizarCronometro()));
+
 		cronometro.setCycleCount(Timeline.INDEFINITE);
+
 		cronometro.play();
 	}
 	// =========================
@@ -213,46 +225,42 @@ public class CalculadoraControler {
 
 	private void actualizarCronometro() {
 
-    long segundosTotales = partidaActual.obtenerTiempoEjecucion();
+		long segundosTotales = partidaActual.obtenerTiempoEjecucion();
 
-    long minutos = segundosTotales / 60;
-    long segundos = segundosTotales % 60;
+		long minutos = segundosTotales / 60;
+		long segundos = segundosTotales % 60;
 
-    String tiempoTexto = String.format("%02d:%02d", minutos, segundos);
+		String tiempoTexto = String.format("%02d:%02d", minutos, segundos);
 
-    lblTiempo.setText(tiempoTexto);
+		lblTiempo.setText(tiempoTexto);
 	}
+
 	// =========================
 	// CRONOMETRO
 	// =========================
 	@FXML
 	private void mostrarReglas() {
 
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("Reglas");
-    alert.setHeaderText("Reglas del juego");
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.setTitle("Reglas");
+		alert.setHeaderText("Reglas del juego");
 
-    String texto =
-        "Con los 4 números de la ronda, arma una expresión matemática "
-        + "distinta para lograr cada resultado del 1 al 10.\n\n"
-        + "Reglas:\n"
-        + "• Usa cada uno de los 4 números exactamente una vez por expresión.\n"
-        + "• Puedes usar +, -, *, ÷ y paréntesis.\n"
-        + "• Se permiten fracciones y resultados negativos intermedios.\n"
-        + "• Puedes unir dos números para formar uno de varias cifras "
-        + "(ej: 1 y 2 → 12).\n\n"
-        + "Completas la ronda cuando encuentres los 10 resultados "
-        + "(1 al 10) usando siempre los mismos 4 números.";
+		String texto = "Con los 4 números de la ronda, arma una expresión matemática "
+				+ "distinta para lograr cada resultado del 1 al 10.\n\n" + "Reglas:\n"
+				+ "• Usa cada uno de los 4 números exactamente una vez por expresión.\n"
+				+ "• Puedes usar +, -, *, ÷ y paréntesis.\n"
+				+ "• Se permiten fracciones y resultados negativos intermedios.\n"
+				+ "• Puedes unir dos números para formar uno de varias cifras " + "(ej: 1 y 2 → 12).\n\n"
+				+ "Completas la ronda cuando encuentres los 10 resultados "
+				+ "(1 al 10) usando siempre los mismos 4 números.";
 
-    	alert.setContentText(texto);
-    	alert.showAndWait();
+		alert.setContentText(texto);
+		alert.showAndWait();
 	}
 
 	// =========================
 	// OPERADORES
 	// =========================
-
-	
 
 	/**
 	 * Selecciona el operador de suma y lo agrega a la expresión.
@@ -289,8 +297,8 @@ public class CalculadoraControler {
 	}
 
 	private void finalizarPartida() {
-		
-	    partidaFinalizada = true;
+
+		partidaFinalizada = true;
 
 		partidaActual.setTiempoEjecucion(partidaActual.obtenerTiempoEjecucion());
 
@@ -302,16 +310,15 @@ public class CalculadoraControler {
 
 		if (actualizada) {
 			System.out.println("Partida finalizada. ID: " + partidaActual.getId());
-			
-	        System.out.println("Partida finalizada. ID: "
-	                + partidaActual.getId());
+
+			System.out.println("Partida finalizada. ID: " + partidaActual.getId());
 
 			System.out.println("Puntaje final: " + puntaje);
 
 			System.out.println("Tiempo: " + partidaActual.getTiempoEjecucion() + " segundos");
 		} else {
-			
-	        partidaFinalizada = false;
+
+			partidaFinalizada = false;
 			lblError.setText("No se pudo finalizar la partida");
 		}
 	}
@@ -420,11 +427,11 @@ public class CalculadoraControler {
 	 */
 	@FXML
 	private void seleccionarNumero(ActionEvent event) {
-		
-	    if (partidaFinalizada) {
-	        lblError.setText("La partida ya terminó");
-	        return;
-	    }
+
+		if (partidaFinalizada) {
+			lblError.setText("La partida ya terminó");
+			return;
+		}
 
 		Button boton = (Button) event.getSource();
 
@@ -491,7 +498,7 @@ public class CalculadoraControler {
 	private void borrarTodo(ActionEvent event) {
 
 		reiniciarNumeros();
-		
+
 		txtValor1.setText("");
 		lblError.setText("");
 
@@ -544,10 +551,10 @@ public class CalculadoraControler {
 	private void resultado() {
 
 		if (partidaFinalizada) {
-		    lblError.setText("La partida ya terminó");
-		    return;
+			lblError.setText("La partida ya terminó");
+			return;
 		}
-		
+
 		if (primerNumero == null || segundoNumero == null || operador == null) {
 			lblError.setText("Seleccione dos números y un operador");
 			return;
@@ -592,14 +599,21 @@ public class CalculadoraControler {
 
 					int resultadoFinal = (int) resultado;
 
-					// Resultado correcto
+					// Aumentar puntaje
 					puntaje++;
 
 					lblResultado.setText(puntaje + "/10");
 
+					// Marcar resultado encontrado
 					marcarResultado(resultadoFinal);
 
-					partidaActual.setResultado(String.valueOf(resultadoFinal));
+					// Crear objeto Resultado
+					Resultado nuevoResultado = new Resultado(0, partidaActual, expresion, resultadoFinal);
+
+					// Agregarlo a la partida
+					partidaActual.agregarResultado(nuevoResultado);
+
+					// Actualizar puntaje de la partida
 					partidaActual.setPuntaje(puntaje);
 
 					if (todosLosNumerosEncontrados()) {
@@ -613,17 +627,12 @@ public class CalculadoraControler {
 						boolean actualizada = dao.actualizar(partidaActual);
 
 						if (!actualizada) {
+
 							lblError.setText("No se pudo actualizar la partida");
 						}
 
 						reiniciarNumeros();
 					}
-				} else {
-
-					// Resultado final incorrecto
-					lblError.setText("No es un número correcto para resultado");
-
-					reiniciarNumeros();
 				}
 			}
 
@@ -642,6 +651,7 @@ public class CalculadoraControler {
 	    List<Partida> partidas = dao.ultimasPartidas(5);
 
 	    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
 	    alert.setTitle("Consulta de partidas");
 	    alert.setHeaderText("Partidas registradas");
 
@@ -660,16 +670,32 @@ public class CalculadoraControler {
 	                 .append("\n");
 
 	            texto.append("Jugador: ")
-	                 .append(p.getJugadorId())
+	                 .append(p.getJugador())
 	                 .append("\n");
 
 	            texto.append("Fecha: ")
 	                 .append(p.getFechaPartida())
 	                 .append("\n");
 
-	            texto.append("Resultado: ")
-	                 .append(p.getResultado())
-	                 .append("\n");
+	            texto.append("Resultados: ");
+
+	            if (p.getResultados().isEmpty()) {
+
+	                texto.append("Sin resultados\n");
+
+	            } else {
+
+	                for (Resultado r : p.getResultados()) {
+
+	                    texto.append(r.getResultado())
+	                         .append(" (dato: ")
+	                         .append(r.getDato())
+	                         .append(")");
+
+	                }
+
+	                texto.append("\n");
+	            }
 
 	            texto.append("Puntaje: ")
 	                 .append(p.getPuntaje())
@@ -696,36 +722,31 @@ public class CalculadoraControler {
 	 */
 	private void marcarResultado(int resultado) {
 
-	    Label[] etiquetas = {
-	        lblResultado1, lblResultado2, lblResultado3, lblResultado4,
-	        lblResultado5, lblResultado6, lblResultado7, lblResultado8,
-	        lblResultado9, lblResultado10
-	    };
+		Label[] etiquetas = { lblResultado1, lblResultado2, lblResultado3, lblResultado4, lblResultado5, lblResultado6,
+				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
 
-	    etiquetas[resultado - 1].setText(String.valueOf(resultado));
-	    etiquetas[resultado - 1].setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+		etiquetas[resultado - 1].setText(String.valueOf(resultado));
+		etiquetas[resultado - 1].setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 	}
+
 	/**
 	 * Comprueba si todos los números han sido encontrados.
 	 *
-	 * @return true si las diez etiquetas están marcadas en verde;
-	 *         false en caso contrario.
+	 * @return true si las diez etiquetas están marcadas en verde; false en caso
+	 *         contrario.
 	 */
 	private boolean todosLosNumerosEncontrados() {
 
-	    Label[] etiquetas = {
-	        lblResultado1, lblResultado2, lblResultado3, lblResultado4,
-	        lblResultado5, lblResultado6, lblResultado7, lblResultado8,
-	        lblResultado9, lblResultado10
-	    };
+		Label[] etiquetas = { lblResultado1, lblResultado2, lblResultado3, lblResultado4, lblResultado5, lblResultado6,
+				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
 
-	    for (Label etiqueta : etiquetas) {
-	        if (!etiqueta.getStyle().contains("-fx-text-fill: green")) {
-	            return false;
-	        }
-	    }
+		for (Label etiqueta : etiquetas) {
+			if (!etiqueta.getStyle().contains("-fx-text-fill: green")) {
+				return false;
+			}
+		}
 
-	    return true;
+		return true;
 	}
 
 	/**
