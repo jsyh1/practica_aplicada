@@ -1,14 +1,14 @@
 package co.edu.poli.modelo;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Partida {
 
     private int id;
 
-    private int jugadorId;
-
-    private String resultado;
+    private Jugador jugador;
 
     private LocalDate fechaPartida;
 
@@ -16,39 +16,36 @@ public class Partida {
 
     private int puntaje;
 
-    // Guarda el momento exacto en que comienza la partida.
-    // No se guarda en la base de datos.
     private long inicioPartida;
 
-    /**
-     * Constructor utilizado para crear una nueva partida.
-     * El id lo genera automáticamente la base de datos.
-     */
-    public Partida(int jugadorId, String resultado,
-                   LocalDate fechaPartida,
-                   long tiempoEjecucion, int puntaje) {
+    private List<Resultado> resultados;
 
-        this.jugadorId = jugadorId;
-        this.resultado = resultado;
+    public Partida(Jugador jugador,
+                   LocalDate fechaPartida,
+                   long tiempoEjecucion,
+                   int puntaje) {
+
+        this.jugador = jugador;
         this.fechaPartida = fechaPartida;
         this.tiempoEjecucion = tiempoEjecucion;
         this.puntaje = puntaje;
+
+        this.resultados = new ArrayList<>();
     }
 
-    /**
-     * Constructor utilizado cuando la partida
-     * ya existe en la base de datos.
-     */
-    public Partida(int id, int jugadorId, String resultado,
+    public Partida(int id,
+                   Jugador jugador,
                    LocalDate fechaPartida,
-                   long tiempoEjecucion, int puntaje) {
+                   long tiempoEjecucion,
+                   int puntaje) {
 
         this.id = id;
-        this.jugadorId = jugadorId;
-        this.resultado = resultado;
+        this.jugador = jugador;
         this.fechaPartida = fechaPartida;
         this.tiempoEjecucion = tiempoEjecucion;
         this.puntaje = puntaje;
+
+        this.resultados = new ArrayList<>();
     }
 
     public int getId() {
@@ -59,20 +56,12 @@ public class Partida {
         this.id = id;
     }
 
-    public int getJugadorId() {
-        return jugadorId;
+    public Jugador getJugador() {
+        return jugador;
     }
 
-    public void setJugadorId(int jugadorId) {
-        this.jugadorId = jugadorId;
-    }
-
-    public String getResultado() {
-        return resultado;
-    }
-
-    public void setResultado(String resultado) {
-        this.resultado = resultado;
+    public void setJugador(Jugador jugador) {
+        this.jugador = jugador;
     }
 
     public LocalDate getFechaPartida() {
@@ -99,25 +88,22 @@ public class Partida {
         this.puntaje = puntaje;
     }
 
-    /**
-     * Genera y establece la fecha actual de la partida.
-     */
+    public List<Resultado> getResultados() {
+        return resultados;
+    }
+
+    public void agregarResultado(Resultado resultado) {
+        resultados.add(resultado);
+    }
+
     public void generarFechaPartida() {
         this.fechaPartida = LocalDate.now();
     }
 
-    /**
-     * Inicia el contador de tiempo de la partida.
-     */
     public void iniciarTiempo() {
         this.inicioPartida = System.currentTimeMillis();
     }
 
-    /**
-     * Calcula el tiempo transcurrido desde el inicio de la partida.
-     *
-     * @return tiempo de ejecución en segundos
-     */
     public long obtenerTiempoEjecucion() {
 
         this.tiempoEjecucion =
