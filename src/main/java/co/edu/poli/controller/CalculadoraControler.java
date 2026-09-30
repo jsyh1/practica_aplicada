@@ -3,7 +3,6 @@ package co.edu.poli.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.ArrayList;
 
 import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoScoreImplementado;
@@ -18,6 +17,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -25,6 +25,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
 import javafx.util.Duration;
 
 /**
@@ -142,6 +144,9 @@ public class CalculadoraControler {
 
 	@FXML
 	private Button btnReglas;
+
+	@FXML 
+	private Button btnMenu;
 
 	private juego partida;
 
@@ -908,7 +913,7 @@ public class CalculadoraControler {
 	 * sin detener la aplicación.
 	 */
 	@FXML
-	private void btnCompartir() {
+	private void Compartir() {
 
 		try {
 
@@ -933,6 +938,49 @@ public class CalculadoraControler {
 
 			lblError.setText("No existe un mecanismo compatible para compartir");
 		}
+	}
+
+	@FXML
+	private void mostrarMenu(ActionEvent event) {
+
+    Popup popup = new Popup();
+    popup.setAutoHide(true);
+
+    Button btnInstrucciones = new Button("Instrucciones");
+    Button btnConsultar = new Button("Consultar");
+	Button btnCompartir = new Button("Compartir");
+
+
+    btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
+    btnConsultar.setMaxWidth(Double.MAX_VALUE);
+	btnCompartir.setMaxWidth(Double.MAX_VALUE);
+
+    btnInstrucciones.setOnAction(e -> {
+        popup.hide();
+        mostrarReglas();
+    });
+
+	btnCompartir.setOnAction(e -> {
+        popup.hide();
+        Compartir();
+    });
+
+    btnConsultar.setOnAction(e -> {
+        popup.hide();
+        consultarPartida();
+    });
+
+
+    VBox contenedor = new VBox(btnInstrucciones, btnCompartir,btnConsultar);
+    contenedor.setSpacing(4);
+    contenedor.setStyle("-fx-background-color: white; -fx-padding: 8; "
+        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);");
+    popup.getContent().add(contenedor);
+
+    Button boton = (Button) event.getSource();
+    Bounds coordenadas = boton.localToScreen(boton.getBoundsInLocal());
+
+    popup.show(boton, coordenadas.getMinX(), coordenadas.getMaxY());
 	}
 
 }
