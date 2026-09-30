@@ -4,26 +4,46 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Time;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.edu.poli.modelo.Calculadora;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
 import co.edu.poli.servicios.ConexionDB;
 
+/**
+ * Implementación del DAO para la entidad Partida.
+ *
+ * Se encarga de realizar las operaciones CRUD sobre la tabla
+ * partida y de cargar los resultados asociados a cada partida.
+ *
+ * @author Jsyh
+ * @version 1.0
+ */
 public class DaoScoreImplementado implements PartidaDAO {
 
     private final Connection conexion;
 
+    /**
+     * Constructor que obtiene la conexión a la base de datos.
+     */
     public DaoScoreImplementado() {
         conexion = ConexionDB.getInstancia().getConexion();
     }
 
+    /**
+     * Consulta las últimas partidas registradas.
+     *
+     * @param cantidad cantidad máxima de partidas a consultar
+     * @return lista de las últimas partidas
+     */
     @Override
     public List<Partida> ultimasPartidas(int cantidad) {
 
@@ -44,20 +64,30 @@ public class DaoScoreImplementado implements PartidaDAO {
 
                 while (rs.next()) {
 
-                    int idJugador = rs.getInt("jugador_id");
+                    int idJugador =
+                            rs.getInt("jugador_id");
 
-                    LocalDateHelper fecha = new LocalDateHelper(
-                            rs.getTimestamp("fecha")
-                    );
+                    LocalDateHelper fecha =
+                            new LocalDateHelper(
+                                    rs.getTimestamp("fecha")
+                            );
 
                     Jugador jugador = new Jugador(
                             idJugador,
                             fecha.getFecha()
                     );
 
+                    /*
+                     * Crear la Calculadora que necesita
+                     * la Partida para poder existir.
+                     */
+                    Calculadora calculadora =
+                            crearCalculadora();
+
                     Partida partida = new Partida(
                             rs.getInt("id"),
                             jugador,
+                            calculadora,
                             fecha.getFecha(),
                             rs.getTime("tiempo")
                                     .toLocalTime()
@@ -77,7 +107,7 @@ public class DaoScoreImplementado implements PartidaDAO {
 
             System.out.println(
                     "Error al consultar últimas partidas: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
         }
 
@@ -100,18 +130,22 @@ public class DaoScoreImplementado implements PartidaDAO {
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-            ps.setInt(1, partida.getId());
+            ps.setInt(
+                    1,
+                    partida.getId()
+            );
 
             try (ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
 
-                    Resultado resultado = new Resultado(
-                            rs.getInt("id"),
-                            partida,
-                            rs.getString("resultado"),
-                            rs.getInt("dato")
-                    );
+                    Resultado resultado =
+                            new Resultado(
+                                    rs.getInt("id"),
+                                    partida,
+                                    rs.getString("resultado"),
+                                    rs.getInt("dato")
+                            );
 
                     partida.agregarResultado(resultado);
                 }
@@ -121,11 +155,17 @@ public class DaoScoreImplementado implements PartidaDAO {
 
             System.out.println(
                     "Error al cargar resultados: "
-                    + e.getMessage()
+                            + e.getMessage()
             );
         }
     }
 
+    /**
+     * Crea una partida en la base de datos.
+     *
+     * @param objeto partida que se desea crear
+     * @return true si se creó correctamente
+     */
     @Override
     public boolean crear(Partida objeto) {
 
@@ -147,7 +187,8 @@ public class DaoScoreImplementado implements PartidaDAO {
             ps.setTimestamp(
                     2,
                     Timestamp.valueOf(
-                            objeto.getFechaPartida().atStartOfDay()
+                            objeto.getFechaPartida()
+                                    .atStartOfDay()
                     )
             );
 
@@ -169,11 +210,13 @@ public class DaoScoreImplementado implements PartidaDAO {
 
             if (filas > 0) {
 
-                try (ResultSet rs = ps.getGeneratedKeys()) {
+                try (ResultSet rs =
+                             ps.getGeneratedKeys()) {
 
                     if (rs.next()) {
 
-                        int idGenerado = rs.getInt(1);
+                        int idGenerado =
+                                rs.getInt(1);
 
                         objeto.setId(idGenerado);
 
@@ -198,6 +241,11 @@ public class DaoScoreImplementado implements PartidaDAO {
         return false;
     }
 
+    /**
+     * Lista todas las partidas registradas.
+     *
+     * @return lista de partidas
+     */
     @Override
     public List<Partida> listar() {
 
@@ -209,23 +257,32 @@ public class DaoScoreImplementado implements PartidaDAO {
                 ORDER BY id
                 """;
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql);
+        try (PreparedStatement ps =
+                     conexion.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
-                LocalDateHelper fecha = new LocalDateHelper(
-                        rs.getTimestamp("fecha")
-                );
+                LocalDateHelper fecha =
+                        new LocalDateHelper(
+                                rs.getTimestamp("fecha")
+                        );
 
                 Jugador jugador = new Jugador(
                         rs.getInt("jugador_id"),
                         fecha.getFecha()
                 );
 
+                /*
+                 * La Partida necesita una Calculadora.
+                 */
+                Calculadora calculadora =
+                        crearCalculadora();
+
                 Partida partida = new Partida(
                         rs.getInt("id"),
                         jugador,
+                        calculadora,
                         fecha.getFecha(),
                         rs.getTime("tiempo")
                                 .toLocalTime()
@@ -251,6 +308,12 @@ public class DaoScoreImplementado implements PartidaDAO {
         return partidas;
     }
 
+    /**
+     * Busca una partida por su identificador.
+     *
+     * @param id identificador de la partida
+     * @return partida encontrada o null si no existe
+     */
     @Override
     public Partida buscarPorId(int id) {
 
@@ -260,26 +323,36 @@ public class DaoScoreImplementado implements PartidaDAO {
                 WHERE id = ?
                 """;
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (PreparedStatement ps =
+                     conexion.prepareStatement(sql)) {
 
             ps.setInt(1, id);
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs =
+                         ps.executeQuery()) {
 
                 if (rs.next()) {
 
-                    LocalDateHelper fecha = new LocalDateHelper(
-                            rs.getTimestamp("fecha")
-                    );
+                    LocalDateHelper fecha =
+                            new LocalDateHelper(
+                                    rs.getTimestamp("fecha")
+                            );
 
                     Jugador jugador = new Jugador(
                             rs.getInt("jugador_id"),
                             fecha.getFecha()
                     );
 
+                    /*
+                     * La Partida necesita una Calculadora.
+                     */
+                    Calculadora calculadora =
+                            crearCalculadora();
+
                     Partida partida = new Partida(
                             rs.getInt("id"),
                             jugador,
+                            calculadora,
                             fecha.getFecha(),
                             rs.getTime("tiempo")
                                     .toLocalTime()
@@ -306,6 +379,12 @@ public class DaoScoreImplementado implements PartidaDAO {
         return null;
     }
 
+    /**
+     * Actualiza una partida existente.
+     *
+     * @param objeto partida que se desea actualizar
+     * @return true si se actualizó correctamente
+     */
     @Override
     public boolean actualizar(Partida objeto) {
 
@@ -318,7 +397,8 @@ public class DaoScoreImplementado implements PartidaDAO {
                 WHERE id = ?
                 """;
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (PreparedStatement ps =
+                     conexion.prepareStatement(sql)) {
 
             ps.setInt(
                     1,
@@ -328,7 +408,8 @@ public class DaoScoreImplementado implements PartidaDAO {
             ps.setTimestamp(
                     2,
                     Timestamp.valueOf(
-                            objeto.getFechaPartida().atStartOfDay()
+                            objeto.getFechaPartida()
+                                    .atStartOfDay()
                     )
             );
 
@@ -364,6 +445,12 @@ public class DaoScoreImplementado implements PartidaDAO {
         }
     }
 
+    /**
+     * Elimina una partida.
+     *
+     * @param id identificador de la partida
+     * @return true si se eliminó correctamente
+     */
     @Override
     public boolean eliminar(int id) {
 
@@ -372,7 +459,8 @@ public class DaoScoreImplementado implements PartidaDAO {
                 WHERE id = ?
                 """;
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (PreparedStatement ps =
+                     conexion.prepareStatement(sql)) {
 
             ps.setInt(1, id);
 
@@ -390,21 +478,50 @@ public class DaoScoreImplementado implements PartidaDAO {
     }
 
     /**
-     * Clase auxiliar para convertir la fecha de SQL.
+     * Crea una Calculadora vacía para reconstruir una Partida
+     * obtenida desde la base de datos.
+     *
+     * La información de la Calculadora no se almacena actualmente
+     * en la tabla partida, por lo que se crea con valores iniciales.
+     *
+     * @return calculadora inicializada
+     */
+    private Calculadora crearCalculadora() {
+
+        return new Calculadora(
+                new String[9],
+                new int[4],
+                ""
+        );
+    }
+
+    /**
+     * Clase auxiliar para convertir una fecha SQL
+     * a LocalDate.
      */
     private static class LocalDateHelper {
 
-        private final java.time.LocalDate fecha;
+        private final LocalDate fecha;
 
+        /**
+         * Constructor.
+         *
+         * @param timestamp fecha obtenida de SQL
+         */
         public LocalDateHelper(Timestamp timestamp) {
+
             this.fecha = timestamp
                     .toLocalDateTime()
                     .toLocalDate();
         }
 
-        public java.time.LocalDate getFecha() {
+        /**
+         * Obtiene la fecha convertida.
+         *
+         * @return fecha
+         */
+        public LocalDate getFecha() {
             return fecha;
         }
     }
 }
-

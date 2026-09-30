@@ -6,12 +6,12 @@ import java.util.List;
 
 import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoScoreImplementado;
-import co.edu.poli.modelo.Fraccion;
+
 import co.edu.poli.modelo.Jugador;
-import co.edu.poli.modelo.Operador;
+
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
-import co.edu.poli.modelo.juego;
+import co.edu.poli.modelo.Calculadora;
 import co.edu.poli.servicios.ConexionDB;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -148,7 +148,7 @@ public class CalculadoraControler {
 	@FXML 
 	private Button btnMenu;
 
-	private juego partida;
+	private Calculadora calculadora;
 
 	private int[] numerosOriginales;
 	private int puntaje = 0;
@@ -159,74 +159,146 @@ public class CalculadoraControler {
 	@FXML
 	public void initialize() {
 
-		DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
+	    DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
 
-		jugadorActual = new Jugador(0, LocalDate.now());
+	    jugadorActual = new Jugador(0, LocalDate.now());
 
-		if (daoJugador.crear(jugadorActual)) {
+	    if (daoJugador.crear(jugadorActual)) {
+	        System.out.println(
+	            "Jugador creado con ID: " + jugadorActual.getId()
+	        );
+	    }
 
-			System.out.println("Jugador creado con ID: " + jugadorActual.getId());
-		}
+	    puntaje = 0;
 
-		puntaje = 0;
+	    lblResultado.setText("0/10");
 
-		lblResultado.setText("0/10");
+	    /*
+	     * La Calculadora pertenece a la partida.
+	     * Primero se crea la Calculadora porque
+	     * la Partida necesita una para poder existir.
+	     */
+	    calculadora = new Calculadora(
+	        new String[9],
+	        new int[4],
+	        ""
+	    );
 
-		partida = new juego(new String[9], new int[4]);
+	    /*
+	     * Generar los números de la ronda.
+	     */
+	    numerosOriginales = calculadora.generarNumeros();
 
-		numerosOriginales = partida.generarNumeros();
+	    /*
+	     * Generar los símbolos de la calculadora.
+	     */
+	    String[] simbolos = calculadora.generarSimbolos();
 
-		String[] simbolos = partida.generarSimbolos();
+	    /*
+	     * Crear la partida.
+	     *
+	     * La partida recibe:
+	     * - Jugador
+	     * - Calculadora
+	     * - Fecha
+	     * - Tiempo inicial
+	     * - Puntaje inicial
+	     */
+	    partidaActual = new Partida(
+	        jugadorActual,
+	        calculadora,
+	        LocalDate.now(),
+	        0,
+	        0
+	    );
 
-		// Crear la partida asociada al jugador
-		partidaActual = new Partida(jugadorActual, LocalDate.now(), 0, 0);
+	    /*
+	     * El jugador conoce su partida.
+	     */
+	    jugadorActual.agregarPartida(partidaActual);
 
-		// El jugador conoce su partida
-		jugadorActual.agregarPartida(partidaActual);
+	    /*
+	     * Generar fecha e iniciar cronómetro.
+	     */
+	    partidaActual.generarFechaPartida();
+	    partidaActual.iniciarTiempo();
 
-		partidaActual.generarFechaPartida();
+	    /*
+	     * Guardar la partida.
+	     */
+	    DaoScoreImplementado daoPartida =
+	        new DaoScoreImplementado();
 
-		partidaActual.iniciarTiempo();
+	    boolean partidaCreada =
+	        daoPartida.crear(partidaActual);
 
-		DaoScoreImplementado daoPartida = new DaoScoreImplementado();
+	    if (!partidaCreada) {
+	        lblError.setText(
+	            "No se pudo crear la partida"
+	        );
+	    }
 
-		boolean partidaCreada = daoPartida.crear(partidaActual);
+	    /*
+	     * Mostrar fecha.
+	     */
+	    DateTimeFormatter formato =
+	        DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		if (!partidaCreada) {
+	    String fechaTexto =
+	        partidaActual
+	            .getFechaPartida()
+	            .format(formato);
 
-			lblError.setText("No se pudo crear la partida");
-		}
+	    lblFecha.setText(fechaTexto);
 
-		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	    /*
+	     * Crear los botones de los cuatro números.
+	     */
+	    for (int numero : numerosOriginales) {
 
-		String fechaTexto = partidaActual.getFechaPartida().format(formato);
+	        Button boton =
+	            new Button(String.valueOf(numero));
 
-		lblFecha.setText(fechaTexto);
+	        boton.setOnAction(
+	            this::seleccionarNumero
+	        );
 
-		for (int numero : numerosOriginales) {
+	        contenedorNumeros
+	            .getChildren()
+	            .add(boton);
+	    }
 
-			Button boton = new Button(String.valueOf(numero));
+	    /*
+	     * Configurar los botones de operaciones.
+	     */
+	    btnSuma.setText(simbolos[0]);
+	    btnResta.setText(simbolos[1]);
+	    btnMultiplicacion.setText(simbolos[2]);
+	    btnDivision.setText(simbolos[3]);
 
-			boton.setOnAction(this::seleccionarNumero);
+	    btnParentesisAbre.setText(simbolos[4]);
+	    btnParentesisCierra.setText(simbolos[5]);
 
-			contenedorNumeros.getChildren().add(boton);
-		}
+	    btnIgual.setText(simbolos[6]);
 
-		btnSuma.setText(simbolos[0]);
-		btnResta.setText(simbolos[1]);
-		btnMultiplicacion.setText(simbolos[2]);
-		btnDivision.setText(simbolos[3]);
-		btnParentesisAbre.setText(simbolos[4]);
-		btnParentesisCierra.setText(simbolos[5]);
-		btnIgual.setText(simbolos[6]);
-		btnBorrarUltimo.setText(simbolos[7]);
-		btnBorrarTodo.setText(simbolos[8]);
+	    btnBorrarUltimo.setText(simbolos[7]);
+	    btnBorrarTodo.setText(simbolos[8]);
 
-		Timeline cronometro = new Timeline(new KeyFrame(Duration.seconds(1), evento -> actualizarCronometro()));
+	    /*
+	     * Crear cronómetro.
+	     */
+	    Timeline cronometro = new Timeline(
+	        new KeyFrame(
+	            Duration.seconds(1),
+	            evento -> actualizarCronometro()
+	        )
+	    );
 
-		cronometro.setCycleCount(Timeline.INDEFINITE);
+	    cronometro.setCycleCount(
+	        Timeline.INDEFINITE
+	    );
 
-		cronometro.play();
+	    cronometro.play();
 	}
 	// =========================
 	// CRONOMETRO
@@ -697,117 +769,221 @@ public class CalculadoraControler {
 	/**
 	 * Calcula la expresión matemática ingresada por el usuario.
 	 *
-	 * Utiliza la clase {@link Operador} para procesar la expresión y obtener el
-	 * resultado. Posteriormente utiliza la clase {@link Fraccion} para convertir
-	 * los resultados decimales a su representación fraccionaria cuando sea
-	 * necesario.
+	 * La expresión es procesada por la Calculadora asociada
+	 * a la partida actual.
 	 *
-	 * Si la expresión contiene un error matemático o de sintaxis, se muestra el
-	 * mensaje correspondiente en la etiqueta de error.
+	 * Si el resultado es válido, se registra como un Resultado
+	 * perteneciente a la Partida.
 	 *
-	 * @throws IllegalArgumentException si la expresión matemática es inválida
-	 * @throws ArithmeticException      si se intenta realizar una división entre
-	 *                                  cero
+	 * Si la expresión contiene un error matemático o de sintaxis,
+	 * se muestra el mensaje correspondiente al usuario.
+	 *
+	 * @throws IllegalArgumentException si la expresión matemática
+	 *                                  es inválida.
+	 * @throws ArithmeticException si se intenta realizar una
+	 *                             división entre cero.
 	 */
-
 	@FXML
 	private void resultado() {
 
-		if (partidaFinalizada) {
-			lblError.setText("La partida ya terminó");//no se a probado
-			return;
-		}
+	    if (partidaFinalizada) {
+	        lblError.setText("La partida ya terminó");
+	        return;
+	    }
 
-		if (expresion.isEmpty()) {
-			lblError.setText("Ingrese una expresión");
-			return;
-		}
+	    if (expresion.isEmpty()) {
+	        lblError.setText("Ingrese una expresión");
+	        return;
+	    }
 
-		try {
+	    try {
 
-			String expresionCalculada = expresion;
-			System.out.println(expresionCalculada);//si es correcto y da un resultado valido que no existiera se debe guardar la ecuacion y su resultado
+	        /*
+	         * Guardamos la expresión antes de limpiarla.
+	         */
+	        String expresionCalculada = expresion;
 
-			Operador op = new Operador(expresionCalculada);
-			double resultado = op.calcular();
+	        System.out.println(
+	            "Expresión: " + expresionCalculada
+	        );
 
-			String resultadoTexto = Fraccion.convertir(resultado);
+	        /*
+	         * La Calculadora que pertenece a la Partida
+	         * recibe la expresión que acaba de construir
+	         * el jugador.
+	         */
+	        calculadora.setEcuacion(
+	            expresionCalculada
+	        );
 
-			// Eliminar los cuatro números utilizados
-			contenedorNumeros.getChildren().removeAll(numerosUtilizados);
+	        /*
+	         * Calcular la expresión.
+	         */
+	        double resultado =
+	            calculadora.calcular();
 
-			// Crear el botón con el resultado
-			Button botonResultado = new Button(resultadoTexto);
+	        /*
+	         * Convertir el resultado a entero o fracción.
+	         *
+	         * Ejemplo:
+	         * 5.0   -> "5"
+	         * 0.5   -> "1/2"
+	         */
+	        String resultadoTexto =
+	            Calculadora.convertir(resultado);
 
-			botonResultado.setOnAction(this::seleccionarNumero);
+	        /*
+	         * Eliminar los números utilizados.
+	         */
+	        contenedorNumeros
+	            .getChildren()
+	            .removeAll(numerosUtilizados);
 
-			// Agregar el resultado
-			contenedorNumeros.getChildren().add(botonResultado);
+	        /*
+	         * Crear botón con el resultado.
+	         */
+	        Button botonResultado =
+	            new Button(resultadoTexto);
 
-			txtValor1.setText("");
-			lblError.setText("");
+	        botonResultado.setOnAction(
+	            this::seleccionarNumero
+	        );
 
-			expresion = "";
-			numerosUtilizados.clear();
+	        /*
+	         * Agregar el resultado como nuevo número.
+	         */
+	        contenedorNumeros
+	            .getChildren()
+	            .add(botonResultado);
 
-			/*
-			 * SOLAMENTE cuando queda un botón se valida si el resultado final está entre 1
-			 * y 10.
-			 */
-			if (contenedorNumeros.getChildren().size() == 1) {
+	        /*
+	         * Limpiar expresión de la interfaz.
+	         */
+	        txtValor1.setText("");
+	        lblError.setText("");
+	        expresion = "";
+	        numerosUtilizados.clear();
 
-				if (resultado > 10) {
-					lblError.setText("no pueden existir numero mayor a 10");
-					reiniciarNumeros();
-					return;
-				} else {
+	        /*
+	         * Solamente cuando queda un botón se valida
+	         * el resultado final de la ronda.
+	         */
+	        if (contenedorNumeros.getChildren().size() == 1) {
 
-					if (resultado >= 1 && resultado <= 10 && resultado == Math.floor(resultado)) {
+	            /*
+	             * No se permiten resultados mayores a 10.
+	             */
+	            if (resultado > 10) {
 
-						int resultadoFinal = (int) resultado;
+	                lblError.setText(
+	                    "No pueden existir números mayores a 10"
+	                );
 
-						// Aumentar puntaje
-						puntaje++;
+	                reiniciarNumeros();
+	                return;
+	            }
 
-						lblResultado.setText(puntaje + "/10");
+	            /*
+	             * Validar que el resultado sea un número
+	             * entero entre 1 y 10.
+	             */
+	            if (resultado >= 1
+	                    && resultado <= 10
+	                    && resultado == Math.floor(resultado)) {
 
-						// Marcar resultado encontrado
-						marcarResultado(resultadoFinal);
+	                int resultadoFinal =
+	                    (int) resultado;
 
-						// Crear objeto Resultado
-						Resultado nuevoResultado = new Resultado(0, partidaActual, expresion, resultadoFinal);
+	                /*
+	                 * Aumentar puntaje.
+	                 */
+	                puntaje++;
 
-						// Agregarlo a la partida
-						partidaActual.agregarResultado(nuevoResultado);
+	                lblResultado.setText(
+	                    puntaje + "/10"
+	                );
 
-						// Actualizar puntaje de la partida
-						partidaActual.setPuntaje(puntaje);
+	                /*
+	                 * Marcar visualmente el resultado.
+	                 */
+	                marcarResultado(
+	                    resultadoFinal
+	                );
 
-						if (todosLosNumerosEncontrados()) {
+	                /*
+	                 * Crear Resultado.
+	                 *
+	                 * Se guarda:
+	                 * - ID temporal 0
+	                 * - Partida actual
+	                 * - Expresión utilizada
+	                 * - Resultado obtenido
+	                 */
+	                Resultado nuevoResultado =
+	                    new Resultado(
+	                        0,
+	                        partidaActual,
+	                        expresionCalculada,
+	                        resultadoFinal
+	                    );
 
-							finalizarPartida();
+	                /*
+	                 * La partida conoce su resultado.
+	                 */
+	                partidaActual.agregarResultado(
+	                    nuevoResultado
+	                );
 
-						} else {
+	                /*
+	                 * Actualizar puntaje de la partida.
+	                 */
+	                partidaActual.setPuntaje(
+	                    puntaje
+	                );
 
-							DaoScoreImplementado dao = new DaoScoreImplementado();
+	                /*
+	                 * Comprobar si ya consiguió
+	                 * los resultados del 1 al 10.
+	                 */
+	                if (todosLosNumerosEncontrados()) {
 
-							boolean actualizada = dao.actualizar(partidaActual);
+	                    finalizarPartida();
 
-							if (!actualizada) {
+	                } else {
 
-								lblError.setText("No se pudo actualizar la partida");
-							}
+	                    /*
+	                     * Actualizar la partida en la base de datos.
+	                     */
+	                    DaoScoreImplementado dao =
+	                        new DaoScoreImplementado();
 
-							reiniciarNumeros();
-						}
-					}
-				}
-			}
-		} catch (IllegalArgumentException | ArithmeticException e) {
+	                    boolean actualizada =
+	                        dao.actualizar(partidaActual);
 
-			// Por ejemplo: resultado negativo no permitido
-			lblError.setText(e.getMessage());
-		}
+	                    if (!actualizada) {
+	                        lblError.setText(
+	                            "No se pudo actualizar la partida"
+	                        );
+	                    }
+
+	                    /*
+	                     * Preparar una nueva ronda.
+	                     */
+	                    reiniciarNumeros();
+	                }
+	            }
+	        }
+
+	    } catch (IllegalArgumentException
+	            | ArithmeticException e) {
+
+	        /*
+	         * Mostrar el error producido por Calculadora.
+	         */
+	        lblError.setText(
+	            e.getMessage()
+	        );
+	    }
 	}
 
 	@FXML

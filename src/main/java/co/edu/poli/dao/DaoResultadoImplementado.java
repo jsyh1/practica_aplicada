@@ -4,25 +4,43 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.edu.poli.modelo.Calculadora;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
 import co.edu.poli.servicios.ConexionDB;
 
+/**
+ * Implementación del DAO para la entidad Resultado.
+ *
+ * Se encarga de realizar las operaciones CRUD sobre la tabla
+ * resultado y de reconstruir las relaciones entre Resultado,
+ * Partida, Jugador y Calculadora.
+ *
+ * @author Jsyh
+ * @version 1.0
+ */
 public class DaoResultadoImplementado implements ResultadoDAO {
 
     private final Connection conexion;
 
+    /**
+     * Constructor que obtiene la conexión a la base de datos.
+     */
     public DaoResultadoImplementado() {
         conexion = ConexionDB.getInstancia().getConexion();
     }
 
+    /**
+     * Crea un resultado en la base de datos.
+     *
+     * @param objeto resultado que se desea crear
+     * @return true si se creó correctamente, false en caso contrario
+     */
     @Override
     public boolean crear(Resultado objeto) {
 
@@ -76,6 +94,11 @@ public class DaoResultadoImplementado implements ResultadoDAO {
         return false;
     }
 
+    /**
+     * Lista todos los resultados registrados.
+     *
+     * @return lista de resultados
+     */
     @Override
     public List<Resultado> listar() {
 
@@ -186,6 +209,12 @@ public class DaoResultadoImplementado implements ResultadoDAO {
         return null;
     }
 
+    /**
+     * Actualiza un resultado existente.
+     *
+     * @param objeto resultado que se desea actualizar
+     * @return true si se actualizó correctamente
+     */
     @Override
     public boolean actualizar(Resultado objeto) {
 
@@ -234,6 +263,12 @@ public class DaoResultadoImplementado implements ResultadoDAO {
         return false;
     }
 
+    /**
+     * Elimina un resultado.
+     *
+     * @param id identificador del resultado
+     * @return true si se eliminó correctamente
+     */
     @Override
     public boolean eliminar(int id) {
 
@@ -263,7 +298,11 @@ public class DaoResultadoImplementado implements ResultadoDAO {
 
     /**
      * Construye una partida utilizando los datos obtenidos
-     * mediante la consulta SQL.
+     * mediante una consulta SQL.
+     *
+     * La partida ahora necesita una Calculadora para poder existir,
+     * por lo que se crea una instancia de Calculadora al reconstruir
+     * la partida desde la base de datos.
      *
      * @param rs resultado de la consulta
      * @return partida construida
@@ -282,9 +321,23 @@ public class DaoResultadoImplementado implements ResultadoDAO {
                 fecha
         );
 
+        /*
+         * La Calculadora pertenece a la Partida.
+         *
+         * Al recuperar una partida desde la base de datos
+         * no necesitamos reconstruir una ecuación en curso,
+         * por lo que se crea con valores iniciales vacíos.
+         */
+        Calculadora calculadora = new Calculadora(
+                new String[9],
+                new int[4],
+                ""
+        );
+
         Partida partida = new Partida(
                 rs.getInt("partida_id"),
                 jugador,
+                calculadora,
                 fecha,
                 rs.getTime("tiempo")
                         .toLocalTime()
