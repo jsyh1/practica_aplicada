@@ -29,9 +29,9 @@ public class ConexionDB {
 
 	private static final String URL = dotenv.get("DB_URL");
 
-	private static final String USUARIO = dotenv.get("DB_USUARIO");
+	private static final String USUARIO = dotenv.get("DB_USER");
 
-	private static final String CLAVE = dotenv.get("DB_CLAVE");
+	private static final String CLAVE = dotenv.get("DB_PASSWORD");
 
 	/**
 	 * Objeto que representa la conexión activa con la base de datos.
