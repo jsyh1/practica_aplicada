@@ -1,15 +1,14 @@
 package co.edu.poli.dao;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.ResultSet;
 
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.servicios.ConexionDB;

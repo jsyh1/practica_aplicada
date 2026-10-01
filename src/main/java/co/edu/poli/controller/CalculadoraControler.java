@@ -1,18 +1,18 @@
 package co.edu.poli.controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoScoreImplementado;
-
+import co.edu.poli.modelo.Calculadora;
 import co.edu.poli.modelo.Jugador;
-
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
-import co.edu.poli.modelo.Calculadora;
 import co.edu.poli.servicios.ConexionDB;
+import co.edu.poli.vista.App;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -22,8 +22,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
@@ -158,9 +156,8 @@ public class CalculadoraControler {
 
 	@FXML
 	public void initialize() {
-
 	    DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
-
+	
 	    jugadorActual = new Jugador(0, LocalDate.now());
 
 	    if (daoJugador.crear(jugadorActual)) {
@@ -168,6 +165,7 @@ public class CalculadoraControler {
 	            "Jugador creado con ID: " + jugadorActual.getId()
 	        );
 	    }
+		
 
 	    puntaje = 0;
 
@@ -1078,43 +1076,8 @@ public class CalculadoraControler {
 		return true;
 	}
 
-	/**
-	 * Inicia el mecanismo disponible para compartir la información mostrada en la
-	 * aplicación.
-	 *
-	 * Si existe información para compartir, esta se copia al portapapeles del
-	 * sistema.
-	 *
-	 * Si ocurre un error o no existe un mecanismo compatible, se informa al usuario
-	 * sin detener la aplicación.
-	 */
-	@FXML
-	private void Compartir() {
 
-		try {
 
-			String resultado = txtValor1.getText();
-
-			if (resultado == null || resultado.isEmpty()) {
-
-				lblError.setText("No hay información para compartir");
-				return;
-			}
-
-			String mensaje = "🧮 Resultado: " + resultado;
-
-			ClipboardContent contenido = new ClipboardContent();
-			contenido.putString(mensaje);
-
-			Clipboard.getSystemClipboard().setContent(contenido);
-
-			lblError.setText("Información preparada para compartir");
-
-		} catch (Exception e) {
-
-			lblError.setText("No existe un mecanismo compatible para compartir");
-		}
-	}
 
 	@FXML
 	private void mostrarMenu(ActionEvent event) {
@@ -1124,30 +1087,26 @@ public class CalculadoraControler {
 
     Button btnInstrucciones = new Button("Instrucciones");
     Button btnConsultar = new Button("Consultar");
-	Button btnCompartir = new Button("Compartir");
-
 
     btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
     btnConsultar.setMaxWidth(Double.MAX_VALUE);
-	btnCompartir.setMaxWidth(Double.MAX_VALUE);
 
     btnInstrucciones.setOnAction(e -> {
         popup.hide();
         mostrarReglas();
     });
 
-	btnCompartir.setOnAction(e -> {
-        popup.hide();
-        Compartir();
-    });
-
     btnConsultar.setOnAction(e -> {
         popup.hide();
-        consultarPartida();
+        try {
+			App.setRoot("consulta");
+		} catch (IOException ex) {
+			lblError.setText("Error al ver consulta ");
+			}
     });
 
 
-    VBox contenedor = new VBox(btnInstrucciones, btnCompartir,btnConsultar);
+    VBox contenedor = new VBox(btnInstrucciones,btnConsultar);
     contenedor.setSpacing(4);
     contenedor.setStyle("-fx-background-color: white; -fx-padding: 8; "
         + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);");
