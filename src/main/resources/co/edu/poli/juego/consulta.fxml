@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="co.edu.poli.controller.ConsultarControler">
+
+    <VBox alignment="CENTER" prefWidth="320.0" spacing="14.0" VBox.vgrow="ALWAYS">
+
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </padding>
+
+        <!-- Encabezado -->
+        <VBox alignment="CENTER_LEFT" spacing="2.0">
+            <Label text="Consulta de partidas" />
+            <Label text="Últimas 5 registradas" />
+        </VBox>
+
+        <!-- Lista de partidas (se llena desde el controlador) -->
+        <ScrollPane fitToWidth="true" prefHeight="420.0" VBox.vgrow="ALWAYS">
+            <content>
+                <VBox fx:id="contenedorPartidas" spacing="10.0" />
+            </content>
+        </ScrollPane>
+        <Label fx:id="lblMensaje" text="" />
+        <!-- Volver -->
+        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#calljuego" text="VOLVER" />
+
+    </VBox>
+</StackPane>

@@ -1,6 +1,8 @@
 package co.edu.poli.vista;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +17,8 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     private static Scene scene;
+    // Guarda las vistas que ya fueron cargadas
+    private static final Map<String, Parent> vistas = new HashMap<>();
 
     /**
      * Inicia la aplicación JavaFX.
@@ -24,32 +28,44 @@ public class App extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("juego"));
 
-        // Nombre de la ventana
-        stage.setTitle("All Ten");
+    Parent juego = loadFXML("juego");
 
-        // Logo de la ventana
-        stage.getIcons().add(
-            new Image(
-                App.class.getResourceAsStream(
-                    "/co/edu/poli/juego/img/logo.jpg"
-                )
+    // Guardamos la vista del juego
+    vistas.put("juego", juego);
+
+    // Usamos la misma vista que acabamos de cargar
+    scene = new Scene(juego);
+
+    stage.setTitle("All Ten");
+
+    stage.getIcons().add(
+        new Image(
+            App.class.getResourceAsStream(
+                "/co/edu/poli/juego/img/logo.jpg"
             )
-        );
+        )
+    );
 
-        stage.setScene(scene);
-        stage.show();
-    }
-
+    stage.setScene(scene);
+    stage.show();
+}
     /**
      * Cambia la vista principal de la aplicación.
      *
      * @param fxml nombre del archivo FXML sin extensión
      * @throws IOException si no se puede cargar el archivo FXML
      */
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
+    public static void setRoot(String fxml) throws IOException {
+        Parent vista = vistas.get(fxml);
+
+        // Si la vista ya existe, reutilizarla
+        if (vista == null) {
+            vista = loadFXML(fxml);
+            vistas.put(fxml, vista);
+        }
+        
+        scene.setRoot(vista);
     }
 
     /**
