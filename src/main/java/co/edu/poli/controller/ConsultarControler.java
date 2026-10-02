@@ -27,15 +27,7 @@ public class ConsultarControler {
     public void initialize() {
 
         DaoScoreImplementado dao = new DaoScoreImplementado();
-        List<Partida> partidas = dao.listar();
-
-        partidas.sort((p1, p2) -> 
-            Integer.compare(
-                p1.getJugador().getId(), 
-                p2.getJugador().getId()
-            )
-        );
-
+        List<Partida> partidas = dao.ultimasPartidas(5);
         if (partidas.isEmpty()) {
 
             contenedorPartidas.getChildren().add(
