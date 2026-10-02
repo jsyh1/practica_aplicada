@@ -984,63 +984,7 @@ public class CalculadoraControler {
 	    }
 	}
 
-	@FXML
-	private void consultarPartida() {
-
-		DaoScoreImplementado dao = new DaoScoreImplementado();
-
-		List<Partida> partidas = dao.ultimasPartidas(5);
-
-		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-
-		alert.setTitle("Consulta de partidas");
-		alert.setHeaderText("Partidas registradas");
-
-		if (partidas.isEmpty()) {
-
-			alert.setContentText("No hay partidas registradas.");
-
-		} else {
-
-			StringBuilder texto = new StringBuilder();
-
-			for (Partida p : partidas) {
-
-				texto.append("ID: ").append(p.getId()).append("\n");
-
-				texto.append("Jugador: ").append(p.getJugador()).append("\n");
-
-				texto.append("Fecha: ").append(p.getFechaPartida()).append("\n");
-
-				texto.append("Resultados: ");
-
-				if (p.getResultados().isEmpty()) {
-
-					texto.append("Sin resultados\n");
-
-				} else {
-
-					for (Resultado r : p.getResultados()) {
-
-						texto.append(r.getResultado()).append(" (dato: ").append(r.getDato()).append(")");
-
-					}
-
-					texto.append("\n");
-				}
-
-				texto.append("Puntaje: ").append(p.getPuntaje()).append("\n");
-
-				texto.append("Tiempo: ").append(p.getTiempoEjecucion()).append(" segundos").append("\n");
-
-				texto.append("----------------------------\n");
-			}
-
-			alert.setContentText(texto.toString());
-		}
-
-		alert.showAndWait();
-	}
+	
 
 	/**
 	 * Marca el resultado indicado en verde.
@@ -1087,9 +1031,11 @@ public class CalculadoraControler {
 
     Button btnInstrucciones = new Button("Instrucciones");
     Button btnConsultar = new Button("Consultar");
+    Button btnAyuda = new Button("Ayuda");
 
     btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
     btnConsultar.setMaxWidth(Double.MAX_VALUE);
+    btnAyuda.setMaxWidth(Double.MAX_VALUE);
 
     btnInstrucciones.setOnAction(e -> {
         popup.hide();
@@ -1104,9 +1050,14 @@ public class CalculadoraControler {
 			lblError.setText("Error al ver consulta ");
 			}
     });
+    
+    btnAyuda.setOnAction(e -> {
+        popup.hide();
+        mostrarReglas();
+    });
 
 
-    VBox contenedor = new VBox(btnInstrucciones,btnConsultar);
+    VBox contenedor = new VBox(btnInstrucciones,btnConsultar,btnAyuda);
     contenedor.setSpacing(4);
     contenedor.setStyle("-fx-background-color: white; -fx-padding: 8; "
         + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);");
