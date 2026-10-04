@@ -20,8 +20,8 @@
 	</properties>
 
 	<dependencies>
-	
-			<!-- Driver de MYSQL -->
+
+		<!-- Driver de MYSQL -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
@@ -34,8 +34,8 @@
 			<version>6.0.1</version>
 			<scope>test</scope>
 		</dependency>
-		
-				<!-- ENV -->
+
+		<!-- ENV -->
 		<dependency>
 			<groupId>io.github.cdimascio</groupId>
 			<artifactId>dotenv-java</artifactId>
@@ -56,7 +56,6 @@
 			<artifactId>javafx-fxml</artifactId>
 			<version>${javafx.version}</version>
 		</dependency>
-		
 
 
 	</dependencies>
@@ -86,13 +85,42 @@
 				</configuration>
 
 			</plugin>
-			
+
 			<!-- JUnit -->
 			<plugin>
-    			<groupId>org.apache.maven.plugins</groupId>
-    			<artifactId>maven-surefire-plugin</artifactId>
-    			<version>3.2.5</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
 			</plugin>
+
+			<!-- NUEVO: Plugin para generar Javadoc en proyectos modulares de
+			Maven -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.11.2</version>
+				<configuration>
+					<!-- Obliga a Maven a mapear las dependencias al Module Path -->
+					<detectModules>true</detectModules>
+					<!-- Evita fallos si tienes alguna etiqueta de comentario
+					mal formateada -->
+					<additionalOptions>-Xdoclint:none</additionalOptions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.11.2</version>
+				<configuration>
+					<detectModules>true</detectModules>
+					<additionalOptions>-Xdoclint:none</additionalOptions>
+					<!-- Fuerza a generar la documentación de absolutamente
+					todas las clases (public, protected, package y private) -->
+					<show>private</show>
+				</configuration>
+			</plugin>
+
 
 		</plugins>
 
