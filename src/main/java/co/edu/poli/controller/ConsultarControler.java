@@ -114,6 +114,7 @@ public class ConsultarControler {
 
         return fila;
     }
+    
 
     /**
      * Prepara la información de una partida y la copia al portapapeles
