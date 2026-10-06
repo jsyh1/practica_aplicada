@@ -3,6 +3,7 @@ package co.edu.poli.controller;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import co.edu.poli.dao.DaoJugadorImplementado;
@@ -12,6 +13,7 @@ import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
 import co.edu.poli.servicios.ConexionDB;
+import co.edu.poli.servicios.GeneradorEcuaciones;
 import co.edu.poli.vista.App;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -143,7 +145,7 @@ public class CalculadoraControler {
 	@FXML
 	private Button btnReglas;
 
-	@FXML 
+	@FXML
 	private Button btnMenu;
 
 	private Calculadora calculadora;
@@ -153,150 +155,116 @@ public class CalculadoraControler {
 	private Partida partidaActual;
 	private Jugador jugadorActual;
 	private boolean partidaFinalizada = false;
+	private boolean ayudaDisponible = false;
+	
+	GeneradorEcuaciones generadorEcuaciones = new GeneradorEcuaciones();
+	
 
 	@FXML
 	public void initialize() {
-	    DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
-	
-	    jugadorActual = new Jugador(0, LocalDate.now());
+		DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
 
-	    if (daoJugador.crear(jugadorActual)) {
-	        System.out.println(
-	            "Jugador creado con ID: " + jugadorActual.getId()
-	        );
-	    }
-		
+		jugadorActual = new Jugador(0, LocalDate.now());
 
-	    puntaje = 0;
+		if (daoJugador.crear(jugadorActual)) {
+			System.out.println("Jugador creado con ID: " + jugadorActual.getId());
+		}
 
-	    lblResultado.setText("0/10");
+		puntaje = 0;
 
-	    /*
-	     * La Calculadora pertenece a la partida.
-	     * Primero se crea la Calculadora porque
-	     * la Partida necesita una para poder existir.
-	     */
-	    calculadora = new Calculadora(
-	        new String[9],
-	        new int[4],
-	        ""
-	    );
+		lblResultado.setText("0/10");
 
-	    /*
-	     * Generar los números de la ronda.
-	     */
-	    numerosOriginales = calculadora.generarNumeros();
+		/*
+		 * La Calculadora pertenece a la partida. Primero se crea la Calculadora porque
+		 * la Partida necesita una para poder existir.
+		 */
+		calculadora = new Calculadora(new String[9], new int[4], "");
 
-	    /*
-	     * Generar los símbolos de la calculadora.
-	     */
-	    String[] simbolos = calculadora.generarSimbolos();
+		/*
+		 * Generar los números de la ronda.
+		 */
+		numerosOriginales = calculadora.generarNumeros();
 
-	    /*
-	     * Crear la partida.
-	     *
-	     * La partida recibe:
-	     * - Jugador
-	     * - Calculadora
-	     * - Fecha
-	     * - Tiempo inicial
-	     * - Puntaje inicial
-	     */
-	    partidaActual = new Partida(
-	        jugadorActual,
-	        calculadora,
-	        LocalDate.now(),
-	        0,
-	        0
-	    );
+		/*
+		 * Generar los símbolos de la calculadora.
+		 */
+		String[] simbolos = calculadora.generarSimbolos();
 
-	    /*
-	     * El jugador conoce su partida.
-	     */
-	    jugadorActual.agregarPartida(partidaActual);
+		/*
+		 * Crear la partida.
+		 *
+		 * La partida recibe: - Jugador - Calculadora - Fecha - Tiempo inicial - Puntaje
+		 * inicial
+		 */
+		partidaActual = new Partida(jugadorActual, calculadora, LocalDate.now(), 0, 0);
 
-	    /*
-	     * Generar fecha e iniciar cronómetro.
-	     */
-	    partidaActual.generarFechaPartida();
-	    partidaActual.iniciarTiempo();
+		/*
+		 * El jugador conoce su partida.
+		 */
+		jugadorActual.agregarPartida(partidaActual);
 
-	    /*
-	     * Guardar la partida.
-	     */
-	    DaoScoreImplementado daoPartida =
-	        new DaoScoreImplementado();
+		/*
+		 * Generar fecha e iniciar cronómetro.
+		 */
+		partidaActual.generarFechaPartida();
+		partidaActual.iniciarTiempo();
 
-	    boolean partidaCreada =
-	        daoPartida.crear(partidaActual);
+		/*
+		 * Guardar la partida.
+		 */
+		DaoScoreImplementado daoPartida = new DaoScoreImplementado();
 
-	    if (!partidaCreada) {
-	        lblError.setText(
-	            "No se pudo crear la partida"
-	        );
-	    }
+		boolean partidaCreada = daoPartida.crear(partidaActual);
 
-	    /*
-	     * Mostrar fecha.
-	     */
-	    DateTimeFormatter formato =
-	        DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		if (!partidaCreada) {
+			lblError.setText("No se pudo crear la partida");
+		}
 
-	    String fechaTexto =
-	        partidaActual
-	            .getFechaPartida()
-	            .format(formato);
+		/*
+		 * Mostrar fecha.
+		 */
+		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-	    lblFecha.setText(fechaTexto);
+		String fechaTexto = partidaActual.getFechaPartida().format(formato);
 
-	    /*
-	     * Crear los botones de los cuatro números.
-	     */
-	    for (int numero : numerosOriginales) {
+		lblFecha.setText(fechaTexto);
 
-	        Button boton =
-	            new Button(String.valueOf(numero));
+		/*
+		 * Crear los botones de los cuatro números.
+		 */
+		for (int numero : numerosOriginales) {
 
-	        boton.setOnAction(
-	            this::seleccionarNumero
-	        );
+			Button boton = new Button(String.valueOf(numero));
 
-	        contenedorNumeros
-	            .getChildren()
-	            .add(boton);
-	    }
+			boton.setOnAction(this::seleccionarNumero);
 
-	    /*
-	     * Configurar los botones de operaciones.
-	     */
-	    btnSuma.setText(simbolos[0]);
-	    btnResta.setText(simbolos[1]);
-	    btnMultiplicacion.setText(simbolos[2]);
-	    btnDivision.setText(simbolos[3]);
+			contenedorNumeros.getChildren().add(boton);
+		}
 
-	    btnParentesisAbre.setText(simbolos[4]);
-	    btnParentesisCierra.setText(simbolos[5]);
+		/*
+		 * Configurar los botones de operaciones.
+		 */
+		btnSuma.setText(simbolos[0]);
+		btnResta.setText(simbolos[1]);
+		btnMultiplicacion.setText(simbolos[2]);
+		btnDivision.setText(simbolos[3]);
 
-	    btnIgual.setText(simbolos[6]);
+		btnParentesisAbre.setText(simbolos[4]);
+		btnParentesisCierra.setText(simbolos[5]);
 
-	    btnBorrarUltimo.setText(simbolos[7]);
-	    btnBorrarTodo.setText(simbolos[8]);
+		btnIgual.setText(simbolos[6]);
 
-	    /*
-	     * Crear cronómetro.
-	     */
-	    Timeline cronometro = new Timeline(
-	        new KeyFrame(
-	            Duration.seconds(1),
-	            evento -> actualizarCronometro()
-	        )
-	    );
+		btnBorrarUltimo.setText(simbolos[7]);
+		btnBorrarTodo.setText(simbolos[8]);
 
-	    cronometro.setCycleCount(
-	        Timeline.INDEFINITE
-	    );
+		/*
+		 * Crear cronómetro.
+		 */
+		Timeline cronometro = new Timeline(new KeyFrame(Duration.seconds(1), evento -> actualizarCronometro()));
 
-	    cronometro.play();
+		cronometro.setCycleCount(Timeline.INDEFINITE);
+
+		cronometro.play();
 	}
 	// =========================
 	// CRONOMETRO
@@ -767,225 +735,187 @@ public class CalculadoraControler {
 	/**
 	 * Calcula la expresión matemática ingresada por el usuario.
 	 *
-	 * La expresión es procesada por la Calculadora asociada
-	 * a la partida actual.
+	 * La expresión es procesada por la Calculadora asociada a la partida actual.
 	 *
-	 * Si el resultado es válido, se registra como un Resultado
-	 * perteneciente a la Partida.
+	 * Si el resultado es válido, se registra como un Resultado perteneciente a la
+	 * Partida.
 	 *
-	 * Si la expresión contiene un error matemático o de sintaxis,
-	 * se muestra el mensaje correspondiente al usuario.
+	 * Si la expresión contiene un error matemático o de sintaxis, se muestra el
+	 * mensaje correspondiente al usuario.
 	 *
-	 * @throws IllegalArgumentException si la expresión matemática
-	 *                                  es inválida.
-	 * @throws ArithmeticException si se intenta realizar una
-	 *                             división entre cero.
+	 * @throws IllegalArgumentException si la expresión matemática es inválida.
+	 * @throws ArithmeticException      si se intenta realizar una división entre
+	 *                                  cero.
 	 */
+	int count = 0;
+
 	@FXML
 	private void resultado() {
 
-	    if (partidaFinalizada) {
-	        lblError.setText("La partida ya terminó");
-	        return;
-	    }
+		if (partidaFinalizada) {
+			lblError.setText("La partida ya terminó");
+			return;
+		}
 
-	    if (expresion.isEmpty()) {
-	        lblError.setText("Ingrese una expresión");
-	        return;
-	    }
+		if (expresion.isEmpty()) {
+			lblError.setText("Ingrese una expresión");
+			return;
+		}
 
-	    try {
+		try {
 
-	        /*
-	         * Guardamos la expresión antes de limpiarla.
-	         */
-	        String expresionCalculada = expresion;
+			System.out.println("Expresión: " + expresion);
 
-	        System.out.println(
-	            "Expresión: " + expresionCalculada
-	        );
+			/*
+			 * La Calculadora que pertenece a la Partida recibe la expresión que acaba de
+			 * construir el jugador.
+			 */
+			calculadora.setEcuacion(expresion);
 
-	        /*
-	         * La Calculadora que pertenece a la Partida
-	         * recibe la expresión que acaba de construir
-	         * el jugador.
-	         */
-	        calculadora.setEcuacion(
-	            expresionCalculada
-	        );
+			/*
+			 * Calcular la expresión.
+			 */
+			double resultado = calculadora.calcular();
 
-	        /*
-	         * Calcular la expresión.
-	         */
-	        double resultado =
-	            calculadora.calcular();
+			/*
+			 * Convertir el resultado a entero o fracción.
+			 *
+			 * Ejemplo: 5.0 -> "5" 0.5 -> "1/2"
+			 */
+			String resultadoTexto = Calculadora.convertir(resultado);
 
-	        /*
-	         * Convertir el resultado a entero o fracción.
-	         *
-	         * Ejemplo:
-	         * 5.0   -> "5"
-	         * 0.5   -> "1/2"
-	         */
-	        String resultadoTexto =
-	            Calculadora.convertir(resultado);
+			generadorEcuaciones.agregarParte(expresion, resultadoTexto);
 
-	        /*
-	         * Eliminar los números utilizados.
-	         */
-	        contenedorNumeros
-	            .getChildren()
-	            .removeAll(numerosUtilizados);
 
-	        /*
-	         * Crear botón con el resultado.
-	         */
-	        Button botonResultado =
-	            new Button(resultadoTexto);
+			
+			/*
+			 * Eliminar los números utilizados.
+			 */
+			contenedorNumeros.getChildren().removeAll(numerosUtilizados);
 
-	        botonResultado.setOnAction(
-	            this::seleccionarNumero
-	        );
+			/*
+			 * Crear botón con el resultado.
+			 */
+			Button botonResultado = new Button(resultadoTexto);
 
-	        /*
-	         * Agregar el resultado como nuevo número.
-	         */
-	        contenedorNumeros
-	            .getChildren()
-	            .add(botonResultado);
+			botonResultado.setOnAction(this::seleccionarNumero);
 
-	        /*
-	         * Limpiar expresión de la interfaz.
-	         */
-	        txtValor1.setText("");
-	        lblError.setText("");
-	        expresion = "";
-	        numerosUtilizados.clear();
+			/*
+			 * Agregar el resultado como nuevo número.
+			 */
+			contenedorNumeros.getChildren().add(botonResultado);
 
-	        /*
-	         * Solamente cuando queda un botón se valida
-	         * el resultado final de la ronda.
-	         */
-	        if (contenedorNumeros.getChildren().size() == 1) {
+			/*
+			 * Limpiar expresión de la interfaz.
+			 */
+			txtValor1.setText("");
+			lblError.setText("");
+			expresion = "";
+			numerosUtilizados.clear();
 
-	            /*
-	             * No se permiten resultados mayores a 10.
-	             */
-	            if (resultado > 10) {
+			/*
+			 * Solamente cuando queda un botón se valida el resultado final de la ronda.
+			 */
+			if (contenedorNumeros.getChildren().size() == 1) {
 
-	                lblError.setText(
-	                    "No pueden existir números mayores a 10"
-	                );
+				/*
+				 * No se permiten resultados mayores a 10.
+				 */
+				if (resultado > 10 || resultado != Math.floor(resultado)) {// y fracciones
 
-	                reiniciarNumeros();
-	                return;
-	            }
+					lblError.setText("No es valido números > 10 o fracciónes no exactas");
 
-	            /*
-	             * Validar que el resultado sea un número
-	             * entero entre 1 y 10.
-	             */
-	            if (resultado >= 1
-	                    && resultado <= 10
-	                    && resultado == Math.floor(resultado)) {
+					count++;
+					reiniciarNumeros();
 
-	                int resultadoFinal =
-	                    (int) resultado;
+					if (count >= 2) {//de 20 no de 2 pero es para probar
+						ayudaDisponible = true;
+					}
 
-	                /*
-	                 * Aumentar puntaje.
-	                 */
-	                puntaje++;
+					return;
+				}
 
-	                lblResultado.setText(
-	                    puntaje + "/10"
-	                );
+				/*
+				 * Validar que el resultado sea un número entero entre 1 y 10.
+				 */
+				if (resultado >= 1 && resultado <= 10 && resultado == Math.floor(resultado)) {
 
-	                /*
-	                 * Marcar visualmente el resultado.
-	                 */
-	                marcarResultado(
-	                    resultadoFinal
-	                );
+					int resultadoFinal = (int) resultado;
 
-	                /*
-	                 * Crear Resultado.
-	                 *
-	                 * Se guarda:
-	                 * - ID temporal 0
-	                 * - Partida actual
-	                 * - Expresión utilizada
-	                 * - Resultado obtenido
-	                 */
-	                Resultado nuevoResultado =
-	                    new Resultado(
-	                        0,
-	                        partidaActual,
-	                        expresionCalculada,
-	                        resultadoFinal
-	                    );
+					/*
+					 * Aumentar puntaje.
+					 */
+					puntaje++;
 
-	                /*
-	                 * La partida conoce su resultado.
-	                 */
-	                partidaActual.agregarResultado(
-	                    nuevoResultado
-	                );
+					lblResultado.setText(puntaje + "/10");
+					
+					String ecuacionCompleta = generadorEcuaciones.obtenerEcuacion();
+					
+					//se guarda en resultado 
+					generadorEcuaciones.limpiar();
 
-	                /*
-	                 * Actualizar puntaje de la partida.
-	                 */
-	                partidaActual.setPuntaje(
-	                    puntaje
-	                );
+					System.out.println("Ecuación completa: " + ecuacionCompleta);
+					
+					/*
+					 * Marcar visualmente el resultado.
+					 */
+					marcarResultado(resultadoFinal);
 
-	                /*
-	                 * Comprobar si ya consiguió
-	                 * los resultados del 1 al 10.
-	                 */
-	                if (todosLosNumerosEncontrados()) {
+					/*
+					 * Crear Resultado.
+					 *
+					 * Se guarda: - ID temporal 0 - Partida actual - Expresión utilizada - Resultado
+					 * obtenido
+					 */
+					Resultado nuevoResultado = new Resultado(0, partidaActual, expresion, resultadoFinal);
 
-	                    finalizarPartida();
+					/*
+					 * La partida conoce su resultado.
+					 */
+					partidaActual.agregarResultado(nuevoResultado);
 
-	                } else {
+					/*
+					 * Actualizar puntaje de la partida.
+					 */
+					partidaActual.setPuntaje(puntaje);
 
-	                    /*
-	                     * Actualizar la partida en la base de datos.
-	                     */
-	                    DaoScoreImplementado dao =
-	                        new DaoScoreImplementado();
+					/*
+					 * Comprobar si ya consiguió los resultados del 1 al 10.
+					 */
+					if (todosLosNumerosEncontrados()) {
 
-	                    boolean actualizada =
-	                        dao.actualizar(partidaActual);
+						finalizarPartida();
 
-	                    if (!actualizada) {
-	                        lblError.setText(
-	                            "No se pudo actualizar la partida"
-	                        );
-	                    }
+					} else {
 
-	                    /*
-	                     * Preparar una nueva ronda.
-	                     */
-	                    reiniciarNumeros();
-	                }
-	            }
-	        }
+						/*
+						 * Actualizar la partida en la base de datos.
+						 */
+						DaoScoreImplementado dao = new DaoScoreImplementado();
 
-	    } catch (IllegalArgumentException
-	            | ArithmeticException e) {
+						boolean actualizada = dao.actualizar(partidaActual);
 
-	        /*
-	         * Mostrar el error producido por Calculadora.
-	         */
-	        lblError.setText(
-	            e.getMessage()
-	        );
-	    }
+						if (!actualizada) {
+							lblError.setText("No se pudo actualizar la partida");
+						}
+
+						/*
+						 * Preparar una nueva ronda.
+						 */
+						reiniciarNumeros();
+					}
+				}
+			}
+
+		} catch (IllegalArgumentException | ArithmeticException e) {
+
+			/*
+			 * Mostrar el error producido por Calculadora.
+			 */
+			lblError.setText(e.getMessage());
+		}
 	}
-
 	
-
 	/**
 	 * Marca el resultado indicado en verde.
 	 *
@@ -1020,53 +950,76 @@ public class CalculadoraControler {
 		return true;
 	}
 
-
-
-
 	@FXML
 	private void mostrarMenu(ActionEvent event) {
 
-    Popup popup = new Popup();
-    popup.setAutoHide(true);
+		Popup popup = new Popup();
 
-    Button btnInstrucciones = new Button("Instrucciones");
-    Button btnConsultar = new Button("Consultar");
-    Button btnAyuda = new Button("Ayuda");
+		popup.setAutoHide(true);
 
-    btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
-    btnConsultar.setMaxWidth(Double.MAX_VALUE);
-    btnAyuda.setMaxWidth(Double.MAX_VALUE);
+		Button btnInstrucciones = new Button("Instrucciones");
+		Button btnConsultar = new Button("Consultar");
 
-    btnInstrucciones.setOnAction(e -> {
-        popup.hide();
-        mostrarReglas();
-    });
+		btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
+		btnConsultar.setMaxWidth(Double.MAX_VALUE);
 
-    btnConsultar.setOnAction(e -> {
-        popup.hide();
-        try {
-			App.setRoot("consulta");
-		} catch (IOException ex) {
-			lblError.setText("Error al ver consulta ");
+		btnInstrucciones.setOnAction(e -> {
+
+			popup.hide();
+
+			mostrarReglas();
+		});
+
+		btnConsultar.setOnAction(e -> {
+
+			popup.hide();
+
+			try {
+
+				App.setRoot("consulta");
+
+			} catch (IOException ex) {
+
+				lblError.setText("Error al ver consulta ");
 			}
-    });
-    
-    btnAyuda.setOnAction(e -> {
-        popup.hide();
-        mostrarReglas();
-    });
+		});
 
+		VBox contenedor = new VBox();
 
-    VBox contenedor = new VBox(btnInstrucciones,btnConsultar,btnAyuda);
-    contenedor.setSpacing(4);
-    contenedor.setStyle("-fx-background-color: white; -fx-padding: 8; "
-        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);");
-    popup.getContent().add(contenedor);
+		contenedor.setSpacing(4);
 
-    Button boton = (Button) event.getSource();
-    Bounds coordenadas = boton.localToScreen(boton.getBoundsInLocal());
+		contenedor.setStyle("-fx-background-color: white; -fx-padding: 8; "
+				+ "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);");
 
-    popup.show(boton, coordenadas.getMinX(), coordenadas.getMaxY());
+		contenedor.getChildren().addAll(btnInstrucciones, btnConsultar);
+
+		/*
+		 * El botón Ayuda solamente aparece después de que se haya cumplido la
+		 * condición.
+		 */
+		if (ayudaDisponible) {
+
+			Button btnAyuda = new Button("Ayuda");
+
+			btnAyuda.setMaxWidth(Double.MAX_VALUE);
+
+			btnAyuda.setOnAction(e -> {
+
+				popup.hide();
+
+				mostrarReglas();
+			});
+
+			contenedor.getChildren().add(btnAyuda);
+		}
+
+		popup.getContent().add(contenedor);
+
+		Button boton = (Button) event.getSource();
+
+		Bounds coordenadas = boton.localToScreen(boton.getBoundsInLocal());
+
+		popup.show(boton, coordenadas.getMinX(), coordenadas.getMaxY());
 	}
 
 }
