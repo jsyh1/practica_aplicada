@@ -14,6 +14,7 @@ import java.util.List;
  * <li>Generar los cuatro números utilizados en el juego.</li>
  * <li>Comprobar que los números generados permitan obtener los resultados
  * del 1 al 10.</li>
+ * <li>Encontrar mediante búsqueda recursiva una ecuación para cada resultado.</li>
  * <li>Resolver ecuaciones matemáticas respetando la prioridad de operaciones.</li>
  * <li>Convertir resultados decimales a fracciones.</li>
  * </ul>
@@ -37,6 +38,12 @@ import java.util.List;
  * @version 1.0
  */
 public class Calculadora {
+
+    /**
+     * Lista de ecuaciones encontradas para obtener los resultados
+     * del 1 al 10 con los cuatro números actuales.
+     */
+    private List<String> ecuacionesResultados = new ArrayList<>();
 
     /**
      * Arreglo que contiene los símbolos disponibles para construir
@@ -63,15 +70,19 @@ public class Calculadora {
      * Construye una instancia del juego.
      *
      * @param simbolos arreglo de símbolos disponibles
-     * @param numeros  arreglo de números disponibles
+     * @param numeros arreglo de números disponibles
      * @param ecuacion ecuación matemática que se desea procesar
      */
-    public Calculadora(String[] simbolos, int[] numeros, String ecuacion) {
+    public Calculadora(
+            String[] simbolos,
+            int[] numeros,
+            String ecuacion) {
 
         this.simbolos = simbolos;
         this.numeros = numeros;
 
         String sinEspacios = ecuacion.replace(" ", "");
+
         this.ecuacion = normalizar(sinEspacios);
         this.posicion = 0;
     }
@@ -92,6 +103,20 @@ public class Calculadora {
      */
     public int[] getNumeros() {
         return numeros;
+    }
+
+    /**
+     * Obtiene las ecuaciones encontradas para los resultados del 1 al 10.
+     *
+     * <p>
+     * Cada posición de la lista representa una ecuación encontrada mediante
+     * búsqueda recursiva utilizando los cuatro números generados.
+     * </p>
+     *
+     * @return lista de ecuaciones encontradas
+     */
+    public List<String> getEcuacionesResultados() {
+        return ecuacionesResultados;
     }
 
     /**
@@ -136,8 +161,12 @@ public class Calculadora {
      *
      * <p>
      * Los números se generan repetidamente hasta encontrar una combinación
-     * que permita obtener todos los resultados desde el 1 hasta el 10
-     * utilizando operaciones matemáticas.
+     * que permita obtener todos los resultados desde el 1 hasta el 10.
+     * </p>
+     *
+     * <p>
+     * Durante la búsqueda también se genera y almacena una ecuación válida
+     * para cada uno de los resultados.
      * </p>
      *
      * @return arreglo con los cuatro números generados
@@ -150,7 +179,8 @@ public class Calculadora {
 
             for (int i = 0; i < this.numeros.length; i++) {
 
-                this.numeros[i] = (int) (Math.random() * 10) + 1;
+                this.numeros[i] =
+                        (int) (Math.random() * 10) + 1;
             }
 
         } while (!esCombinacionValida(this.numeros));
@@ -162,133 +192,384 @@ public class Calculadora {
      * Comprueba si una combinación de cuatro números permite obtener
      * todos los resultados desde el 1 hasta el 10.
      *
+     * <p>
+     * La búsqueda recursiva encuentra una ecuación para cada resultado.
+     * Las ecuaciones encontradas se almacenan temporalmente y solamente
+     * se agregan a la lista definitiva cuando los diez resultados han
+     * sido encontrados.
+     * </p>
+     *
      * @param numeros números que serán evaluados
      * @return {@code true} si la combinación permite obtener todos los
      *         resultados del 1 al 10; {@code false} en caso contrario
      */
     private boolean esCombinacionValida(int[] numeros) {
 
+        /*
+         * Lista temporal para la combinación que se está evaluando.
+         */
+        List<String> ecuacionesEncontradas = new ArrayList<>();
+
+        /*
+         * Buscar una ecuación para cada resultado del 1 al 10.
+         */
         for (int objetivo = 1; objetivo <= 10; objetivo++) {
 
-            if (!puedeObtenerResultado(numeros, objetivo)) {
+            String ecuacionEncontrada =
+                    buscarEcuacion(numeros, objetivo);
+
+            /*
+             * Si no existe una ecuación para uno de los objetivos,
+             * la combinación completa no es válida.
+             */
+            if (ecuacionEncontrada == null) {
                 return false;
             }
+
+            /*
+             * Guardar la ecuación junto con su resultado.
+             */
+            ecuacionesEncontradas.add(
+                    ecuacionEncontrada + " = " + objetivo
+            );
         }
+
+        /*
+         * La combinación consiguió los diez resultados.
+         * Ahora sí se actualiza la lista definitiva.
+         */
+        this.ecuacionesResultados.clear();
+
+        this.ecuacionesResultados.addAll(
+                ecuacionesEncontradas
+        );
 
         return true;
     }
 
     /**
-     * Comprueba si un resultado específico puede obtenerse utilizando
-     * los números disponibles.
+     * Busca una ecuación que permita obtener un resultado específico
+     * utilizando los cuatro números proporcionados.
      *
-     * @param numeros  números disponibles para realizar las operaciones
+     * @param numeros números disponibles
      * @param objetivo resultado que se desea obtener
-     * @return {@code true} si el resultado puede obtenerse; {@code false}
-     *         en caso contrario
+     * @return ecuación encontrada o {@code null} si no existe
      */
-    private boolean puedeObtenerResultado(int[] numeros, int objetivo) {
+    private String buscarEcuacion(
+            int[] numeros,
+            int objetivo) {
 
-        List<Double> valores = new ArrayList<>();
+        List<Expresion> valores = new ArrayList<>();
 
+        /*
+         * Convertir los cuatro números iniciales en expresiones.
+         */
         for (int numero : numeros) {
-            valores.add((double) numero);
+
+            valores.add(
+                    new Expresion(
+                            numero,
+                            String.valueOf(numero)
+                    )
+            );
         }
 
-        return buscarResultado(valores, objetivo);
+        /*
+         * Iniciar la búsqueda recursiva.
+         */
+        return buscarEcuacionRecursiva(
+                valores,
+                objetivo
+        );
     }
 
     /**
-     * Busca recursivamente todas las combinaciones posibles de operaciones
-     * entre los números disponibles.
+     * Realiza una búsqueda recursiva de las diferentes operaciones
+     * posibles entre los valores disponibles.
      *
      * <p>
-     * Para cada par de números se prueban las operaciones de suma, resta,
-     * multiplicación y división. Los resultados obtenidos se vuelven a
-     * utilizar recursivamente hasta obtener un único valor.
+     * En cada llamada se seleccionan dos valores y se combinan mediante
+     * las operaciones permitidas. El resultado de la operación reemplaza
+     * los dos valores utilizados.
      * </p>
      *
-     * @param valores  valores disponibles para realizar las operaciones
-     * @param objetivo resultado que se desea encontrar
-     * @return {@code true} si se encuentra una combinación que produce
-     *         el objetivo; {@code false} en caso contrario
+     * <p>
+     * Cuando solamente queda un valor, significa que los cuatro números
+     * originales fueron utilizados.
+     * </p>
+     *
+     * @param valores valores disponibles durante la búsqueda
+     * @param objetivo resultado que se desea obtener
+     * @return expresión encontrada o {@code null} si no se encuentra
      */
-    private boolean buscarResultado(List<Double> valores, int objetivo) {
+    private String buscarEcuacionRecursiva(
+            List<Expresion> valores,
+            int objetivo) {
 
         /*
-         * Cuando solamente queda un valor se comprueba si corresponde
-         * al resultado buscado.
+         * Cuando solamente queda un valor significa que todos los números
+         * originales ya fueron utilizados.
          */
         if (valores.size() == 1) {
 
-            double resultado = valores.get(0);
+            double resultado =
+                    valores.get(0).valor;
 
-            return Math.abs(resultado - objetivo) < 0.000001;
+            if (Math.abs(resultado - objetivo) < 0.000001) {
+
+                return valores.get(0).expresion;
+            }
+
+            return null;
         }
 
         /*
-         * Se seleccionan dos valores diferentes para realizar
-         * una operación entre ellos.
+         * Seleccionar dos valores diferentes para combinarlos.
          */
         for (int i = 0; i < valores.size(); i++) {
 
             for (int j = i + 1; j < valores.size(); j++) {
 
-                double a = valores.get(i);
-                double b = valores.get(j);
-
-                List<Double> restantes = new ArrayList<>();
+                Expresion a = valores.get(i);
+                Expresion b = valores.get(j);
 
                 /*
-                 * Se conservan los valores que no fueron seleccionados.
+                 * Conservar los valores que no participan
+                 * en la operación actual.
                  */
+                List<Expresion> restantes =
+                        new ArrayList<>();
+
                 for (int k = 0; k < valores.size(); k++) {
 
                     if (k != i && k != j) {
-                        restantes.add(valores.get(k));
+
+                        restantes.add(
+                                valores.get(k)
+                        );
                     }
                 }
 
-                List<Double> resultados = new ArrayList<>();
+                /*
+                 * ========================================================
+                 * SUMA
+                 * ========================================================
+                 */
+                List<Expresion> nuevaLista =
+                        new ArrayList<>(restantes);
 
-                // Suma
-                resultados.add(a + b);
+                nuevaLista.add(
+                        new Expresion(
+                                a.valor + b.valor,
+                                "("
+                                        + a.expresion
+                                        + " + "
+                                        + b.expresion
+                                        + ")"
+                        )
+                );
 
-                // Resta
-                resultados.add(a - b);
-                resultados.add(b - a);
+                String resultado =
+                        buscarEcuacionRecursiva(
+                                nuevaLista,
+                                objetivo
+                        );
 
-                // Multiplicación
-                resultados.add(a * b);
+                if (resultado != null) {
 
-                // División a / b
-                if (Math.abs(b) > 0.000001) {
-                    resultados.add(a / b);
-                }
-
-                // División b / a
-                if (Math.abs(a) > 0.000001) {
-                    resultados.add(b / a);
+                    return resultado;
                 }
 
                 /*
-                 * Se prueba cada resultado obtenido de forma recursiva.
+                 * ========================================================
+                 * RESTA: a - b
+                 * ========================================================
+                 *
+                 * Solamente se permite si el resultado no es negativo.
                  */
-                for (double resultado : resultados) {
+                if (a.valor >= b.valor) {
 
-                    List<Double> nuevaLista =
+                    nuevaLista =
                             new ArrayList<>(restantes);
 
-                    nuevaLista.add(resultado);
+                    nuevaLista.add(
+                            new Expresion(
+                                    a.valor - b.valor,
+                                    "("
+                                            + a.expresion
+                                            + " - "
+                                            + b.expresion
+                                            + ")"
+                            )
+                    );
 
-                    if (buscarResultado(nuevaLista, objetivo)) {
-                        return true;
+                    resultado =
+                            buscarEcuacionRecursiva(
+                                    nuevaLista,
+                                    objetivo
+                            );
+
+                    if (resultado != null) {
+
+                        return resultado;
+                    }
+                }
+
+                /*
+                 * ========================================================
+                 * RESTA: b - a
+                 * ========================================================
+                 *
+                 * También debe ser positiva o cero.
+                 */
+                if (b.valor >= a.valor) {
+
+                    nuevaLista =
+                            new ArrayList<>(restantes);
+
+                    nuevaLista.add(
+                            new Expresion(
+                                    b.valor - a.valor,
+                                    "("
+                                            + b.expresion
+                                            + " - "
+                                            + a.expresion
+                                            + ")"
+                            )
+                    );
+
+                    resultado =
+                            buscarEcuacionRecursiva(
+                                    nuevaLista,
+                                    objetivo
+                            );
+
+                    if (resultado != null) {
+
+                        return resultado;
+                    }
+                }
+
+                /*
+                 * ========================================================
+                 * MULTIPLICACIÓN
+                 * ========================================================
+                 */
+                nuevaLista =
+                        new ArrayList<>(restantes);
+
+                nuevaLista.add(
+                        new Expresion(
+                                a.valor * b.valor,
+                                "("
+                                        + a.expresion
+                                        + " * "
+                                        + b.expresion
+                                        + ")"
+                        )
+                );
+
+                resultado =
+                        buscarEcuacionRecursiva(
+                                nuevaLista,
+                                objetivo
+                        );
+
+                if (resultado != null) {
+
+                    return resultado;
+                }
+
+                /*
+                 * ========================================================
+                 * DIVISIÓN: a / b
+                 * ========================================================
+                 */
+                if (Math.abs(b.valor) > 0.000001) {
+
+                    double division =
+                            a.valor / b.valor;
+
+                    /*
+                     * No se permiten resultados negativos.
+                     */
+                    if (division >= 0) {
+
+                        nuevaLista =
+                                new ArrayList<>(restantes);
+
+                        nuevaLista.add(
+                                new Expresion(
+                                        division,
+                                        "("
+                                                + a.expresion
+                                                + " / "
+                                                + b.expresion
+                                                + ")"
+                                )
+                        );
+
+                        resultado =
+                                buscarEcuacionRecursiva(
+                                        nuevaLista,
+                                        objetivo
+                                );
+
+                        if (resultado != null) {
+
+                            return resultado;
+                        }
+                    }
+                }
+
+                /*
+                 * ========================================================
+                 * DIVISIÓN: b / a
+                 * ========================================================
+                 */
+                if (Math.abs(a.valor) > 0.000001) {
+
+                    double division =
+                            b.valor / a.valor;
+
+                    /*
+                     * No se permiten resultados negativos.
+                     */
+                    if (division >= 0) {
+
+                        nuevaLista =
+                                new ArrayList<>(restantes);
+
+                        nuevaLista.add(
+                                new Expresion(
+                                        division,
+                                        "("
+                                                + b.expresion
+                                                + " / "
+                                                + a.expresion
+                                                + ")"
+                                )
+                        );
+
+                        resultado =
+                                buscarEcuacionRecursiva(
+                                        nuevaLista,
+                                        objetivo
+                                );
+
+                        if (resultado != null) {
+
+                            return resultado;
+                        }
                     }
                 }
             }
         }
 
-        return false;
+        /*
+         * No se encontró ninguna combinación válida.
+         */
+        return null;
     }
 
     /**
@@ -303,7 +584,8 @@ public class Calculadora {
 
         for (int objetivo = 1; objetivo <= 10; objetivo++) {
 
-            if (!puedeObtenerResultado(numeros, objetivo)) {
+            if (buscarEcuacion(numeros, objetivo) == null) {
+
                 return false;
             }
         }
@@ -319,16 +601,17 @@ public class Calculadora {
     public void setEcuacion(String ecuacion) {
 
         if (ecuacion == null) {
+
             throw new IllegalArgumentException(
-                "La ecuación no puede ser nula"
+                    "La ecuación no puede ser nula"
             );
         }
 
         String sinEspacios =
-            ecuacion.replace(" ", "");
+                ecuacion.replace(" ", "");
 
         this.ecuacion =
-            normalizar(sinEspacios);
+                normalizar(sinEspacios);
 
         /*
          * Reiniciar la posición para que la expresión
@@ -336,7 +619,7 @@ public class Calculadora {
          */
         this.posicion = 0;
     }
-    
+
     // ============================================================
     // MÉTODOS PARA PROCESAR ECUACIONES
     // ============================================================
@@ -366,8 +649,8 @@ public class Calculadora {
          * Número o ')' seguido de '('.
          *
          * Ejemplos:
-         * 2(2)      -> 2*(2)
-         * (2+1)(3)  -> (2+1)*(3)
+         * 2(2) -> 2*(2)
+         * (2+1)(3) -> (2+1)*(3)
          */
         resultado = resultado.replaceAll(
                 "(?<=[0-9)])(?=\\()",
@@ -406,20 +689,24 @@ public class Calculadora {
     public double calcular() {
 
         if (ecuacion == null || ecuacion.isEmpty()) {
+
             throw new IllegalArgumentException(
                     "La ecuación está vacía"
             );
         }
 
-        double resultado = expresion();
+        double resultado =
+                expresion();
 
         if (posicion < ecuacion.length()) {
+
             throw new IllegalArgumentException(
                     "Ecuación inválida"
             );
         }
 
         if (resultado < 0) {
+
             throw new IllegalArgumentException(
                     "No se permiten números negativos"
             );
@@ -441,20 +728,24 @@ public class Calculadora {
      */
     private double expresion() {
 
-        double resultado = termino();
+        double resultado =
+                termino();
 
         while (posicion < ecuacion.length()) {
 
-            char operador = ecuacion.charAt(posicion);
+            char operador =
+                    ecuacion.charAt(posicion);
 
             if (operador == '+') {
 
                 posicion++;
+
                 resultado += termino();
 
             } else if (operador == '-') {
 
                 posicion++;
+
                 resultado -= termino();
 
             } else {
@@ -479,24 +770,29 @@ public class Calculadora {
      */
     private double termino() {
 
-        double resultado = factor();
+        double resultado =
+                factor();
 
         while (posicion < ecuacion.length()) {
 
-            char operador = ecuacion.charAt(posicion);
+            char operador =
+                    ecuacion.charAt(posicion);
 
             if (operador == '*') {
 
                 posicion++;
+
                 resultado *= factor();
 
             } else if (operador == '/') {
 
                 posicion++;
 
-                double divisor = factor();
+                double divisor =
+                        factor();
 
                 if (divisor == 0) {
+
                     throw new ArithmeticException(
                             "No se puede dividir entre cero"
                     );
@@ -535,12 +831,14 @@ public class Calculadora {
     private double factor() {
 
         if (posicion >= ecuacion.length()) {
+
             throw new IllegalArgumentException(
                     "Falta un número"
             );
         }
 
-        char caracter = ecuacion.charAt(posicion);
+        char caracter =
+                ecuacion.charAt(posicion);
 
         /*
          * Paréntesis de apertura.
@@ -549,7 +847,8 @@ public class Calculadora {
 
             posicion++;
 
-            double resultado = expresion();
+            double resultado =
+                    expresion();
 
             if (posicion >= ecuacion.length()
                     || ecuacion.charAt(posicion) != ')') {
@@ -604,11 +903,13 @@ public class Calculadora {
      */
     private double numero() {
 
-        int inicio = posicion;
+        int inicio =
+                posicion;
 
         while (posicion < ecuacion.length()) {
 
-            char caracter = ecuacion.charAt(posicion);
+            char caracter =
+                    ecuacion.charAt(posicion);
 
             if ((caracter >= '0' && caracter <= '9')
                     || caracter == '.') {
@@ -630,7 +931,10 @@ public class Calculadora {
         }
 
         return Double.parseDouble(
-                ecuacion.substring(inicio, posicion)
+                ecuacion.substring(
+                        inicio,
+                        posicion
+                )
         );
     }
 
@@ -663,24 +967,30 @@ public class Calculadora {
          */
         if (numero == Math.floor(numero)) {
 
-            return String.valueOf((int) numero);
+            return String.valueOf(
+                    (int) numero
+            );
         }
 
         int denominador = 1000;
 
-        int numerador = (int) Math.round(
-                numero * denominador
-        );
+        int numerador =
+                (int) Math.round(
+                        numero * denominador
+                );
 
-        int mcd = calcularMCD(
-                numerador,
-                denominador
-        );
+        int mcd =
+                calcularMCD(
+                        numerador,
+                        denominador
+                );
 
         numerador /= mcd;
         denominador /= mcd;
 
-        return numerador + "/" + denominador;
+        return numerador
+                + "/"
+                + denominador;
     }
 
     /**
@@ -708,5 +1018,36 @@ public class Calculadora {
         }
 
         return a;
+    }
+
+    /**
+     * Representa un valor numérico junto con la expresión
+     * que permite obtenerlo.
+     */
+    private static class Expresion {
+
+        /**
+         * Valor numérico de la expresión.
+         */
+        double valor;
+
+        /**
+         * Expresión matemática que produce el valor.
+         */
+        String expresion;
+
+        /**
+         * Construye una expresión con su valor numérico.
+         *
+         * @param valor valor numérico
+         * @param expresion expresión matemática
+         */
+        Expresion(
+                double valor,
+                String expresion) {
+
+            this.valor = valor;
+            this.expresion = expresion;
+        }
     }
 }

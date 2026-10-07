@@ -95,6 +95,45 @@ public class DaoResultadoImplementado implements ResultadoDAO {
     }
 
     /**
+     * Busca un resultado específico dentro de una partida.
+     *
+     * @param partidaId identificador de la partida
+     * @param dato valor numérico del resultado
+     * @return {@code true} si el dato ya existe en la partida;
+     *         {@code false} en caso contrario
+     */
+    public boolean existePorPartidaYDato(int partidaId, int dato) {
+
+        String sql = """
+            SELECT 1
+            FROM resultado
+            WHERE partida_id = ?
+            AND dato = ?
+            LIMIT 1
+            """;
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setInt(1, partidaId);
+            ps.setInt(2, dato);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                "Error al comprobar el resultado: "
+                + e.getMessage()
+            );
+
+            return false;
+        }
+    }
+    
+    
+    /**
      * Lista todos los resultados registrados.
      *
      * @return lista de resultados
