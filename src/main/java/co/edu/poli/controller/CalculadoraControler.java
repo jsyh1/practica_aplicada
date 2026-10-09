@@ -3,7 +3,6 @@ package co.edu.poli.controller;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import co.edu.poli.dao.DaoJugadorImplementado;
@@ -21,17 +20,17 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
-import javafx.scene.control.Alert;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Popup;
 import javafx.util.Duration;
-
 /**
  * Controlador principal de la calculadora.
  *
@@ -152,13 +151,15 @@ public class CalculadoraControler {
 	private Button btnMenu;
 
 	private Calculadora calculadora;
+	private Popup menuPopup;
+	private long ultimoCierreMenu = 0;
 
 	private int[] numerosOriginales;
 	private int puntaje = 0;
 	private Partida partidaActual;
 	private Jugador jugadorActual;
 	private boolean partidaFinalizada = false;
-	private boolean ayudaDisponible = false;
+	private boolean ayudaDisponible = true;
 
 	GeneradorEcuaciones generadorEcuaciones = new GeneradorEcuaciones();
 
@@ -239,7 +240,7 @@ public class CalculadoraControler {
 			Button boton = new Button(String.valueOf(numero));
 
 			boton.setOnAction(this::seleccionarNumero);
-
+			boton.getStyleClass().addAll("btn-base", "btn-numero"); 
 			contenedorNumeros.getChildren().add(boton);
 		}
 
@@ -250,12 +251,8 @@ public class CalculadoraControler {
 		btnResta.setText(simbolos[1]);
 		btnMultiplicacion.setText(simbolos[2]);
 		btnDivision.setText(simbolos[3]);
-
 		btnParentesisAbre.setText(simbolos[4]);
 		btnParentesisCierra.setText(simbolos[5]);
-
-		btnIgual.setText(simbolos[6]);
-
 		btnBorrarUltimo.setText(simbolos[7]);
 		btnBorrarTodo.setText(simbolos[8]);
 
@@ -267,6 +264,35 @@ public class CalculadoraControler {
 		cronometro.setCycleCount(Timeline.INDEFINITE);
 
 		cronometro.play();
+
+		/*
+		 * Iconos
+		 */
+		// Borrar último (retroceso)
+		btnBorrarUltimo.setGraphic(crearIcono(
+    		"M21 4 H8 l-7 8 7 8 h13 a2 2 0 0 0 2 -2 V6 a2 2 0 0 0 -2 -2 z "
+    		+ "M18 9 L12 15 M12 9 L18 15"));
+		btnBorrarUltimo.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		// Reiniciar (flecha circular)
+		btnBorrarTodo.setGraphic(crearIcono(
+   		 "M23 4 L23 10 L17 10 M20.49 15 a9 9 0 1 1 -2.12 -9.36 L23 10"));
+		btnBorrarTodo.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		// Multiplicar (X)
+		btnMultiplicacion.setGraphic(crearIcono("M18 6 L6 18 M6 6 L18 18"));
+		btnMultiplicacion.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		// Suma
+		btnSuma.setGraphic(crearIcono("M12 5 L12 19 M5 12 L19 12"));
+		btnSuma.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		// Resta
+		btnResta.setGraphic(crearIcono("M5 12 L19 12"));
+		btnResta.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		// División
+		btnDivision.setGraphic(crearIcono(
+    	"M5 12 L19 12 "
+    	+ "M11 6 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0 "
+    	+ "M11 18 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0"));
+		btnDivision.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 	}
 	// =========================
 	// CRONOMETRO
@@ -284,27 +310,20 @@ public class CalculadoraControler {
 		lblTiempo.setText(tiempoTexto);
 	}
 
-	// =========================
-	// CRONOMETRO
-	// =========================
+	private SVGPath crearIcono(String contenido) {
+    	SVGPath icono = new SVGPath();
+    	icono.setContent(contenido);
+    	icono.getStyleClass().add("icono");
+    	return icono;
+	}
+
 	@FXML
 	private void mostrarReglas() {
-
-		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Reglas");
-		alert.setHeaderText("Reglas del juego");
-
-		String texto = "Con los 4 números de la ronda, arma una expresión matemática "
-				+ "distinta para lograr cada resultado del 1 al 10.\n\n" + "Reglas:\n"
-				+ "• Usa cada uno de los 4 números exactamente una vez por expresión.\n"
-				+ "• Puedes usar +, -, *, ÷ y paréntesis.\n"
-				+ "• Se permiten fracciones y resultados negativos intermedios.\n"
-				+ "• Puedes unir dos números para formar uno de varias cifras " + "(ej: 1 y 2 → 12).\n\n"
-				+ "Completas la ronda cuando encuentres los 10 resultados "
-				+ "(1 al 10) usando siempre los mismos 4 números.";
-
-		alert.setContentText(texto);
-		alert.showAndWait();
+    try {
+        	App.setRoot("reglas");
+    	} catch (IOException ex) {
+        	lblError.setText("Error al abrir las reglas");
+    	}
 	}
 
 	// =========================
@@ -717,11 +736,9 @@ public class CalculadoraControler {
 		contenedorNumeros.getChildren().clear();
 
 		for (int numero : numerosOriginales) {
-
 			Button boton = new Button(String.valueOf(numero));
-
+			boton.getStyleClass().addAll("btn-base", "btn-numero"); 
 			boton.setOnAction(this::seleccionarNumero);
-
 			contenedorNumeros.getChildren().add(boton);
 		}
 
@@ -764,12 +781,14 @@ public class CalculadoraControler {
 		if (partidaFinalizada) {
 
 			lblError.setText("La partida ya terminó");
+			lblError.setWrapText(true);
 			return;
 		}
 
 		if (exprecion.isEmpty()) {
 
 			lblError.setText("Ingrese una expresión");
+			lblError.setWrapText(true);
 			return;
 		}
 
@@ -796,17 +815,18 @@ public class CalculadoraControler {
 			String resultadoTexto = Calculadora.convertir(resultado);
 
 			generadorEcuaciones.agregarParte(exprecion, resultadoTexto);
+	        /*
+	         * Crear botón con el resultado.
+	         */
+	        Button botonResultado =
+	            new Button(resultadoTexto);
+			botonResultado.getStyleClass().addAll("btn-base", "btn-numero");
+			botonResultado.setOnAction(this::seleccionarNumero);
 
 			/*
 			 * Eliminar los números utilizados.
 			 */
 			contenedorNumeros.getChildren().removeAll(numerosUtilizados);
-
-			/*
-			 * Crear botón con el resultado.
-			 */
-			Button botonResultado = new Button(resultadoTexto);
-			botonResultado.setOnAction(this::seleccionarNumero);
 
 			/*
 			 * Agregar el resultado como nuevo número.
@@ -832,6 +852,7 @@ public class CalculadoraControler {
 				if (resultado > 10 || resultado != Math.floor(resultado)) {
 
 					lblError.setText("No es valido números > 10 o fracciónes no exactas");
+					
 
 					count++;
 
@@ -968,9 +989,12 @@ public class CalculadoraControler {
 
 		Label[] etiquetas = { lblResultado1, lblResultado2, lblResultado3, lblResultado4, lblResultado5, lblResultado6,
 				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
-
+		
+		Node celda = etiquetas[resultado - 1].getParent();
 		etiquetas[resultado - 1].setText(String.valueOf(resultado));
-		etiquetas[resultado - 1].setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+		celda.getStyleClass().remove("casilla-pendiente");
+		celda.getStyleClass().add("casilla-resuelta");
+
 	}
 
 	/**
@@ -985,7 +1009,7 @@ public class CalculadoraControler {
 				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
 
 		for (Label etiqueta : etiquetas) {
-			if (!etiqueta.getStyle().contains("-fx-text-fill: green")) {
+			if (!etiqueta.getStyleClass().contains("casilla-resuelta")) {
 				return false;
 			}
 		}
@@ -998,64 +1022,15 @@ public class CalculadoraControler {
 	 * los resultados del 1 al 10 utilizando los cuatro números
 	 * generados para la partida actual.
 	 */
+
 	private void mostrarAyuda() {
+    	try {
+        	AyudaControler.setEcuaciones(calculadora.getEcuacionesResultados());
+        	App.setRoot("ayuda");
+    } 	catch (IOException ex) {
+        lblError.setText("Error al abrir la ayuda");
+    }
 
-		TableView<String[]> tabla = new TableView<>();
-
-		TableColumn<String[], String> columnaResultado =
-				new TableColumn<>("Resultado");
-
-		TableColumn<String[], String> columnaExpresion =
-				new TableColumn<>("Expresión");
-
-		columnaResultado.setCellValueFactory(
-				dato -> new javafx.beans.property.SimpleStringProperty(
-						dato.getValue()[0]
-				)
-		);
-
-		columnaExpresion.setCellValueFactory(
-				dato -> new javafx.beans.property.SimpleStringProperty(
-						dato.getValue()[1]
-				)
-		);
-
-		tabla.getColumns().addAll(
-				columnaResultado,
-				columnaExpresion
-		);
-
-		List<String> ecuaciones =
-				calculadora.getEcuacionesResultados();
-
-		for (String ecuacion : ecuaciones) {
-
-			String[] partes = ecuacion.split(" = ");
-
-			if (partes.length == 2) {
-
-				tabla.getItems().add(partes);
-			}
-		}
-
-		tabla.setColumnResizePolicy(
-				TableView.CONSTRAINED_RESIZE_POLICY
-		);
-
-		tabla.setPrefWidth(600);
-		tabla.setPrefHeight(350);
-
-		Alert alert =
-				new Alert(Alert.AlertType.INFORMATION);
-
-		alert.setTitle("Ayuda");
-		alert.setHeaderText(
-				"Expresiones para obtener los resultados"
-		);
-
-		alert.getDialogPane().setContent(tabla);
-
-		alert.showAndWait();
 	}
 
 	/**
@@ -1069,90 +1044,105 @@ public class CalculadoraControler {
 	 *
 	 * @param event evento generado al presionar el botón de menú
 	 */
+
 	@FXML
 	private void mostrarMenu(ActionEvent event) {
 
+    	if (menuPopup != null && menuPopup.isShowing()) {
+        menuPopup.hide();
+        return;
+    	}
+		if (System.currentTimeMillis() - ultimoCierreMenu < 400) {
+        return;
+    	}
 		Popup popup = new Popup();
+    	popup.setAutoHide(true);
+    	popup.setOnHidden(e -> ultimoCierreMenu = System.currentTimeMillis());
+    	menuPopup = popup;
 
-		popup.setAutoHide(true);
+    	Button btnInstrucciones = new Button("Instrucciones");
+    	Button btnConsultar = new Button("Consultar Partida");
+    	Button btnDificultad = new Button("Dificultad");
 
-		Button btnInstrucciones = new Button("Instrucciones");
-		Button btnConsultar = new Button("Consultar");
+    	btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
+    	btnInstrucciones.getStyleClass().add("btn-menu-item");
 
-		btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
-		btnConsultar.setMaxWidth(Double.MAX_VALUE);
+    	btnConsultar.setMaxWidth(Double.MAX_VALUE);
+    	btnConsultar.getStyleClass().add("btn-menu-item");
+		btnConsultar.setMinWidth(Region.USE_PREF_SIZE);
 
-		btnInstrucciones.setOnAction(e -> {
+    	btnDificultad.setMaxWidth(Double.MAX_VALUE);
+    	btnDificultad.getStyleClass().add("btn-menu-item");
 
-			popup.hide();
+    	btnInstrucciones.setOnAction(e -> {
+        popup.hide();
+       	mostrarReglas();
+    });
 
-			mostrarReglas();
-		});
+    btnConsultar.setOnAction(e -> {
+        popup.hide();
 
-		btnConsultar.setOnAction(e -> {
+        try {
+            App.setRoot("consulta");
+        } catch (IOException ex) {
+            lblError.setText("Error al ver consulta");
+        }
+    });
 
-			popup.hide();
+    btnDificultad.setOnAction(e -> {
+        popup.hide();
+    });
 
-			try {
+    VBox contenedor = new VBox();
+    contenedor.setPrefWidth(160);
+    contenedor.setSpacing(8);
 
-				App.setRoot("consulta");
+    contenedor.getStylesheets().add(
+        getClass()
+            .getResource("/co/edu/poli/juego/style.css")
+            .toExternalForm()
+    );
 
-			} catch (IOException ex) {
+    contenedor.getStyleClass().add("menu-popup");
 
-				lblError.setText("Error al ver consulta ");
-			}
-		});
+    contenedor.getChildren().addAll(
+        btnInstrucciones,
+        btnConsultar,
+        btnDificultad
+    );
 
-		VBox contenedor = new VBox();
+    /*
+     * El botón Ayuda solamente aparece después de que
+     * se haya cumplido la condición establecida mediante count.
+     */
+    if (ayudaDisponible) {
 
-		contenedor.setSpacing(4);
+        Button btnAyuda = new Button("Ayuda");
 
-		contenedor.setStyle(
-				"-fx-background-color: white; "
-				+ "-fx-padding: 8; "
-				+ "-fx-effect: dropshadow("
-				+ "gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);"
-		);
+        btnAyuda.setMaxWidth(Double.MAX_VALUE);
+        btnAyuda.getStyleClass().add("btn-menu-item");
 
-		contenedor.getChildren().addAll(
-				btnInstrucciones,
-				btnConsultar
-		);
+        btnAyuda.setOnAction(e -> {
+            popup.hide();
+            mostrarAyuda();
+        });
 
-		/*
-		 * El botón Ayuda solamente aparece después de que
-		 * se haya cumplido la condición establecida mediante count.
-		 */
-		if (ayudaDisponible) {
+        contenedor.getChildren().add(btnAyuda);
+    }
 
-			Button btnAyuda = new Button("Ayuda");
+    popup.getContent().add(contenedor);
 
-			btnAyuda.setMaxWidth(Double.MAX_VALUE);
+    Button boton = (Button) event.getSource();
 
-			btnAyuda.setOnAction(e -> {
+    Bounds coordenadas =
+        boton.localToScreen(
+            boton.getBoundsInLocal()
+        );
 
-				popup.hide();
+    double x = coordenadas.getMaxX() - contenedor.getPrefWidth();
+    double y = coordenadas.getMaxY();
 
-				mostrarAyuda();
-			});
-
-			contenedor.getChildren().add(btnAyuda);
-		}
-
-		popup.getContent().add(contenedor);
-
-		Button boton = (Button) event.getSource();
-
-		Bounds coordenadas =
-				boton.localToScreen(
-						boton.getBoundsInLocal()
-				);
-
-		popup.show(
-				boton,
-				coordenadas.getMinX(),
-				coordenadas.getMaxY()
-		);
+    popup.show(boton, x, y);
 	}
-
 }
+
