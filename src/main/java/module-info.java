@@ -38,6 +38,7 @@ module co.edu.poli.juego {
      * dotenv-java.
      */
     requires io.github.cdimascio.dotenv.java;
+    requires javafx.graphics;
 
     /**
      * Permite que JavaFX acceda mediante reflexión a las clases

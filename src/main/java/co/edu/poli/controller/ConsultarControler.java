@@ -13,6 +13,8 @@ import javafx.scene.control.Label;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
@@ -83,39 +85,51 @@ public class ConsultarControler {
      * @param p partida cuyos datos se mostrarán
      * @return contenedor visual con la información de la partida
      */
-    private VBox crearFila(Partida p) {
+private VBox crearFila(Partida p) {
 
-        VBox fila = new VBox(6);
-        fila.setStyle(
-            "-fx-background-color: #d9d9d9; -fx-padding: 10; "
-            + "-fx-background-radius: 8;"
-        );
+    VBox fila = new VBox(6);
+    fila.getStyleClass().add("fila-partida");
 
-        Label jugador = new Label("Jugador #" + p.getJugador().getId());
-        Label fecha = new Label("Fecha: " + p.getFechaPartida());
-        Label puntaje = new Label("Puntaje: " + p.getPuntaje());
-        Label tiempo = new Label("Tiempo: " + p.getTiempoEjecucion() + " segundos");
-
-        String resultadosTexto = p.getResultados().isEmpty()
-            ? "Sin resultados"
-            : p.getResultados().size() + " resultado(s)";
-
-        Label resultados = new Label("Resultados: " + resultadosTexto);
-
-        Button btnCompartir = new Button("Compartir");
-        btnCompartir.setOnAction(e -> compartir(p));
-
-        HBox filaBoton = new HBox(btnCompartir);
-        filaBoton.setAlignment(Pos.CENTER_RIGHT);
-
-        fila.getChildren().addAll(
-            jugador, fecha, puntaje, tiempo, resultados, filaBoton
-        );
-
-        return fila;
-    }
+    Label jugador = new Label("Jugador #" + p.getJugador().getId());
+    jugador.setMinWidth(Region.USE_PREF_SIZE);
+    jugador.getStyleClass().add("nombre-jugador");
     
 
+    Label fecha = new Label(p.getFechaPartida().toString());
+    fecha.getStyleClass().add("fecha-partida");
+    fecha.setMinWidth(Region.USE_PREF_SIZE);
+
+    Region espacio = new Region();
+    HBox.setHgrow(espacio, Priority.ALWAYS);
+
+    HBox encabezado = new HBox(jugador, espacio, fecha);
+    encabezado.setAlignment(Pos.CENTER_LEFT);
+
+    Label infoLinea = new Label(
+        "Puntaje " + p.getPuntaje() + " - Tiempo " + p.getTiempoEjecucion() + "s"
+    );
+
+    String resultadosTexto = p.getResultados().isEmpty()
+        ? "Sin resultados"
+        : p.getResultados().size() + " resultado(s)";
+
+    Label resultados = new Label("Resultados: " + resultadosTexto);
+
+    VBox columnaTexto = new VBox(2, encabezado, infoLinea, resultados);
+    HBox.setHgrow(columnaTexto, Priority.ALWAYS);
+
+    Button btnCompartir = new Button("Compartir");
+    btnCompartir.getStyleClass().add("btn-compartir");
+    btnCompartir.setOnAction(e -> compartir(p));
+    btnCompartir.setMinWidth(Region.USE_PREF_SIZE);
+
+    HBox filaCompleta = new HBox(10, columnaTexto, btnCompartir);
+    filaCompleta.setAlignment(Pos.CENTER_LEFT);
+
+    fila.getChildren().add(filaCompleta);
+
+    return fila;
+    }
     /**
      * Prepara la información de una partida y la copia al portapapeles
      * del sistema.
