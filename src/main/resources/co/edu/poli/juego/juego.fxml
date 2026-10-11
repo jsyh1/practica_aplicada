@@ -33,7 +33,7 @@
                     <Label fx:id="lblTiempo" text="00:00" styleClass="progreso" />
                 </HBox>
                 </VBox>
-                <Button fx:id="btnMenu" alignment="CENTER" mnemonicParsing="false" onAction="#mostrarMenu" prefHeight="20.0" prefWidth="32.0" text="☰" styleClass="btn-menu"/>             
+                <Button fx:id="btnMenu" alignment="CENTER" mnemonicParsing="false" onAction="#mostrarMenu" prefHeight="20.0" prefWidth="32.0" text="☰" styleClass="btn-menu"/>
             </children>
         </HBox>
 

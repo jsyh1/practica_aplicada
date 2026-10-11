@@ -1,3 +1,4 @@
+
 package co.edu.poli.dao;
 
 import java.sql.Connection;
@@ -17,15 +18,20 @@ import co.edu.poli.servicios.ConexionDB;
 /**
  * Implementación del DAO para la entidad Resultado.
  *
- * Se encarga de realizar las operaciones CRUD sobre la tabla
- * resultado y de reconstruir las relaciones entre Resultado,
- * Partida, Jugador y Calculadora.
+ * <p>
+ * Realiza las operaciones CRUD sobre la tabla resultado y reconstruye
+ * las relaciones entre Resultado, Partida, Jugador y Calculadora.
+ * También recupera el nombre del jugador asociado a cada partida.
+ * </p>
  *
  * @author Jsyh
- * @version 1.0
+ * @version 1.1
  */
 public class DaoResultadoImplementado implements ResultadoDAO {
 
+    /**
+     * Conexión utilizada para acceder a la base de datos.
+     */
     private final Connection conexion;
 
     /**
@@ -39,42 +45,28 @@ public class DaoResultadoImplementado implements ResultadoDAO {
      * Crea un resultado en la base de datos.
      *
      * @param objeto resultado que se desea crear
-     * @return true si se creó correctamente, false en caso contrario
+     * @return true si se creó correctamente; false en caso contrario
      */
     @Override
     public boolean crear(Resultado objeto) {
 
         String sql = """
-                INSERT INTO resultado
-                (partida_id, resultado, dato)
+                INSERT INTO resultado (partida_id, resultado, dato)
                 VALUES (?, ?, ?)
                 """;
 
         try (PreparedStatement ps = conexion.prepareStatement(
-                sql,
-                java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setInt(
-                    1,
-                    objeto.getPartida().getId()
-            );
-
-            ps.setString(
-                    2,
-                    objeto.getResultado()
-            );
-
-            ps.setInt(
-                    3,
-                    objeto.getDato()
-            );
+            ps.setInt(1, objeto.getPartida().getId());
+            ps.setString(2, objeto.getResultado());
+            ps.setInt(3, objeto.getDato());
 
             int filas = ps.executeUpdate();
 
             if (filas > 0) {
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
-
                     if (rs.next()) {
                         objeto.setId(rs.getInt(1));
                     }
@@ -84,10 +76,8 @@ public class DaoResultadoImplementado implements ResultadoDAO {
             }
 
         } catch (SQLException e) {
-
             System.out.println(
-                    "Error al crear resultado: "
-                    + e.getMessage()
+                    "Error al crear resultado: " + e.getMessage()
             );
         }
 
@@ -95,22 +85,21 @@ public class DaoResultadoImplementado implements ResultadoDAO {
     }
 
     /**
-     * Busca un resultado específico dentro de una partida.
+     * Comprueba si un dato ya existe en una partida.
      *
      * @param partidaId identificador de la partida
      * @param dato valor numérico del resultado
-     * @return {@code true} si el dato ya existe en la partida;
-     *         {@code false} en caso contrario
+     * @return true si existe; false en caso contrario
      */
     public boolean existePorPartidaYDato(int partidaId, int dato) {
 
         String sql = """
-            SELECT 1
-            FROM resultado
-            WHERE partida_id = ?
-            AND dato = ?
-            LIMIT 1
-            """;
+                SELECT 1
+                FROM resultado
+                WHERE partida_id = ?
+                  AND dato = ?
+                LIMIT 1
+                """;
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
@@ -122,19 +111,68 @@ public class DaoResultadoImplementado implements ResultadoDAO {
             }
 
         } catch (SQLException e) {
-
             System.out.println(
-                "Error al comprobar el resultado: "
-                + e.getMessage()
+                    "Error al comprobar el resultado: " + e.getMessage()
             );
-
-            return false;
         }
+
+        return false;
     }
     
-    
     /**
-     * Lista todos los resultados registrados.
+     * Consulta los resultados asociados a una partida.
+     *
+     * @param partida partida cuyos resultados se consultarán
+     * @return lista de resultados de esa partida
+     */
+    public List<Resultado> listarPorPartida(Partida partida) {
+
+        List<Resultado> resultados = new ArrayList<>();
+
+        if (partida == null || partida.getId() <= 0) {
+            return resultados;
+        }
+
+        String sql = """
+                SELECT id, resultado, dato
+                FROM resultado
+                WHERE partida_id = ?
+                ORDER BY dato ASC
+                """;
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setInt(1, partida.getId());
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Resultado resultado = new Resultado(
+                            rs.getInt("id"),
+                            partida,
+                            rs.getString("resultado"),
+                            rs.getInt("dato")
+                    );
+
+                    resultados.add(resultado);
+                }
+
+            }
+
+        } catch (SQLException e) {
+            System.out.println(
+                    "Error al consultar resultados de la partida: "
+                    + e.getMessage()
+            );
+        }
+
+        return resultados;
+    }
+
+    /**
+     * Lista todos los resultados registrados, incluyendo los datos
+     * de la partida y del jugador asociado.
      *
      * @return lista de resultados
      */
@@ -150,17 +188,21 @@ public class DaoResultadoImplementado implements ResultadoDAO {
                     r.resultado,
                     r.dato,
                     p.jugador_id,
-                    p.fecha,
+                    p.fecha AS fecha_partida,
                     p.tiempo,
-                    p.puntaje
+                    p.puntaje,
+                    j.nombre AS jugador_nombre,
+                    j.fecha AS fecha_jugador
                 FROM resultado r
                 INNER JOIN partida p
                     ON r.partida_id = p.id
+                INNER JOIN jugador j
+                    ON p.jugador_id = j.id
                 ORDER BY r.id
                 """;
 
         try (PreparedStatement ps = conexion.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
@@ -174,15 +216,12 @@ public class DaoResultadoImplementado implements ResultadoDAO {
                 );
 
                 partida.agregarResultado(resultado);
-
                 resultados.add(resultado);
             }
 
         } catch (SQLException e) {
-
             System.out.println(
-                    "Error al listar resultados: "
-                    + e.getMessage()
+                    "Error al listar resultados: " + e.getMessage()
             );
         }
 
@@ -190,7 +229,8 @@ public class DaoResultadoImplementado implements ResultadoDAO {
     }
 
     /**
-     * Busca un resultado por su identificador.
+     * Busca un resultado por su identificador, incluyendo la información
+     * de la partida y el nombre del jugador asociado.
      *
      * @param id identificador del resultado
      * @return resultado encontrado o null si no existe
@@ -205,12 +245,16 @@ public class DaoResultadoImplementado implements ResultadoDAO {
                     r.resultado,
                     r.dato,
                     p.jugador_id,
-                    p.fecha,
+                    p.fecha AS fecha_partida,
                     p.tiempo,
-                    p.puntaje
+                    p.puntaje,
+                    j.nombre AS jugador_nombre,
+                    j.fecha AS fecha_jugador
                 FROM resultado r
                 INNER JOIN partida p
                     ON r.partida_id = p.id
+                INNER JOIN jugador j
+                    ON p.jugador_id = j.id
                 WHERE r.id = ?
                 """;
 
@@ -238,10 +282,8 @@ public class DaoResultadoImplementado implements ResultadoDAO {
             }
 
         } catch (SQLException e) {
-
             System.out.println(
-                    "Error al buscar resultado: "
-                    + e.getMessage()
+                    "Error al buscar resultado: " + e.getMessage()
             );
         }
 
@@ -251,8 +293,8 @@ public class DaoResultadoImplementado implements ResultadoDAO {
     /**
      * Actualiza un resultado existente.
      *
-     * @param objeto resultado que se desea actualizar
-     * @return true si se actualizó correctamente
+     * @param objeto resultado con los datos actualizados
+     * @return true si se actualizó correctamente; false en caso contrario
      */
     @Override
     public boolean actualizar(Resultado objeto) {
@@ -267,35 +309,16 @@ public class DaoResultadoImplementado implements ResultadoDAO {
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-            ps.setInt(
-                    1,
-                    objeto.getPartida().getId()
-            );
+            ps.setInt(1, objeto.getPartida().getId());
+            ps.setString(2, objeto.getResultado());
+            ps.setInt(3, objeto.getDato());
+            ps.setInt(4, objeto.getId());
 
-            ps.setString(
-                    2,
-                    objeto.getResultado()
-            );
-
-            ps.setInt(
-                    3,
-                    objeto.getDato()
-            );
-
-            ps.setInt(
-                    4,
-                    objeto.getId()
-            );
-
-            int filas = ps.executeUpdate();
-
-            return filas > 0;
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-
             System.out.println(
-                    "Error al actualizar resultado: "
-                    + e.getMessage()
+                    "Error al actualizar resultado: " + e.getMessage()
             );
         }
 
@@ -303,10 +326,10 @@ public class DaoResultadoImplementado implements ResultadoDAO {
     }
 
     /**
-     * Elimina un resultado.
+     * Elimina un resultado por su identificador.
      *
      * @param id identificador del resultado
-     * @return true si se eliminó correctamente
+     * @return true si se eliminó correctamente; false en caso contrario
      */
     @Override
     public boolean eliminar(int id) {
@@ -320,15 +343,11 @@ public class DaoResultadoImplementado implements ResultadoDAO {
 
             ps.setInt(1, id);
 
-            int filas = ps.executeUpdate();
-
-            return filas > 0;
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-
             System.out.println(
-                    "Error al eliminar resultado: "
-                    + e.getMessage()
+                    "Error al eliminar resultado: " + e.getMessage()
             );
         }
 
@@ -336,37 +355,31 @@ public class DaoResultadoImplementado implements ResultadoDAO {
     }
 
     /**
-     * Construye una partida utilizando los datos obtenidos
-     * mediante una consulta SQL.
+     * Construye una partida con su jugador, nombre, fecha,
+     * calculadora y datos de ejecución.
      *
-     * La partida ahora necesita una Calculadora para poder existir,
-     * por lo que se crea una instancia de Calculadora al reconstruir
-     * la partida desde la base de datos.
-     *
-     * @param rs resultado de la consulta
-     * @return partida construida
+     * @param rs resultado de la consulta SQL
+     * @return partida reconstruida
      * @throws SQLException si ocurre un error al leer los datos
      */
     private Partida construirPartida(ResultSet rs) throws SQLException {
 
         int jugadorId = rs.getInt("jugador_id");
+        String nombreJugador = rs.getString("jugador_nombre");
 
-        LocalDate fecha = rs.getTimestamp("fecha")
-                .toLocalDateTime()
+        LocalDate fechaJugador = rs.getDate("fecha_jugador")
                 .toLocalDate();
 
         Jugador jugador = new Jugador(
                 jugadorId,
-                fecha
+                nombreJugador,
+                fechaJugador
         );
 
-        /*
-         * La Calculadora pertenece a la Partida.
-         *
-         * Al recuperar una partida desde la base de datos
-         * no necesitamos reconstruir una ecuación en curso,
-         * por lo que se crea con valores iniciales vacíos.
-         */
+        LocalDate fechaPartida = rs.getTimestamp("fecha_partida")
+                .toLocalDateTime()
+                .toLocalDate();
+
         Calculadora calculadora = new Calculadora(
                 new String[9],
                 new int[4],
@@ -377,7 +390,7 @@ public class DaoResultadoImplementado implements ResultadoDAO {
                 rs.getInt("partida_id"),
                 jugador,
                 calculadora,
-                fecha,
+                fechaPartida,
                 rs.getTime("tiempo")
                         .toLocalTime()
                         .toSecondOfDay(),
@@ -389,3 +402,4 @@ public class DaoResultadoImplementado implements ResultadoDAO {
         return partida;
     }
 }
+

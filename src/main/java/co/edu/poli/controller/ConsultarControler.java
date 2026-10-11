@@ -22,8 +22,8 @@ import javafx.scene.layout.VBox;
  *
  * <p>
  * Permite mostrar las últimas partidas almacenadas, presentar información
- * relevante de cada una y copiar los datos de una partida al portapapeles
- * para facilitar su posterior compartición.
+ * relevante de cada una y copiar los datos de una partida al portapapeles para
+ * facilitar su posterior compartición.
  * </p>
  *
  * @author Jsyh
@@ -31,151 +31,154 @@ import javafx.scene.layout.VBox;
  */
 public class ConsultarControler {
 
-    /**
-     * Contenedor visual donde se agregan las filas correspondientes
-     * a las partidas consultadas.
-     */
-    @FXML
-    private VBox contenedorPartidas;
+	/**
+	 * Contenedor visual donde se agregan las filas correspondientes a las partidas
+	 * consultadas.
+	 */
+	@FXML
+	private VBox contenedorPartidas;
 
-    /**
-     * Etiqueta utilizada para mostrar mensajes informativos al usuario.
-     */
-    @FXML
-    private Label lblMensaje;
+	/**
+	 * Etiqueta utilizada para mostrar mensajes informativos al usuario.
+	 */
+	@FXML
+	private Label lblMensaje;
 
-    /**
-     * Inicializa la interfaz de consulta.
-     *
-     * <p>
-     * Recupera las últimas cinco partidas registradas y las presenta
-     * dentro del contenedor visual. Si no existen partidas, muestra
-     * un mensaje informativo.
-     * </p>
-     */
-    @FXML
-    public void initialize() {
+	/**
+	 * Inicializa la interfaz de consulta.
+	 *
+	 * <p>
+	 * Recupera las últimas cinco partidas registradas y las presenta dentro del
+	 * contenedor visual. Si no existen partidas, muestra un mensaje informativo.
+	 * </p>
+	 */
+	@FXML
+	public void initialize() {
 
-        DaoScoreImplementado dao = new DaoScoreImplementado();
-        List<Partida> partidas = dao.ultimasPartidas(5);
-        if (partidas.isEmpty()) {
+		DaoScoreImplementado dao = new DaoScoreImplementado();
+		List<Partida> partidas = dao.ultimasPartidas(5);
+		if (partidas.isEmpty()) {
 
-            contenedorPartidas.getChildren().add(
-                new Label("No hay partidas registradas.")
-            );
+			contenedorPartidas.getChildren().add(new Label("No hay partidas registradas."));
 
-        } else {
+		} else {
 
-            for (Partida p : partidas) {
+			for (Partida p : partidas) {
 
-                contenedorPartidas.getChildren().add(crearFila(p));
-            }
-        }
-    }
+				contenedorPartidas.getChildren().add(crearFila(p));
+			}
+		}
+	}
 
-    /**
-     * Construye el componente visual que representa una partida.
-     *
-     * <p>
-     * La fila contiene el identificador del jugador, la fecha,
-     * el puntaje, el tiempo de ejecución, la cantidad de resultados
-     * y un botón para compartir la información.
-     * </p>
-     *
-     * @param p partida cuyos datos se mostrarán
-     * @return contenedor visual con la información de la partida
-     */
-private VBox crearFila(Partida p) {
+	/**
+	 * Prepara la información de una partida y la copia al portapapeles del sistema.
+	 *
+	 * <p>
+	 * Si la partida no contiene resultados, muestra un mensaje indicando que no
+	 * existe información para compartir.
+	 * </p>
+	 *
+	 * @param p partida cuya información se desea compartir
+	 */
 
-    VBox fila = new VBox(6);
-    fila.getStyleClass().add("fila-partida");
 
-    Label jugador = new Label("Jugador #" + p.getJugador().getId());
-    jugador.setMinWidth(Region.USE_PREF_SIZE);
-    jugador.getStyleClass().add("nombre-jugador");
-    
+	/**
+	 * Construye el componente visual que representa una partida.
+	 *
+	 * <p>
+	 * La fila contiene el identificador del jugador, la fecha, el puntaje, el
+	 * tiempo de ejecución, la cantidad de resultados y un botón para compartir la
+	 * información.
+	 * </p>
+	 *
+	 * @param p partida cuyos datos se mostrarán
+	 * @return contenedor visual con la información de la partida
+	 */
+	private VBox crearFila(Partida p) {
 
-    Label fecha = new Label(p.getFechaPartida().toString());
-    fecha.getStyleClass().add("fecha-partida");
-    fecha.setMinWidth(Region.USE_PREF_SIZE);
+		VBox fila = new VBox(6);
+		fila.getStyleClass().add("fila-partida");
 
-    Region espacio = new Region();
-    HBox.setHgrow(espacio, Priority.ALWAYS);
+		Label jugador = new Label("Jugador #" + p.getJugador().getId());
+		jugador.setMinWidth(Region.USE_PREF_SIZE);
+		jugador.getStyleClass().add("nombre-jugador");
 
-    HBox encabezado = new HBox(jugador, espacio, fecha);
-    encabezado.setAlignment(Pos.CENTER_LEFT);
+		Label fecha = new Label(p.getFechaPartida().toString());
+		fecha.getStyleClass().add("fecha-partida");
+		fecha.setMinWidth(Region.USE_PREF_SIZE);
 
-    Label infoLinea = new Label(
-        "Puntaje " + p.getPuntaje() + " - Tiempo " + p.getTiempoEjecucion() + "s"
-    );
+		Region espacio = new Region();
+		HBox.setHgrow(espacio, Priority.ALWAYS);
 
-    String resultadosTexto = p.getResultados().isEmpty()
-        ? "Sin resultados"
-        : p.getResultados().size() + " resultado(s)";
+		HBox encabezado = new HBox(jugador, espacio, fecha);
+		encabezado.setAlignment(Pos.CENTER_LEFT);
 
-    Label resultados = new Label("Resultados: " + resultadosTexto);
+		Label infoLinea = new Label("Puntaje " + p.getPuntaje() + " - Tiempo " + p.getTiempoEjecucion() + "s");
 
-    VBox columnaTexto = new VBox(2, encabezado, infoLinea, resultados);
-    HBox.setHgrow(columnaTexto, Priority.ALWAYS);
+		String resultadosTexto = p.getResultados().isEmpty() ? "Sin resultados"
+				: p.getResultados().size() + " resultado(s)";
 
-    Button btnCompartir = new Button("Compartir");
-    btnCompartir.getStyleClass().add("btn-compartir");
-    btnCompartir.setOnAction(e -> compartir(p));
-    btnCompartir.setMinWidth(Region.USE_PREF_SIZE);
+		Label resultados = new Label("Resultados: " + resultadosTexto);
 
-    HBox filaCompleta = new HBox(10, columnaTexto, btnCompartir);
-    filaCompleta.setAlignment(Pos.CENTER_LEFT);
+		VBox columnaTexto = new VBox(2, encabezado, infoLinea, resultados);
+		HBox.setHgrow(columnaTexto, Priority.ALWAYS);
 
-    fila.getChildren().add(filaCompleta);
+		Button btnCompartir = new Button("Compartir");
+		btnCompartir.getStyleClass().add("btn-compartir");
+		btnCompartir.setOnAction(e -> compartir(p));
+		btnCompartir.setMinWidth(Region.USE_PREF_SIZE);
 
-    return fila;
-    }
-    /**
-     * Prepara la información de una partida y la copia al portapapeles
-     * del sistema.
-     *
-     * <p>
-     * Si la partida no contiene resultados, muestra un mensaje
-     * indicando que no existe información para compartir.
-     * </p>
-     *
-     * @param p partida cuya información se desea compartir
-     */
-    private void compartir(Partida p) {
+		HBox filaCompleta = new HBox(10, columnaTexto, btnCompartir);
+		filaCompleta.setAlignment(Pos.CENTER_LEFT);
 
-        if (p.getResultados().isEmpty()) {
+		fila.getChildren().add(filaCompleta);
 
-            lblMensaje.setText("No hay información para compartir");
-            return;
-        }
+		return fila;
+	}
 
-        String mensaje = "Partida #" + p.getId()
-            + " — Jugador #" + p.getJugador().getId()
-            + " — Puntaje: " + p.getPuntaje()
-            + " — Tiempo: " + p.getTiempoEjecucion() + "s";
+	/**
+	 * Prepara la información de una partida y la copia al portapapeles del sistema.
+	 *
+	 * <p>
+	 * Si la partida no contiene resultados, muestra un mensaje indicando que no
+	 * existe información para compartir.
+	 * </p>
+	 *
+	 * @param p partida cuya información se desea compartir
+	 */
+	private void compartir(Partida p) {
 
-        ClipboardContent contenido = new ClipboardContent();
-        contenido.putString(mensaje);
+		if (p.getResultados().isEmpty()) {
 
-        Clipboard.getSystemClipboard().setContent(contenido);
+			lblMensaje.setText("No hay información para compartir");
+			return;
+		}
 
-        lblMensaje.setText("Información preparada para compartir");
-    }
+		String mensaje = "Partida #" + p.getId() + " — Jugador #" + p.getJugador().getId() + " — Puntaje: "
+				+ p.getPuntaje() + " — Tiempo: " + p.getTiempoEjecucion() + "s";
 
-    /**
-     * Regresa a la pantalla principal del juego.
-     *
-     * <p>
-     * Si ocurre un error durante la carga de la interfaz,
-     * se imprime el mensaje correspondiente en la consola.
-     * </p>
-     */
-    @FXML
-    private void calljuego() {
-        try {
-            App.setRoot("juego");
-        } catch (IOException e) {
-            System.out.println("No se pudo volver al juego: " + e.getMessage());
-        }
-    }
+		ClipboardContent contenido = new ClipboardContent();
+		contenido.putString(mensaje);
+
+		Clipboard.getSystemClipboard().setContent(contenido);
+
+		lblMensaje.setText("Información preparada para compartir");
+	}
+
+	/**
+	 * Regresa a la pantalla principal del juego.
+	 *
+	 * <p>
+	 * Si ocurre un error durante la carga de la interfaz, se imprime el mensaje
+	 * correspondiente en la consola.
+	 * </p>
+	 */
+	@FXML
+	private void calljuego() {
+		try {
+			App.setRoot("juego");
+		} catch (IOException e) {
+			System.out.println("No se pudo volver al juego: " + e.getMessage());
+		}
+	}
 }

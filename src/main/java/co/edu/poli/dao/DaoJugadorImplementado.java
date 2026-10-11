@@ -5,8 +5,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,12 +15,13 @@ import co.edu.poli.servicios.ConexionDB;
  * Implementación de las operaciones de acceso a datos para la entidad Jugador.
  *
  * <p>
- * Esta clase permite registrar y consultar jugadores mediante sentencias
- * SQL ejecutadas sobre la conexión proporcionada por ConexionDB.
+ * Esta clase permite registrar, consultar, actualizar y eliminar jugadores
+ * mediante sentencias SQL ejecutadas sobre la conexión proporcionada
+ * por ConexionDB.
  * </p>
  *
  * @author Jsyh
- * @version 1.0
+ * @version 1.1
  */
 public class DaoJugadorImplementado implements JugadorDAO {
 
@@ -39,12 +38,7 @@ public class DaoJugadorImplementado implements JugadorDAO {
     }
 
     /**
-     * Registra un jugador en la base de datos.
-     *
-     * <p>
-     * Después de insertar el registro, recupera el identificador generado
-     * y lo asigna al objeto Jugador recibido.
-     * </p>
+     * Registra un jugador en la base de datos y recupera su identificador.
      *
      * @param objeto jugador que se desea registrar
      * @return true si el registro se realiza correctamente; false en caso contrario
@@ -53,21 +47,20 @@ public class DaoJugadorImplementado implements JugadorDAO {
     public boolean crear(Jugador objeto) {
 
         String sql = """
-                INSERT INTO jugador
-                (fecha)
-                VALUES (?)
+                INSERT INTO jugador (nombre, fecha)
+                VALUES (?, ?)
                 """;
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setTimestamp(1, Timestamp.valueOf(objeto.getFechaPartida().atStartOfDay()));
+            ps.setString(1, objeto.getNombre());
+            ps.setDate(2, Date.valueOf(objeto.getFechaPartida()));
 
             int filas = ps.executeUpdate();
 
             if (filas > 0) {
-
                 try (ResultSet rs = ps.getGeneratedKeys()) {
-
                     if (rs.next()) {
                         objeto.setId(rs.getInt(1));
                     }
@@ -77,7 +70,6 @@ public class DaoJugadorImplementado implements JugadorDAO {
             }
 
         } catch (SQLException e) {
-
             System.out.println("Error al crear jugador: " + e.getMessage());
         }
 
@@ -87,13 +79,7 @@ public class DaoJugadorImplementado implements JugadorDAO {
     /**
      * Consulta todos los jugadores registrados en la base de datos.
      *
-     * <p>
-     * Los registros recuperados se convierten en objetos Jugador
-     * y se almacenan en una lista ordenada por identificador.
-     * </p>
-     *
-     * @return lista de jugadores encontrados; una lista vacía si no existen
-     *         registros o se presenta un error
+     * @return lista de jugadores ordenada por identificador
      */
     @Override
     public List<Jugador> listar() {
@@ -101,26 +87,26 @@ public class DaoJugadorImplementado implements JugadorDAO {
         List<Jugador> jugadores = new ArrayList<>();
 
         String sql = """
-                SELECT id, fecha
+                SELECT id, nombre, fecha
                 FROM jugador
                 ORDER BY id
                 """;
 
-        try (PreparedStatement ps = conexion.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = conexion.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
-                Date fecha = rs.getDate("fecha");
-
-                LocalDate fechaPartida = fecha.toLocalDate();
-
-                Jugador jugador = new Jugador(rs.getInt("id"), fechaPartida);
+                Jugador jugador = new Jugador(
+                        rs.getInt("id"),
+                        rs.getString("nombre"),
+                        rs.getDate("fecha").toLocalDate()
+                );
 
                 jugadores.add(jugador);
             }
 
         } catch (SQLException e) {
-
             System.out.println("Error al listar jugadores: " + e.getMessage());
         }
 
@@ -137,7 +123,7 @@ public class DaoJugadorImplementado implements JugadorDAO {
     public Jugador buscarPorId(int id) {
 
         String sql = """
-                SELECT id, fecha
+                SELECT id, nombre, fecha
                 FROM jugador
                 WHERE id = ?
                 """;
@@ -150,16 +136,15 @@ public class DaoJugadorImplementado implements JugadorDAO {
 
                 if (rs.next()) {
 
-                    Date fecha = rs.getDate("fecha");
-
-                    LocalDate fechaPartida = fecha.toLocalDate();
-
-                    return new Jugador(rs.getInt("id"), fechaPartida);
+                    return new Jugador(
+                            rs.getInt("id"),
+                            rs.getString("nombre"),
+                            rs.getDate("fecha").toLocalDate()
+                    );
                 }
             }
 
         } catch (SQLException e) {
-
             System.out.println("Error al buscar jugador: " + e.getMessage());
         }
 
@@ -167,25 +152,65 @@ public class DaoJugadorImplementado implements JugadorDAO {
     }
 
     /**
-     * Actualiza la información de un jugador existente.
+     * Actualiza el nombre y la fecha de un jugador existente.
      *
-     * @param objeto jugador que contiene la información que se desea actualizar
-     * @return false, debido a que la operación no está implementada
+     * @param objeto jugador con los datos actualizados
+     * @return true si se actualiza el registro; false en caso contrario
      */
     @Override
     public boolean actualizar(Jugador objeto) {
+
+        String sql = """
+                UPDATE jugador
+                SET nombre = ?, fecha = ?
+                WHERE id = ?
+                """;
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setString(1, objeto.getNombre());
+            ps.setDate(2, Date.valueOf(objeto.getFechaPartida()));
+            ps.setInt(3, objeto.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error al actualizar jugador: " + e.getMessage());
+        }
+
         return false;
     }
 
     /**
      * Elimina un jugador mediante su identificador.
      *
+     * <p>
+     * Las partidas y los resultados asociados también se eliminarán
+     * debido a las restricciones ON DELETE CASCADE de la base de datos.
+     * </p>
+     *
      * @param id identificador del jugador que se desea eliminar
-     * @return false, debido a que la operación no está implementada
+     * @return true si se elimina el registro; false en caso contrario
      */
     @Override
     public boolean eliminar(int id) {
+
+        String sql = """
+                DELETE FROM jugador
+                WHERE id = ?
+                """;
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar jugador: " + e.getMessage());
+        }
+
         return false;
     }
-
 }
+

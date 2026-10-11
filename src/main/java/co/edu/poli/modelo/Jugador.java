@@ -21,6 +21,8 @@ public class Jugador {
      * Identificador único del jugador.
      */
     private int id;
+    
+    private String nombre;
 
     /**
      * Fecha asociada al registro del jugador.
@@ -42,8 +44,9 @@ public class Jugador {
      * @param id identificador del jugador
      * @param fechaPartida fecha asociada al jugador
      */
-    public Jugador(int id, LocalDate fechaPartida) {
+    public Jugador(int id,String nombre, LocalDate fechaPartida) {
         this.id = id;
+        this.nombre = nombre;
         this.fechaPartida = fechaPartida;
         this.partidas = new ArrayList<>();
     }
@@ -66,6 +69,15 @@ public class Jugador {
         this.id = id;
     }
 
+    public String getNombre() {
+    	return nombre;
+    }
+    
+    public void setNombre(String nombre) {
+    	this.nombre = nombre;
+    }
+    
+    
     /**
      * Obtiene la fecha asociada al jugador.
      *
