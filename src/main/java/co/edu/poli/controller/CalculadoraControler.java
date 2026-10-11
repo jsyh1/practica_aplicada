@@ -41,8 +41,8 @@ import javafx.util.Duration;
 /**
  * Controlador principal de la calculadora.
  *
- * Gestiona la interacción entre la interfaz gráfica y los servicios
- * encargados de realizar las operaciones matemáticas.
+ * Gestiona la interacción entre la interfaz gráfica y los servicios encargados
+ * de realizar las operaciones matemáticas.
  *
  * Permite ingresar números, operadores y paréntesis; calcular expresiones;
  * registrar resultados; consultar ayuda y reglas; y finalizar la partida.
@@ -52,1127 +52,970 @@ import javafx.util.Duration;
  */
 public class CalculadoraControler {
 
-    /**
-     * Campo de texto donde se construye la expresión matemática.
-     */
-    @FXML
-    private TextField txtValor1;
+	/**
+	 * Campo de texto donde se construye la expresión matemática.
+	 */
+	@FXML
+	private TextField txtValor1;
 
-    /**
-     * Conexión con la base de datos.
-     */
-    private final ConexionDB db = new ConexionDB();
+	/**
+	 * Conexión con la base de datos.
+	 */
+	private final ConexionDB db = new ConexionDB();
 
-    /**
-     * Etiqueta utilizada para mostrar mensajes de error.
-     */
-    @FXML
-    private Label lblError;
+	/**
+	 * Etiqueta utilizada para mostrar mensajes de error.
+	 */
+	@FXML
+	private Label lblError;
 
-    /**
-     * Expresión matemática construida por el jugador.
-     */
-    private String exprecion = "";
+	/**
+	 * Expresión matemática construida por el jugador.
+	 */
+	private String exprecion = "";
 
-    /**
-     * Botones numéricos utilizados en la expresión actual.
-     */
-    private final List<Button> numerosUtilizados = new ArrayList<>();
+	/**
+	 * Botones numéricos utilizados en la expresión actual.
+	 */
+	private final List<Button> numerosUtilizados = new ArrayList<>();
 
-    /**
-     * Contenedor de los números disponibles para la ronda.
-     */
-    @FXML
-    private HBox contenedorNumeros;
+	/**
+	 * Contenedor de los números disponibles para la ronda.
+	 */
+	@FXML
+	private HBox contenedorNumeros;
 
-    @FXML
-    private Label lblFecha;
+	@FXML
+	private Label lblFecha;
 
-    @FXML
-    private Label lblTiempo;
+	@FXML
+	private Label lblTiempo;
 
-    @FXML
-    private Label lblResultado1;
+	@FXML
+	private Label lblResultado1;
 
-    @FXML
-    private Label lblResultado2;
+	@FXML
+	private Label lblResultado2;
 
-    @FXML
-    private Label lblResultado3;
+	@FXML
+	private Label lblResultado3;
 
-    @FXML
-    private Label lblResultado4;
+	@FXML
+	private Label lblResultado4;
 
-    @FXML
-    private Label lblResultado5;
+	@FXML
+	private Label lblResultado5;
 
-    @FXML
-    private Label lblResultado6;
+	@FXML
+	private Label lblResultado6;
 
-    @FXML
-    private Label lblResultado7;
+	@FXML
+	private Label lblResultado7;
 
-    @FXML
-    private Label lblResultado8;
+	@FXML
+	private Label lblResultado8;
 
-    @FXML
-    private Label lblResultado9;
-
-    @FXML
-    private Label lblResultado10;
+	@FXML
+	private Label lblResultado9;
+
+	@FXML
+	private Label lblResultado10;
 
-    @FXML
-    private Label lblResultado;
+	@FXML
+	private Label lblResultado;
 
-    @FXML
-    private Button btnSuma;
+	@FXML
+	private Button btnSuma;
 
-    @FXML
-    private Button btnResta;
-
-    @FXML
-    private Button btnMultiplicacion;
+	@FXML
+	private Button btnResta;
 
-    @FXML
-    private Button btnDivision;
+	@FXML
+	private Button btnMultiplicacion;
 
-    @FXML
-    private Button btnParentesisAbre;
+	@FXML
+	private Button btnDivision;
 
-    @FXML
-    private Button btnParentesisCierra;
+	@FXML
+	private Button btnParentesisAbre;
 
-    @FXML
-    private Button btnBorrarUltimo;
+	@FXML
+	private Button btnParentesisCierra;
 
-    @FXML
-    private Button btnBorrarTodo;
+	@FXML
+	private Button btnBorrarUltimo;
 
-    @FXML
-    private Button btnIgual;
+	@FXML
+	private Button btnBorrarTodo;
 
-    @FXML
-    private Button btnReglas;
-
-    @FXML
-    private Button btnMenu;
-
-    /**
-     * Calculadora asociada a la partida actual.
-     */
-    private Calculadora calculadora;
-
-    /**
-     * Menú emergente de opciones.
-     */
-    private Popup menuPopup;
-
-    /**
-     * Momento del último cierre del menú.
-     */
-    private long ultimoCierreMenu = 0;
+	@FXML
+	private Button btnIgual;
 
-    /**
-     * Números originales de la ronda.
-     */
-    private int[] numerosOriginales;
+	@FXML
+	private Button btnReglas;
 
-    /**
-     * Puntaje acumulado durante la partida.
-     */
-    private int puntaje = 0;
+	@FXML
+	private Button btnMenu;
 
-    /**
-     * Partida actual.
-     */
-    private Partida partidaActual;
+	/**
+	 * Calculadora asociada a la partida actual.
+	 */
+	private Calculadora calculadora;
 
-    /**
-     * Jugador asociado a la partida.
-     */
-    private Jugador jugadorActual;
+	/**
+	 * Menú emergente de opciones.
+	 */
+	private Popup menuPopup;
 
-    /**
-     * Indica si la partida ya terminó.
-     */
-    private boolean partidaFinalizada = false;
+	/**
+	 * Momento del último cierre del menú.
+	 */
+	private long ultimoCierreMenu = 0;
 
-    /**
-     * Indica si la opción de ayuda está disponible.
-     */
-    private boolean ayudaDisponible = true;
-
-    /**
-     * Generador de ecuaciones de la partida.
-     */
-    private final GeneradorEcuaciones generadorEcuaciones =
-            new GeneradorEcuaciones();
-
-    /**
-     * Contador utilizado para habilitar la ayuda.
-     */
-    private int count = 0;
-
-    /**
-     * Inicializa el juego, registra el jugador y la partida, genera los números
-     * y configura los controles de la interfaz.
-     */
-    @FXML
-    public void initialize() {
-
-        DaoJugadorImplementado daoJugador =
-                new DaoJugadorImplementado();
-
-        jugadorActual = new Jugador(0, "", LocalDate.now());
-
-        if (daoJugador.crear(jugadorActual)) {
-            System.out.println(
-                    "Jugador creado con ID: " + jugadorActual.getId()
-            );
-        }
-
-        puntaje = 0;
-        lblResultado.setText("0/10");
-
-        calculadora = new Calculadora(new String[9], new int[4], "");
-
-        numerosOriginales = calculadora.generarNumeros();
-
-        String[] simbolos = calculadora.generarSimbolos();
-
-        partidaActual = new Partida(
-                jugadorActual,
-                calculadora,
-                LocalDate.now(),
-                0,
-                0
-        );
-
-        jugadorActual.agregarPartida(partidaActual);
-
-        partidaActual.generarFechaPartida();
-        partidaActual.iniciarTiempo();
-
-        DaoScoreImplementado daoPartida =
-                new DaoScoreImplementado();
-
-        boolean partidaCreada = daoPartida.crear(partidaActual);
-
-        if (!partidaCreada) {
-            lblError.setText("No se pudo crear la partida");
-        }
-
-        DateTimeFormatter formato =
-                DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        String fechaTexto =
-                partidaActual.getFechaPartida().format(formato);
-
-        lblFecha.setText(fechaTexto);
-
-        for (int numero : numerosOriginales) {
-
-            Button boton = new Button(String.valueOf(numero));
-
-            boton.setOnAction(this::seleccionarNumero);
-            boton.getStyleClass().addAll("btn-base", "btn-numero");
-
-            contenedorNumeros.getChildren().add(boton);
-        }
-
-        btnSuma.setText(simbolos[0]);
-        btnResta.setText(simbolos[1]);
-        btnMultiplicacion.setText(simbolos[2]);
-        btnDivision.setText(simbolos[3]);
-        btnParentesisAbre.setText(simbolos[4]);
-        btnParentesisCierra.setText(simbolos[5]);
-        btnBorrarUltimo.setText(simbolos[7]);
-        btnBorrarTodo.setText(simbolos[8]);
-
-        Timeline cronometro = new Timeline(
-                new KeyFrame(
-                        Duration.seconds(1),
-                        evento -> actualizarCronometro()
-                )
-        );
-
-        cronometro.setCycleCount(Timeline.INDEFINITE);
-        cronometro.play();
-
-        btnBorrarUltimo.setGraphic(crearIcono(
-                "M21 4 H8 l-7 8 7 8 h13 a2 2 0 0 0 2 -2 V6 a2 2 0 0 0 -2 -2 z "
-                + "M18 9 L12 15 M12 9 L18 15"
-        ));
-        btnBorrarUltimo.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-        btnBorrarTodo.setGraphic(crearIcono(
-                "M23 4 L23 10 L17 10 M20.49 15 a9 9 0 1 1 -2.12 -9.36 L23 10"
-        ));
-        btnBorrarTodo.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-        btnMultiplicacion.setGraphic(
-                crearIcono("M18 6 L6 18 M6 6 L18 18")
-        );
-        btnMultiplicacion.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-        btnSuma.setGraphic(
-                crearIcono("M12 5 L12 19 M5 12 L19 12")
-        );
-        btnSuma.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-        btnResta.setGraphic(
-                crearIcono("M5 12 L19 12")
-        );
-        btnResta.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-        btnDivision.setGraphic(crearIcono(
-                "M5 12 L19 12 "
-                + "M11 6 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0 "
-                + "M11 18 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0"
-        ));
-        btnDivision.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-    }
-
-    /**
-     * Actualiza el cronómetro de la partida.
-     */
-    private void actualizarCronometro() {
-
-        long segundosTotales =
-                partidaActual.obtenerTiempoEjecucion();
-
-        long minutos = segundosTotales / 60;
-        long segundos = segundosTotales % 60;
-
-        lblTiempo.setText(
-                String.format("%02d:%02d", minutos, segundos)
-        );
-    }
-
-    /**
-     * Crea un icono SVG.
-     *
-     * @param contenido contenido SVG del icono
-     * @return icono generado
-     */
-    private SVGPath crearIcono(String contenido) {
-
-        SVGPath icono = new SVGPath();
-        icono.setContent(contenido);
-        icono.getStyleClass().add("icono");
-
-        return icono;
-    }
-
-    /**
-     * Abre la pantalla de reglas.
-     */
-    @FXML
-    private void mostrarReglas() {
-
-        try {
-            App.setRoot("reglas");
-        } catch (IOException ex) {
-            lblError.setText("Error al abrir las reglas");
-        }
-    }
-
-    /**
-     * Agrega el operador de suma.
-     *
-     * @param event evento del botón
-     */
-    @FXML
-    private void seleccionarSuma(ActionEvent event) {
-        agregarOperador("+");
-    }
-
-    /**
-     * Agrega el operador de resta.
-     *
-     * @param event evento del botón
-     */
-    @FXML
-    private void seleccionarResta(ActionEvent event) {
-        agregarOperador("-");
-    }
-
-    /**
-     * Agrega el operador de multiplicación.
-     *
-     * @param event evento del botón
-     */
-    @FXML
-    private void seleccionarMultiplicacion(ActionEvent event) {
-        agregarOperador("*");
-    }
-
-    /**
-     * Agrega el operador de división.
-     *
-     * @param event evento del botón
-     */
-    @FXML
-    private void seleccionarDivision(ActionEvent event) {
-        agregarOperador("/");
-    }
-
-    /**
-     * Agrega un operador a la expresión actual.
-     *
-     * @param nuevoOperador operador que se agregará
-     */
-    private void agregarOperador(String nuevoOperador) {
-
-        if (partidaFinalizada) {
-            lblError.setText("La partida ya terminó");
-            return;
-        }
-
-        if (exprecion.isEmpty()) {
-            lblError.setText("Seleccione primero un número");
-            return;
-        }
-
-        char ultimoCaracter =
-                exprecion.charAt(exprecion.length() - 1);
-
-        if (ultimoCaracter == '+'
-                || ultimoCaracter == '-'
-                || ultimoCaracter == '*'
-                || ultimoCaracter == '/') {
-
-            lblError.setText(
-                    "No puede colocar dos operadores seguidos"
-            );
-            return;
-        }
-
-        if (ultimoCaracter == '(') {
-            lblError.setText("Falta un número");
-            return;
-        }
-
-        exprecion += nuevoOperador;
-
-        txtValor1.setText(exprecion);
-        txtValor1.positionCaret(exprecion.length());
-
-        lblError.setText("");
-    }
-
-    /**
-     * Guarda el tiempo y el puntaje finales de la partida.
-     */
-    private void finalizarPartida() {
-
-        partidaFinalizada = true;
-
-        partidaActual.setTiempoEjecucion(
-                partidaActual.obtenerTiempoEjecucion()
-        );
-
-        partidaActual.setPuntaje(puntaje);
-
-        DaoScoreImplementado dao =
-                new DaoScoreImplementado();
-
-        boolean actualizada = dao.actualizar(partidaActual);
-
-        if (actualizada) {
-
-            System.out.println(
-                    "Partida finalizada. ID: " + partidaActual.getId()
-            );
-            System.out.println("Puntaje final: " + puntaje);
-            System.out.println(
-                    "Tiempo: "
-                    + partidaActual.getTiempoEjecucion()
-                    + " segundos"
-            );
-
-            mostrarAlerta();
-
-        } else {
-
-            partidaFinalizada = false;
-            lblError.setText("No se pudo finalizar la partida");
-        }
-    }
-
-    /**
-     * Agrega un paréntesis de apertura.
-     *
-     * @param event evento del botón
-     */
-    @FXML
-    private void seleccionarParentesisAbierto(ActionEvent event) {
-
-        Button boton = (Button) event.getSource();
-        String pAbierto = boton.getText();
-
-        lblError.setText("");
-
-        agregarTexto(pAbierto);
-    }
-
-    /**
-     * Agrega un paréntesis de cierre.
-     *
-     * @param event evento del botón
-     */
-    @FXML
-    private void seleccionarParentesisCerrado(ActionEvent event) {
-
-        Button boton = (Button) event.getSource();
-        String pCerrado = boton.getText();
-
-        lblError.setText("");
-
-        agregarTexto(pCerrado);
-    }
-
-    /**
-     * Agrega texto a la expresión matemática y contempla la multiplicación
-     * implícita antes de un paréntesis de apertura.
-     *
-     * @param texto texto que se agregará
-     */
-    private void agregarTexto(String texto) {
-
-        if (partidaFinalizada) {
-            lblError.setText("La partida ya terminó");
-            return;
-        }
-
-        if (texto.equals("(")) {
-
-            if (!exprecion.isEmpty()) {
-
-                char ultimoCaracter =
-                        exprecion.charAt(exprecion.length() - 1);
-
-                if (Character.isDigit(ultimoCaracter)
-                        || ultimoCaracter == ')') {
-                    exprecion += "*";
-                }
-            }
-
-            exprecion += "(";
-
-        } else if (texto.equals(")")) {
-
-            if (exprecion.isEmpty()) {
-                lblError.setText(
-                        "No se puede cerrar un paréntesis vacío"
-                );
-                return;
-            }
-
-            char ultimoCaracter =
-                    exprecion.charAt(exprecion.length() - 1);
-
-            if (ultimoCaracter == '+'
-                    || ultimoCaracter == '-'
-                    || ultimoCaracter == '*'
-                    || ultimoCaracter == '/'
-                    || ultimoCaracter == '(') {
-
-                lblError.setText(
-                        "El paréntesis no puede cerrarse aquí"
-                );
-                return;
-            }
-
-            exprecion += ")";
-
-        } else {
-
-            exprecion += texto;
-        }
-
-        txtValor1.setText(exprecion);
-        txtValor1.positionCaret(exprecion.length());
-    }
-
-    /**
-     * Agrega un número a la expresión.
-     *
-     * Evita reutilizar botones numéricos y contempla la multiplicación
-     * implícita después de un paréntesis de cierre.
-     *
-     * @param event evento del botón numérico
-     */
-    @FXML
-    private void seleccionarNumero(ActionEvent event) {
-
-        if (partidaFinalizada) {
-            lblError.setText("La partida ya terminó");
-            return;
-        }
-
-        Button boton = (Button) event.getSource();
-
-        lblError.setText("");
-
-        if (numerosUtilizados.contains(boton)) {
-            lblError.setText("Ese número ya fue utilizado");
-            return;
-        }
-
-        String numero = boton.getText();
-
-        if (exprecion.isEmpty()) {
-
-            exprecion = numero;
-
-        } else {
-
-            char ultimoCaracter =
-                    exprecion.charAt(exprecion.length() - 1);
-
-            if (ultimoCaracter == '(') {
-
-                exprecion += numero;
-
-            } else if (Character.isDigit(ultimoCaracter)) {
-
-                exprecion += numero;
-
-            } else if (ultimoCaracter == ')') {
-
-                exprecion += "*" + numero;
-
-            } else {
-
-                exprecion += numero;
-            }
-        }
-
-        numerosUtilizados.add(boton);
-
-        txtValor1.setText(exprecion);
-        txtValor1.positionCaret(exprecion.length());
-    }
-
-    /**
-     * Elimina el último elemento de la expresión y libera el botón numérico
-     * correspondiente cuando se elimina un número.
-     */
-    @FXML
-    private void borrarUltimo() {
-
-        if (exprecion == null || exprecion.isEmpty()) {
-            return;
-        }
-
-        char ultimoCaracter =
-                exprecion.charAt(exprecion.length() - 1);
-
-        if (Character.isDigit(ultimoCaracter)) {
-
-            exprecion =
-                    exprecion.substring(0, exprecion.length() - 1);
-
-            if (!numerosUtilizados.isEmpty()) {
-
-                Button ultimoBoton = numerosUtilizados.remove(
-                        numerosUtilizados.size() - 1
-                );
-
-                if (!contenedorNumeros.getChildren()
-                        .contains(ultimoBoton)) {
-                    contenedorNumeros.getChildren().add(ultimoBoton);
-                }
-            }
-
-        } else if (ultimoCaracter == ')') {
+	/**
+	 * Números originales de la ronda.
+	 */
+	private int[] numerosOriginales;
 
-            exprecion =
-                    exprecion.substring(0, exprecion.length() - 1);
+	/**
+	 * Puntaje acumulado durante la partida.
+	 */
+	private int puntaje = 0;
 
-        } else if (ultimoCaracter == '(') {
+	/**
+	 * Partida actual.
+	 */
+	private Partida partidaActual;
 
-            exprecion =
-                    exprecion.substring(0, exprecion.length() - 1);
+	/**
+	 * Jugador asociado a la partida.
+	 */
+	private Jugador jugadorActual;
 
-            if (!exprecion.isEmpty()
-                    && exprecion.charAt(exprecion.length() - 1) == '*') {
+	/**
+	 * Indica si la partida ya terminó.
+	 */
+	private boolean partidaFinalizada = false;
 
-                exprecion =
-                        exprecion.substring(0, exprecion.length() - 1);
-            }
-
-        } else if (ultimoCaracter == '+'
-                || ultimoCaracter == '-'
-                || ultimoCaracter == '*'
-                || ultimoCaracter == '/') {
+	/**
+	 * Indica si la opción de ayuda está disponible.
+	 */
+	private boolean ayudaDisponible = true;
 
-            exprecion =
-                    exprecion.substring(0, exprecion.length() - 1);
-        }
+	/**
+	 * Generador de ecuaciones de la partida.
+	 */
+	private final GeneradorEcuaciones generadorEcuaciones = new GeneradorEcuaciones();
 
-        txtValor1.setText(exprecion);
-        txtValor1.positionCaret(exprecion.length());
+	/**
+	 * Contador utilizado para habilitar la ayuda.
+	 */
+	private int count = 1;
 
-        lblError.setText("");
-    }
+	/**
+	 * Inicializa el juego, registra el jugador y la partida, genera los números y
+	 * configura los controles de la interfaz.
+	 */
+	@FXML
+	public void initialize() {
 
-    /**
-     * Limpia la expresión y reinicia los números disponibles.
-     *
-     * @param event evento del botón
-     */
-    @FXML
-    private void borrarTodo(ActionEvent event) {
+		DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
 
-        reiniciarNumeros();
+		jugadorActual = new Jugador(0, "", LocalDate.now());
 
-        txtValor1.setText("");
-        lblError.setText("");
+		if (daoJugador.crear(jugadorActual)) {
+			System.out.println("Jugador creado con ID: " + jugadorActual.getId());
+		}
 
-        exprecion = "";
-        numerosUtilizados.clear();
+		puntaje = 0;
+		lblResultado.setText("0/10");
 
-        generadorEcuaciones.limpiar();
-    }
+		calculadora = new Calculadora(new String[9], new int[4], "");
 
-    /**
-     * Restablece los cuatro números originales de la ronda.
-     */
-    private void reiniciarNumeros() {
+		numerosOriginales = calculadora.generarNumeros();
 
-        contenedorNumeros.getChildren().clear();
+		String[] simbolos = calculadora.generarSimbolos();
 
-        for (int numero : numerosOriginales) {
+		partidaActual = new Partida(jugadorActual, calculadora, LocalDate.now(), 0, 0);
 
-            Button boton = new Button(String.valueOf(numero));
+		jugadorActual.agregarPartida(partidaActual);
 
-            boton.getStyleClass().addAll("btn-base", "btn-numero");
-            boton.setOnAction(this::seleccionarNumero);
+		partidaActual.generarFechaPartida();
+		partidaActual.iniciarTiempo();
 
-            contenedorNumeros.getChildren().add(boton);
-        }
+		DaoScoreImplementado daoPartida = new DaoScoreImplementado();
 
-        exprecion = "";
-        numerosUtilizados.clear();
+		boolean partidaCreada = daoPartida.crear(partidaActual);
 
-        txtValor1.setText("");
-    }
+		if (!partidaCreada) {
+			lblError.setText("No se pudo crear la partida");
+		}
 
-    /**
-     * Calcula la expresión, registra los resultados válidos y actualiza
-     * el puntaje y el estado de la partida.
-     */
-    @FXML
-    private void resultado() {
+		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        if (partidaFinalizada) {
-            lblError.setText("La partida ya terminó");
-            lblError.setWrapText(true);
-            return;
-        }
+		String fechaTexto = partidaActual.getFechaPartida().format(formato);
 
-        if (exprecion.isEmpty()) {
-            lblError.setText("Ingrese una expresión");
-            lblError.setWrapText(true);
-            return;
-        }
+		lblFecha.setText(fechaTexto);
 
-        try {
+		for (int numero : numerosOriginales) {
 
-            System.out.println("Expresión: " + exprecion);
+			Button boton = new Button(String.valueOf(numero));
 
-            calculadora.setEcuacion(exprecion);
+			boton.setOnAction(this::seleccionarNumero);
+			boton.getStyleClass().addAll("btn-base", "btn-numero");
 
-            double resultado = calculadora.calcular();
+			contenedorNumeros.getChildren().add(boton);
+		}
 
-            String resultadoTexto =
-                    Calculadora.convertir(resultado);
+		btnSuma.setText(simbolos[0]);
+		btnResta.setText(simbolos[1]);
+		btnMultiplicacion.setText(simbolos[2]);
+		btnDivision.setText(simbolos[3]);
+		btnParentesisAbre.setText(simbolos[4]);
+		btnParentesisCierra.setText(simbolos[5]);
+		btnBorrarUltimo.setText(simbolos[7]);
+		btnBorrarTodo.setText(simbolos[8]);
+
+		Timeline cronometro = new Timeline(new KeyFrame(Duration.seconds(1), evento -> actualizarCronometro()));
+
+		cronometro.setCycleCount(Timeline.INDEFINITE);
+		cronometro.play();
+
+		btnBorrarUltimo.setGraphic(crearIcono(
+				"M21 4 H8 l-7 8 7 8 h13 a2 2 0 0 0 2 -2 V6 a2 2 0 0 0 -2 -2 z " + "M18 9 L12 15 M12 9 L18 15"));
+		btnBorrarUltimo.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnBorrarTodo.setGraphic(crearIcono("M23 4 L23 10 L17 10 M20.49 15 a9 9 0 1 1 -2.12 -9.36 L23 10"));
+		btnBorrarTodo.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnMultiplicacion.setGraphic(crearIcono("M18 6 L6 18 M6 6 L18 18"));
+		btnMultiplicacion.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnSuma.setGraphic(crearIcono("M12 5 L12 19 M5 12 L19 12"));
+		btnSuma.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnResta.setGraphic(crearIcono("M5 12 L19 12"));
+		btnResta.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnDivision.setGraphic(crearIcono(
+				"M5 12 L19 12 " + "M11 6 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0 " + "M11 18 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0"));
+		btnDivision.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+	}
+
+	/**
+	 * Actualiza el cronómetro de la partida.
+	 */
+	private void actualizarCronometro() {
+
+		long segundosTotales = partidaActual.obtenerTiempoEjecucion();
+
+		long minutos = segundosTotales / 60;
+		long segundos = segundosTotales % 60;
+
+		lblTiempo.setText(String.format("%02d:%02d", minutos, segundos));
+	}
+
+	/**
+	 * Crea un icono SVG.
+	 *
+	 * @param contenido contenido SVG del icono
+	 * @return icono generado
+	 */
+	private SVGPath crearIcono(String contenido) {
+
+		SVGPath icono = new SVGPath();
+		icono.setContent(contenido);
+		icono.getStyleClass().add("icono");
+
+		return icono;
+	}
+
+	/**
+	 * Abre la pantalla de reglas.
+	 */
+	@FXML
+	private void mostrarReglas() {
 
-            generadorEcuaciones.agregarParte(
-                    exprecion,
-                    resultadoTexto
-            );
+		try {
+			App.setRoot("reglas");
+		} catch (IOException ex) {
+			lblError.setText("Error al abrir las reglas");
+		}
+	}
 
-            Button botonResultado =
-                    new Button(resultadoTexto);
+	/**
+	 * Agrega el operador de suma.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void seleccionarSuma(ActionEvent event) {
+		agregarOperador("+");
+	}
 
-            botonResultado.getStyleClass().addAll(
-                    "btn-base",
-                    "btn-numero"
-            );
+	/**
+	 * Agrega el operador de resta.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void seleccionarResta(ActionEvent event) {
+		agregarOperador("-");
+	}
 
-            botonResultado.setOnAction(this::seleccionarNumero);
+	/**
+	 * Agrega el operador de multiplicación.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void seleccionarMultiplicacion(ActionEvent event) {
+		agregarOperador("*");
+	}
 
-            contenedorNumeros.getChildren()
-                    .removeAll(numerosUtilizados);
+	/**
+	 * Agrega el operador de división.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void seleccionarDivision(ActionEvent event) {
+		agregarOperador("/");
+	}
 
-            contenedorNumeros.getChildren()
-                    .add(botonResultado);
+	/**
+	 * Agrega un operador a la expresión actual.
+	 *
+	 * @param nuevoOperador operador que se agregará
+	 */
+	private void agregarOperador(String nuevoOperador) {
 
-            txtValor1.setText("");
-            lblError.setText("");
+		if (partidaFinalizada) {
+			lblError.setText("La partida ya terminó");
+			return;
+		}
 
-            exprecion = "";
-            numerosUtilizados.clear();
+		if (exprecion.isEmpty()) {
+			lblError.setText("Seleccione primero un número");
+			return;
+		}
 
-            if (contenedorNumeros.getChildren().size() == 1) {
+		char ultimoCaracter = exprecion.charAt(exprecion.length() - 1);
 
-                if (resultado > 10
-                        || resultado != Math.floor(resultado)) {
+		if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/') {
 
-                    lblError.setText(
-                            "No es válido números > 10 o fracciones no exactas"
-                    );
+			lblError.setText("No puede colocar dos operadores seguidos");
+			return;
+		}
 
-                    count++;
+		if (ultimoCaracter == '(') {
+			lblError.setText("Falta un número");
+			return;
+		}
 
-                    reiniciarNumeros();
+		exprecion += nuevoOperador;
 
-                    if (count >= 2) {
-                        ayudaDisponible = true;
-                    }
+		txtValor1.setText(exprecion);
+		txtValor1.positionCaret(exprecion.length());
 
-                    return;
-                }
+		lblError.setText("");
+	}
 
-                if (resultado >= 1
-                        && resultado <= 10
-                        && resultado == Math.floor(resultado)) {
+	/**
+	 * Guarda el tiempo y el puntaje finales de la partida.
+	 */
+	private void finalizarPartida() {
 
-                    puntaje++;
+		partidaFinalizada = true;
 
-                    lblResultado.setText(puntaje + "/10");
+		partidaActual.setTiempoEjecucion(partidaActual.obtenerTiempoEjecucion());
 
-                    int resultadoFinal = (int) resultado;
+		partidaActual.setPuntaje(puntaje);
 
-                    DaoResultadoImplementado daoResultado =
-                            new DaoResultadoImplementado();
+		DaoScoreImplementado dao = new DaoScoreImplementado();
 
-                    boolean yaExiste =
-                            daoResultado.existePorPartidaYDato(
-                                    partidaActual.getId(),
-                                    resultadoFinal
-                            );
+		boolean actualizada = dao.actualizar(partidaActual);
 
-                    exprecion =
-                            generadorEcuaciones.obtenerEcuacion();
+		if (actualizada) {
 
-                    generadorEcuaciones.limpiar();
+			System.out.println("Partida finalizada. ID: " + partidaActual.getId());
+			System.out.println("Puntaje final: " + puntaje);
+			System.out.println("Tiempo: " + partidaActual.getTiempoEjecucion() + " segundos");
 
-                    System.out.println(
-                            "Ecuación completa: " + exprecion
-                    );
+			mostrarAlerta();
 
-                    if (!yaExiste) {
+		} else {
 
-                        marcarResultado(resultadoFinal);
+			partidaFinalizada = false;
+			lblError.setText("No se pudo finalizar la partida");
+		}
+	}
 
-                        Resultado nuevoResultado = new Resultado(
-                                0,
-                                partidaActual,
-                                exprecion,
-                                resultadoFinal
-                        );
+	/**
+	 * Agrega un paréntesis de apertura.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void seleccionarParentesisAbierto(ActionEvent event) {
 
-                        partidaActual.agregarResultado(nuevoResultado);
+		Button boton = (Button) event.getSource();
+		String pAbierto = boton.getText();
 
-                        boolean resultadoCreado =
-                                daoResultado.crear(nuevoResultado);
+		lblError.setText("");
 
-                        if (!resultadoCreado) {
-                            lblError.setText(
-                                    "No se pudo guardar el resultado"
-                            );
-                        }
+		agregarTexto(pAbierto);
+	}
 
-                    } else {
+	/**
+	 * Agrega un paréntesis de cierre.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void seleccionarParentesisCerrado(ActionEvent event) {
 
-                        count++;
-                    }
+		Button boton = (Button) event.getSource();
+		String pCerrado = boton.getText();
 
-                    System.out.println(
-                            partidaActual.getResultados()
-                    );
+		lblError.setText("");
 
-                    partidaActual.setPuntaje(puntaje);
+		agregarTexto(pCerrado);
+	}
 
-                    if (todosLosNumerosEncontrados()) {
+	/**
+	 * Agrega texto a la expresión matemática y contempla la multiplicación
+	 * implícita antes de un paréntesis de apertura.
+	 *
+	 * @param texto texto que se agregará
+	 */
+	private void agregarTexto(String texto) {
 
-                        finalizarPartida();
+		if (partidaFinalizada) {
+			lblError.setText("La partida ya terminó");
+			return;
+		}
 
-                    } else {
+		if (texto.equals("(")) {
 
-                        DaoScoreImplementado dao =
-                                new DaoScoreImplementado();
+			if (!exprecion.isEmpty()) {
 
-                        boolean actualizada =
-                                dao.actualizar(partidaActual);
+				char ultimoCaracter = exprecion.charAt(exprecion.length() - 1);
 
-                        if (!actualizada) {
-                            lblError.setText(
-                                    "No se pudo actualizar la partida"
-                            );
-                        }
+				if (Character.isDigit(ultimoCaracter) || ultimoCaracter == ')') {
+					exprecion += "*";
+				}
+			}
 
-                        reiniciarNumeros();
-                    }
-                }
-            }
+			exprecion += "(";
 
-        } catch (IllegalArgumentException | ArithmeticException e) {
+		} else if (texto.equals(")")) {
 
-            lblError.setText(e.getMessage());
-        }
-    }
+			if (exprecion.isEmpty()) {
+				lblError.setText("No se puede cerrar un paréntesis vacío");
+				return;
+			}
 
-    /**
-     * Marca visualmente un resultado encontrado.
-     *
-     * @param resultado resultado entre 1 y 10
-     */
-    private void marcarResultado(int resultado) {
+			char ultimoCaracter = exprecion.charAt(exprecion.length() - 1);
 
-        Label[] etiquetas = {
-            lblResultado1,
-            lblResultado2,
-            lblResultado3,
-            lblResultado4,
-            lblResultado5,
-            lblResultado6,
-            lblResultado7,
-            lblResultado8,
-            lblResultado9,
-            lblResultado10
-        };
+			if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/'
+					|| ultimoCaracter == '(') {
 
-        Node celda = etiquetas[resultado - 1].getParent();
+				lblError.setText("El paréntesis no puede cerrarse aquí");
+				return;
+			}
 
-        etiquetas[resultado - 1].setText(
-                String.valueOf(resultado)
-        );
+			exprecion += ")";
 
-        celda.getStyleClass().remove("casilla-pendiente");
-        celda.getStyleClass().add("casilla-resuelta");
-    }
+		} else {
 
-    /**
-     * Comprueba si se encontraron los resultados del 1 al 10.
-     *
-     * @return true cuando todos los resultados están resueltos
-     */
-    private boolean todosLosNumerosEncontrados() {
+			exprecion += texto;
+		}
 
-        Label[] etiquetas = {
-            lblResultado1,
-            lblResultado2,
-            lblResultado3,
-            lblResultado4,
-            lblResultado5,
-            lblResultado6,
-            lblResultado7,
-            lblResultado8,
-            lblResultado9,
-            lblResultado10
-        };
+		txtValor1.setText(exprecion);
+		txtValor1.positionCaret(exprecion.length());
+	}
 
-        for (Label etiqueta : etiquetas) {
+	/**
+	 * Agrega un número a la expresión.
+	 *
+	 * Evita reutilizar botones numéricos y contempla la multiplicación implícita
+	 * después de un paréntesis de cierre.
+	 *
+	 * @param event evento del botón numérico
+	 */
+	@FXML
+	private void seleccionarNumero(ActionEvent event) {
 
-            if (!etiqueta.getStyleClass()
-                    .contains("casilla-resuelta")) {
-                return false;
-            }
-        }
+		if (partidaFinalizada) {
+			lblError.setText("La partida ya terminó");
+			return;
+		}
 
-        return true;
-    }
+		Button boton = (Button) event.getSource();
 
-    /**
-     * Abre la pantalla de ayuda con las ecuaciones disponibles.
-     */
-    private void mostrarAyuda() {
+		lblError.setText("");
 
-        try {
+		if (numerosUtilizados.contains(boton)) {
+			lblError.setText("Ese número ya fue utilizado");
+			return;
+		}
 
-            AyudaControler.setEcuaciones(
-                    calculadora.getEcuacionesResultados()
-            );
+		String numero = boton.getText();
 
-            App.setRoot("ayuda");
+		if (exprecion.isEmpty()) {
 
-        } catch (IOException ex) {
+			exprecion = numero;
 
-            lblError.setText("Error al abrir la ayuda");
-        }
-    }
+		} else {
 
-    /**
-     * Muestra el menú de opciones de la partida.
-     *
-     * Incluye instrucciones, consulta de partidas, dificultad y ayuda.
-     *
-     * @param event evento generado al presionar el botón de menú
-     */
-    @FXML
-    private void mostrarMenu(ActionEvent event) {
+			char ultimoCaracter = exprecion.charAt(exprecion.length() - 1);
 
-        if (menuPopup != null && menuPopup.isShowing()) {
-            menuPopup.hide();
-            return;
-        }
+			if (ultimoCaracter == '(') {
 
-        if (System.currentTimeMillis() - ultimoCierreMenu < 400) {
-            return;
-        }
+				exprecion += numero;
 
-        Popup popup = new Popup();
+			} else if (Character.isDigit(ultimoCaracter)) {
 
-        popup.setAutoHide(true);
-        popup.setOnHidden(
-                e -> ultimoCierreMenu = System.currentTimeMillis()
-        );
+				exprecion += numero;
 
-        menuPopup = popup;
+			} else if (ultimoCaracter == ')') {
 
-        Button btnInstrucciones =
-                new Button("Instrucciones");
+				exprecion += "*" + numero;
 
-        Button btnConsultar =
-                new Button("Consultar Partida");
+			} else {
 
-        Button btnDificultad =
-                new Button("Dificultad");
+				exprecion += numero;
+			}
+		}
 
-        btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
-        btnInstrucciones.getStyleClass()
-                .add("btn-menu-item");
+		numerosUtilizados.add(boton);
 
-        btnConsultar.setMaxWidth(Double.MAX_VALUE);
-        btnConsultar.setMinWidth(Region.USE_PREF_SIZE);
-        btnConsultar.getStyleClass()
-                .add("btn-menu-item");
+		txtValor1.setText(exprecion);
+		txtValor1.positionCaret(exprecion.length());
+	}
 
-        btnDificultad.setMaxWidth(Double.MAX_VALUE);
-        btnDificultad.getStyleClass()
-                .add("btn-menu-item");
+	/**
+	 * Elimina el último elemento de la expresión y libera el botón numérico
+	 * correspondiente cuando se elimina un número.
+	 */
+	@FXML
+	private void borrarUltimo() {
 
-        btnInstrucciones.setOnAction(e -> {
-            popup.hide();
-            mostrarReglas();
-        });
+		if (exprecion == null || exprecion.isEmpty()) {
+			return;
+		}
 
-        btnConsultar.setOnAction(e -> {
+		char ultimoCaracter = exprecion.charAt(exprecion.length() - 1);
 
-            popup.hide();
+		if (Character.isDigit(ultimoCaracter)) {
 
-            try {
-                App.setRoot("consulta");
-            } catch (IOException ex) {
-                lblError.setText("Error al ver consulta");
-            }
-        });
+			exprecion = exprecion.substring(0, exprecion.length() - 1);
 
-        btnDificultad.setOnAction(e -> popup.hide());
+			if (!numerosUtilizados.isEmpty()) {
 
-        VBox contenedor = new VBox(8);
-        contenedor.setPrefWidth(160);
+				Button ultimoBoton = numerosUtilizados.remove(numerosUtilizados.size() - 1);
 
-        java.net.URL css = getClass().getResource(
-                "/co/edu/poli/juego/style.css"
-        );
+				if (!contenedorNumeros.getChildren().contains(ultimoBoton)) {
+					contenedorNumeros.getChildren().add(ultimoBoton);
+				}
+			}
 
-        if (css != null) {
-            contenedor.getStylesheets()
-                    .add(css.toExternalForm());
-        }
+		} else if (ultimoCaracter == ')') {
 
-        contenedor.getStyleClass().add("menu-popup");
+			exprecion = exprecion.substring(0, exprecion.length() - 1);
 
-        contenedor.getChildren().addAll(
-                btnInstrucciones,
-                btnConsultar,
-                btnDificultad
-        );
+		} else if (ultimoCaracter == '(') {
 
-        if (ayudaDisponible) {
+			exprecion = exprecion.substring(0, exprecion.length() - 1);
 
-            Button btnAyuda = new Button("Ayuda");
+			if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '*') {
 
-            btnAyuda.setMaxWidth(Double.MAX_VALUE);
-            btnAyuda.getStyleClass()
-                    .add("btn-menu-item");
+				exprecion = exprecion.substring(0, exprecion.length() - 1);
+			}
 
-            btnAyuda.setOnAction(e -> {
-                popup.hide();
-                mostrarAyuda();
-            });
+		} else if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/') {
 
-            contenedor.getChildren().add(btnAyuda);
-        }
+			exprecion = exprecion.substring(0, exprecion.length() - 1);
+		}
 
-        popup.getContent().add(contenedor);
+		txtValor1.setText(exprecion);
+		txtValor1.positionCaret(exprecion.length());
 
-        Button boton = (Button) event.getSource();
+		lblError.setText("");
+	}
 
-        Bounds coordenadas = boton.localToScreen(
-                boton.getBoundsInLocal()
-        );
+	/**
+	 * Limpia la expresión y reinicia los números disponibles.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void borrarTodo(ActionEvent event) {
 
-        if (coordenadas != null) {
+		reiniciarNumeros();
 
-            double x = coordenadas.getMaxX()
-                    - contenedor.getPrefWidth();
+		txtValor1.setText("");
+		lblError.setText("");
 
-            double y = coordenadas.getMaxY();
+		exprecion = "";
+		numerosUtilizados.clear();
 
-            popup.show(boton, x, y);
-        }
-    }
+		generadorEcuaciones.limpiar();
+	}
 
-    /**
-     * Muestra la ventana final con la información de la partida completada.
-     */
-    private void mostrarAlerta() {
+	/**
+	 * Restablece los cuatro números originales de la ronda.
+	 */
+	private void reiniciarNumeros() {
 
-        try {
+		contenedorNumeros.getChildren().clear();
 
-            javafx.fxml.FXMLLoader loader =
-                    new javafx.fxml.FXMLLoader(
-                            App.class.getResource(
-                                    "/co/edu/poli/juego/gameOver.fxml"
-                            )
-                    );
+		for (int numero : numerosOriginales) {
 
-            Parent root = loader.load();
+			Button boton = new Button(String.valueOf(numero));
 
-            GameOverControler controlador =
-                    loader.getController();
+			boton.getStyleClass().addAll("btn-base", "btn-numero");
+			boton.setOnAction(this::seleccionarNumero);
 
-            controlador.establecerPartida(partidaActual);
+			contenedorNumeros.getChildren().add(boton);
+		}
 
-            Stage ventana = new Stage();
+		exprecion = "";
+		numerosUtilizados.clear();
 
-            ventana.setTitle(
-                    "All Ten - Partida completada"
-            );
+		txtValor1.setText("");
+	}
 
-            ventana.initModality(
-                    Modality.APPLICATION_MODAL
-            );
+	/**
+	 * Calcula la expresión, registra los resultados válidos y actualiza el puntaje
+	 * y el estado de la partida.
+	 */
+	@FXML
+	private void resultado() {
 
-            ventana.setResizable(false);
-            ventana.setScene(new Scene(root));
+		if (partidaFinalizada) {
+			lblError.setText("La partida ya terminó");
+			lblError.setWrapText(true);
+			return;
+		}
 
-            ventana.showAndWait();
+		if (exprecion.isEmpty()) {
+			lblError.setText("Ingrese una expresión");
+			lblError.setWrapText(true);
+			return;
+		}
 
-        } catch (IOException e) {
+		try {
 
-            lblError.setText(
-                    "No se pudo mostrar la ventana de resultados."
-            );
+			System.out.println("Expresión: " + exprecion);
 
-            e.printStackTrace();
-        }
-    }
+			calculadora.setEcuacion(exprecion);
+
+			double resultado = calculadora.calcular();
+
+			String resultadoTexto = Calculadora.convertir(resultado);
+
+			generadorEcuaciones.agregarParte(exprecion, resultadoTexto);
+
+			Button botonResultado = new Button(resultadoTexto);
+
+			botonResultado.getStyleClass().addAll("btn-base", "btn-numero");
+
+			botonResultado.setOnAction(this::seleccionarNumero);
+
+			contenedorNumeros.getChildren().removeAll(numerosUtilizados);
+
+			contenedorNumeros.getChildren().add(botonResultado);
+
+			txtValor1.setText("");
+			lblError.setText("");
+
+			exprecion = "";
+			numerosUtilizados.clear();
+
+			if (contenedorNumeros.getChildren().size() == 1) {
+
+				if (resultado > 10 || resultado != Math.floor(resultado)) {
+
+					lblError.setText("No es válido números > 10 o fracciones no exactas");
+
+					count++;
+
+					reiniciarNumeros();
+
+					if (count >= 20) {
+						ayudaDisponible = true;
+					}
+
+					return;
+				}
+
+				if (resultado >= 1 && resultado <= 10 && resultado == Math.floor(resultado)) {
+
+					puntaje++;
+
+					lblResultado.setText(puntaje + "/10");
+
+					int resultadoFinal = (int) resultado;
+
+					DaoResultadoImplementado daoResultado = new DaoResultadoImplementado();
+
+					boolean yaExiste = daoResultado.existePorPartidaYDato(partidaActual.getId(), resultadoFinal);
+
+					exprecion = generadorEcuaciones.obtenerEcuacion();
+
+					generadorEcuaciones.limpiar();
+
+					System.out.println("Ecuación completa: " + exprecion);
+
+					if (!yaExiste) {
+
+						marcarResultado(resultadoFinal);
+
+						Resultado nuevoResultado = new Resultado(0, partidaActual, exprecion, resultadoFinal);
+
+						partidaActual.agregarResultado(nuevoResultado);
+
+						boolean resultadoCreado = daoResultado.crear(nuevoResultado);
+
+						if (!resultadoCreado) {
+							lblError.setText("No se pudo guardar el resultado");
+						}
+
+					} else {
+
+						count++;
+					}
+
+					System.out.println(partidaActual.getResultados());
+
+					partidaActual.setPuntaje(puntaje);
+
+					if (todosLosNumerosEncontrados()) {
+
+						finalizarPartida();
+
+					} else {
+
+						DaoScoreImplementado dao = new DaoScoreImplementado();
+
+						boolean actualizada = dao.actualizar(partidaActual);
+
+						if (!actualizada) {
+							lblError.setText("No se pudo actualizar la partida");
+						}
+
+						reiniciarNumeros();
+					}
+				}
+			}
+
+		} catch (IllegalArgumentException | ArithmeticException e) {
+
+			lblError.setText(e.getMessage());
+		}
+	}
+
+	/**
+	 * Marca visualmente un resultado encontrado.
+	 *
+	 * @param resultado resultado entre 1 y 10
+	 */
+	private void marcarResultado(int resultado) {
+
+		Label[] etiquetas = { lblResultado1, lblResultado2, lblResultado3, lblResultado4, lblResultado5, lblResultado6,
+				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
+
+		Node celda = etiquetas[resultado - 1].getParent();
+
+		etiquetas[resultado - 1].setText(String.valueOf(resultado));
+
+		celda.getStyleClass().remove("casilla-pendiente");
+		celda.getStyleClass().add("casilla-resuelta");
+	}
+
+	/**
+	 * Comprueba si se encontraron los resultados del 1 al 10.
+	 *
+	 * @return true cuando todos los resultados están resueltos
+	 */
+	private boolean todosLosNumerosEncontrados() {
+
+	    Label[] etiquetas = {
+	        lblResultado1, lblResultado2, lblResultado3,
+	        lblResultado4, lblResultado5, lblResultado6,
+	        lblResultado7, lblResultado8, lblResultado9,
+	        lblResultado10
+	    };
+
+	    for (Label etiqueta : etiquetas) {
+
+	        Node celda = etiqueta.getParent();
+
+	        if (celda == null ||
+	                !celda.getStyleClass().contains("casilla-resuelta")) {
+
+	            return false;
+	        }
+	    }
+
+	    return true;
+	}
+
+	/**
+	 * Abre la pantalla de ayuda con las ecuaciones disponibles.
+	 */
+	private void mostrarAyuda() {
+
+		try {
+
+			AyudaControler.setEcuaciones(calculadora.getEcuacionesResultados());
+
+			App.setRoot("ayuda");
+
+		} catch (IOException ex) {
+
+			lblError.setText("Error al abrir la ayuda");
+		}
+	}
+
+	/**
+	 * Muestra el menú de opciones de la partida.
+	 *
+	 * Incluye instrucciones, consulta de partidas, dificultad y ayuda.
+	 *
+	 * @param event evento generado al presionar el botón de menú
+	 */
+	@FXML
+	private void mostrarMenu(ActionEvent event) {
+
+		if (menuPopup != null && menuPopup.isShowing()) {
+			menuPopup.hide();
+			return;
+		}
+
+		if (System.currentTimeMillis() - ultimoCierreMenu < 400) {
+			return;
+		}
+
+		Popup popup = new Popup();
+
+		popup.setAutoHide(true);
+		popup.setOnHidden(e -> ultimoCierreMenu = System.currentTimeMillis());
+
+		menuPopup = popup;
+
+		Button btnInstrucciones = new Button("Instrucciones");
+
+		Button btnConsultar = new Button("Consultar Partida");
+
+		Button btnDificultad = new Button("Dificultad");
+
+		btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
+		btnInstrucciones.getStyleClass().add("btn-menu-item");
+
+		btnConsultar.setMaxWidth(Double.MAX_VALUE);
+		btnConsultar.setMinWidth(Region.USE_PREF_SIZE);
+		btnConsultar.getStyleClass().add("btn-menu-item");
+
+		btnDificultad.setMaxWidth(Double.MAX_VALUE);
+		btnDificultad.getStyleClass().add("btn-menu-item");
+
+		btnInstrucciones.setOnAction(e -> {
+			popup.hide();
+			mostrarReglas();
+		});
+
+		btnConsultar.setOnAction(e -> {
+
+			popup.hide();
+
+			try {
+				App.setRoot("consulta");
+			} catch (IOException ex) {
+				lblError.setText("Error al ver consulta");
+			}
+		});
+
+		btnDificultad.setOnAction(e -> popup.hide());
+
+		VBox contenedor = new VBox(8);
+		contenedor.setPrefWidth(160);
+
+		java.net.URL css = getClass().getResource("/co/edu/poli/juego/style.css");
+
+		if (css != null) {
+			contenedor.getStylesheets().add(css.toExternalForm());
+		}
+
+		contenedor.getStyleClass().add("menu-popup");
+
+		contenedor.getChildren().addAll(btnInstrucciones, btnConsultar, btnDificultad);
+
+		if (ayudaDisponible) {
+
+			Button btnAyuda = new Button("Ayuda");
+
+			btnAyuda.setMaxWidth(Double.MAX_VALUE);
+			btnAyuda.getStyleClass().add("btn-menu-item");
+
+			btnAyuda.setOnAction(e -> {
+				popup.hide();
+				mostrarAyuda();
+			});
+
+			contenedor.getChildren().add(btnAyuda);
+		}
+
+		popup.getContent().add(contenedor);
+
+		Button boton = (Button) event.getSource();
+
+		Bounds coordenadas = boton.localToScreen(boton.getBoundsInLocal());
+
+		if (coordenadas != null) {
+
+			double x = coordenadas.getMaxX() - contenedor.getPrefWidth();
+
+			double y = coordenadas.getMaxY();
+
+			popup.show(boton, x, y);
+		}
+	}
+
+	/**
+	 * Muestra la ventana final con la información de la partida completada.
+	 */
+	private void mostrarAlerta() {
+
+		try {
+
+			javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+					App.class.getResource("/co/edu/poli/juego/gameOver.fxml"));
+
+			Parent root = loader.load();
+
+			GameOverControler controlador = loader.getController();
+
+			controlador.establecerPartida(partidaActual);
+
+			Stage ventana = new Stage();
+
+			ventana.setTitle("All Ten - Partida completada");
+
+			ventana.initModality(Modality.APPLICATION_MODAL);
+
+			ventana.setResizable(false);
+			ventana.setScene(new Scene(root));
+
+			ventana.showAndWait();
+
+		} catch (IOException e) {
+
+			lblError.setText("No se pudo mostrar la ventana de resultados.");
+
+			e.printStackTrace();
+		}
+	}
 }

@@ -118,6 +118,57 @@ public class DaoResultadoImplementado implements ResultadoDAO {
 
         return false;
     }
+    
+    /**
+     * Consulta los resultados asociados a una partida.
+     *
+     * @param partida partida cuyos resultados se consultarán
+     * @return lista de resultados de esa partida
+     */
+    public List<Resultado> listarPorPartida(Partida partida) {
+
+        List<Resultado> resultados = new ArrayList<>();
+
+        if (partida == null || partida.getId() <= 0) {
+            return resultados;
+        }
+
+        String sql = """
+                SELECT id, resultado, dato
+                FROM resultado
+                WHERE partida_id = ?
+                ORDER BY dato ASC
+                """;
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setInt(1, partida.getId());
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Resultado resultado = new Resultado(
+                            rs.getInt("id"),
+                            partida,
+                            rs.getString("resultado"),
+                            rs.getInt("dato")
+                    );
+
+                    resultados.add(resultado);
+                }
+
+            }
+
+        } catch (SQLException e) {
+            System.out.println(
+                    "Error al consultar resultados de la partida: "
+                    + e.getMessage()
+            );
+        }
+
+        return resultados;
+    }
 
     /**
      * Lista todos los resultados registrados, incluyendo los datos
