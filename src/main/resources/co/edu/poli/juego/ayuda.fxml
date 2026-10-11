@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="co.edu.poli.controller.AyudaControler"
+           stylesheets="@style.css">
+
+    <VBox alignment="CENTER" prefWidth="320.0" spacing="14.0" styleClass="card" StackPane.alignment="CENTER">
+
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </padding>
+
+        <Label text="Ayuda" styleClass="titulo" />
+        <Label text="Expresiones para obtener los resultados" styleClass="subtitulo" wrapText="true" />
+
+        <TableView fx:id="tablaEcuaciones" prefHeight="300.0" styleClass="tabla-ayuda">
+            <columns>
+                <TableColumn fx:id="colResultado" text="Resultado" />
+                <TableColumn fx:id="colExpresion" text="Expresión" />
+            </columns>
+        </TableView>
+
+        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#calljuego"
+                styleClass="btn-comprobar" text="Volver" />
+
+    </VBox>
+</StackPane>

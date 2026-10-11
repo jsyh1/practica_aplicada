@@ -1,0 +1,197 @@
+.root {
+    -fx-background-color: #d9d9d9;
+}
+.card { 
+    -fx-background-color: #d9d9d9;
+    -fx-padding: 20;
+}
+    
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .corner {
+    -fx-background-color: transparent;
+}
+
+.titulo {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+}
+.subtitulo{
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+}
+.progreso {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6b6b6b;
+}
+.casilla-pendiente{
+    -fx-background-color: #867CA3;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #4F378A;
+    -fx-padding: 4 8 4 8;   
+}
+.casilla-resuelta{
+    -fx-background-color: #3ecf6e;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #04342C;
+    -fx-padding: 4 8 4 8;
+}
+.barra-resultado{
+    -fx-background-color: #4a4458;
+    -fx-padding: 10;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.lbl-error { 
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.btn-base{
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-pref-width: 60;
+    -fx-pref-height: 44;
+    -fx-cursor: hand;
+    -fx-border-color: black;
+    -fx-border-radius: 8;
+    -fx-font-size: 15px;
+}
+.btn-numero{
+    -fx-background-color: #5b4e94;
+    -fx-font-weight: bold;
+    
+}
+.btn-numero:hover{
+    -fx-background-color: #6f5eb0;
+}
+.btn-operador{
+    -fx-background-color: #2b2b2b;
+}
+.btn-operador:hover{
+    -fx-background-color: #3a3a3a;
+}
+.btn-comprobar{
+    -fx-background-color: #2b2b2b; 
+    -fx-background-radius: 8; 
+    -fx-text-fill: white; 
+    -fx-font-size: 16px; 
+    -fx-pref-height: 48; 
+    -fx-cursor: hand;
+}
+.btn-comprobar:hover{
+    -fx-background-color: #3a3a3a;
+}
+.btn-menu{
+    -fx-background-color: #2b2b2b; 
+    -fx-text-fill: white; 
+    -fx-background-radius: 8; 
+    -fx-cursor: hand; 
+}
+.menu-popup {
+    -fx-background-color: #d9d9d9;
+    -fx-padding: 14;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 12, 0, 0, 4);
+}
+
+.btn-menu-item {
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-padding: 10 16 10 16;
+    -fx-cursor: hand;
+}
+
+.btn-menu-item:hover {
+    -fx-background-color: #3a3a3a;
+}
+.fila-partida { 
+    -fx-background-color: #3ecf6e; 
+    -fx-background-radius: 10; 
+    -fx-padding: 12;  
+}
+.btn-compartir{ -fx-background-color: #2b2b2b; 
+    -fx-text-fill: white; 
+    -fx-background-radius: 6;
+    -fx-cursor: hand; 
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 12px;
+}
+.btn-compartir:hover{
+    -fx-background-color: #3a3a3a;
+}
+.nombre-jugador {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #04342C;
+}
+
+.fecha-partida {
+    -fx-text-fill: #085041;
+}
+
+.caja-reglas {
+    -fx-background-color: #ada6c9;
+    -fx-background-radius: 10;
+    -fx-padding: 16;
+}
+
+.texto-reglas {
+    -fx-text-fill: #1a1a1a;
+    -fx-font-size: 13px;
+}
+
+.tabla-ayuda {
+    -fx-background-color: #ada6c9;
+    -fx-background-radius: 10;
+    -fx-control-inner-background: #ada6c9;
+    -fx-control-inner-background-alt: #b9b3d3;
+    -fx-table-cell-border-color: transparent;
+}
+
+.tabla-ayuda .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.tabla-ayuda .column-header {
+    -fx-background-color: #2b2b2b;
+}
+
+.tabla-ayuda .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.tabla-ayuda .table-cell {
+    -fx-text-fill: #1a1a1a;
+}
+
+.tabla-ayuda .table-row-cell:filled:selected {
+    -fx-background-color: #5b4e94;
+}
+
+.tabla-ayuda .table-row-cell:filled:selected .table-cell {
+    -fx-text-fill: white;
+}
+
+.text{
+    -fx-font-smoothing-type: gray;
+}
+.icono {
+    -fx-fill: transparent;
+    -fx-stroke: white;
+    -fx-stroke-width: 2;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+}
