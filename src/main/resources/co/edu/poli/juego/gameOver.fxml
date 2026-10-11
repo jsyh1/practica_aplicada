@@ -1,0 +1,73 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/26"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="co.edu.poli.controller.GameOverControler"
+      alignment="CENTER"
+      spacing="12"
+      prefWidth="440"
+      prefHeight="520">
+
+    <padding>
+        <Insets top="20" right="24" bottom="20" left="24"/>
+    </padding>
+
+    <Label text="¡Partida completada!"
+           style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+    <Label text="Ingresa el nombre del jugador:"/>
+
+    <HBox spacing="8" alignment="CENTER">
+        <TextField fx:id="txtNombre"
+                   promptText="Nombre del jugador"
+                   HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="btnCargar"
+                text="Cargar"
+                onAction="#cargarNombre"/>
+    </HBox>
+
+    <Label fx:id="lblPuntaje"
+           text="Puntaje: pendiente"
+           style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+
+    <Label fx:id="lblTiempo"
+           text="Tiempo de juego: pendiente"
+           style="-fx-font-size: 15px;"/>
+
+    <Label text="Resultados de la partida:"
+           style="-fx-font-weight: bold;"/>
+
+    <TextArea fx:id="lblResultados"
+              editable="false"
+              wrapText="true"
+              prefHeight="220"
+              VBox.vgrow="ALWAYS"
+              promptText="Aquí aparecerán los resultados"/>
+
+    <HBox spacing="12" alignment="CENTER">
+        <Button fx:id="btnCompartir"
+                text="Compartir"
+                onAction="#compartir"
+                disable="true"/>
+
+        <Button fx:id="btnExportar"
+                text="Exportar"
+                onAction="#exportar"
+                disable="true"/>
+    </HBox>
+
+    <Label fx:id="lblMensaje"
+           wrapText="true"
+           text="Escribe el nombre para cargar los resultados."/>
+
+</VBox>

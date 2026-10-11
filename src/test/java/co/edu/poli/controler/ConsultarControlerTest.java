@@ -30,6 +30,7 @@ class ConsultarControlerTest {
 
         Jugador jugador = new Jugador(
             10,
+            "",
             LocalDate.now()
         );
 

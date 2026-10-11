@@ -31,6 +31,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.util.Duration;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 /**
  * Controlador principal de la calculadora.
@@ -166,7 +171,7 @@ public class CalculadoraControler {
 	public void initialize() {
 		DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
 
-		jugadorActual = new Jugador(0, LocalDate.now());
+		jugadorActual = new Jugador(0, "", LocalDate.now());
 
 		if (daoJugador.crear(jugadorActual)) {
 			System.out.println("Jugador creado con ID: " + jugadorActual.getId());
@@ -406,6 +411,8 @@ public class CalculadoraControler {
 			System.out.println("Puntaje final: " + puntaje);
 
 			System.out.println("Tiempo: " + partidaActual.getTiempoEjecucion() + " segundos");
+
+			mostrarAlerta();
 		} else {
 
 			partidaFinalizada = false;
@@ -992,41 +999,28 @@ public class CalculadoraControler {
 
 		return true;
 	}
-	
+
 	/**
-	 * Muestra una tabla con las expresiones que permiten obtener
-	 * los resultados del 1 al 10 utilizando los cuatro números
-	 * generados para la partida actual.
+	 * Muestra una tabla con las expresiones que permiten obtener los resultados del
+	 * 1 al 10 utilizando los cuatro números generados para la partida actual.
 	 */
 	private void mostrarAyuda() {
 
 		TableView<String[]> tabla = new TableView<>();
 
-		TableColumn<String[], String> columnaResultado =
-				new TableColumn<>("Resultado");
+		TableColumn<String[], String> columnaResultado = new TableColumn<>("Resultado");
 
-		TableColumn<String[], String> columnaExpresion =
-				new TableColumn<>("Expresión");
+		TableColumn<String[], String> columnaExpresion = new TableColumn<>("Expresión");
 
-		columnaResultado.setCellValueFactory(
-				dato -> new javafx.beans.property.SimpleStringProperty(
-						dato.getValue()[0]
-				)
-		);
+		columnaResultado
+				.setCellValueFactory(dato -> new javafx.beans.property.SimpleStringProperty(dato.getValue()[0]));
 
-		columnaExpresion.setCellValueFactory(
-				dato -> new javafx.beans.property.SimpleStringProperty(
-						dato.getValue()[1]
-				)
-		);
+		columnaExpresion
+				.setCellValueFactory(dato -> new javafx.beans.property.SimpleStringProperty(dato.getValue()[1]));
 
-		tabla.getColumns().addAll(
-				columnaResultado,
-				columnaExpresion
-		);
+		tabla.getColumns().addAll(columnaResultado, columnaExpresion);
 
-		List<String> ecuaciones =
-				calculadora.getEcuacionesResultados();
+		List<String> ecuaciones = calculadora.getEcuacionesResultados();
 
 		for (String ecuacion : ecuaciones) {
 
@@ -1038,20 +1032,15 @@ public class CalculadoraControler {
 			}
 		}
 
-		tabla.setColumnResizePolicy(
-				TableView.CONSTRAINED_RESIZE_POLICY
-		);
+		tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
 		tabla.setPrefWidth(600);
 		tabla.setPrefHeight(350);
 
-		Alert alert =
-				new Alert(Alert.AlertType.INFORMATION);
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 		alert.setTitle("Ayuda");
-		alert.setHeaderText(
-				"Expresiones para obtener los resultados"
-		);
+		alert.setHeaderText("Expresiones para obtener los resultados");
 
 		alert.getDialogPane().setContent(tabla);
 
@@ -1062,9 +1051,9 @@ public class CalculadoraControler {
 	 * Muestra el menú de opciones de la partida.
 	 *
 	 * <p>
-	 * El menú permite acceder a las instrucciones, consultar los
-	 * resultados almacenados y, cuando corresponde, utilizar la ayuda
-	 * con las expresiones generadas para la ronda.
+	 * El menú permite acceder a las instrucciones, consultar los resultados
+	 * almacenados y, cuando corresponde, utilizar la ayuda con las expresiones
+	 * generadas para la ronda.
 	 * </p>
 	 *
 	 * @param event evento generado al presionar el botón de menú
@@ -1107,21 +1096,14 @@ public class CalculadoraControler {
 
 		contenedor.setSpacing(4);
 
-		contenedor.setStyle(
-				"-fx-background-color: white; "
-				+ "-fx-padding: 8; "
-				+ "-fx-effect: dropshadow("
-				+ "gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);"
-		);
+		contenedor.setStyle("-fx-background-color: white; " + "-fx-padding: 8; " + "-fx-effect: dropshadow("
+				+ "gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);");
 
-		contenedor.getChildren().addAll(
-				btnInstrucciones,
-				btnConsultar
-		);
+		contenedor.getChildren().addAll(btnInstrucciones, btnConsultar);
 
 		/*
-		 * El botón Ayuda solamente aparece después de que
-		 * se haya cumplido la condición establecida mediante count.
+		 * El botón Ayuda solamente aparece después de que se haya cumplido la condición
+		 * establecida mediante count.
 		 */
 		if (ayudaDisponible) {
 
@@ -1143,16 +1125,38 @@ public class CalculadoraControler {
 
 		Button boton = (Button) event.getSource();
 
-		Bounds coordenadas =
-				boton.localToScreen(
-						boton.getBoundsInLocal()
-				);
+		Bounds coordenadas = boton.localToScreen(boton.getBoundsInLocal());
 
-		popup.show(
-				boton,
-				coordenadas.getMinX(),
-				coordenadas.getMaxY()
-		);
+		popup.show(boton, coordenadas.getMinX(), coordenadas.getMaxY());
+	}
+
+	/**
+	 * Muestra una ventana emergente con el nombre del jugador.
+	 *
+	 * @param nombre nombre del jugador
+	 */
+
+	private void mostrarAlerta() {
+		try {
+			FXMLLoader loader = new FXMLLoader(App.class.getResource("/co/edu/poli/juego/gameOver.fxml"));
+
+			Parent root = loader.load();
+
+			GameOverControler controlador = loader.getController();
+			controlador.establecerPartida(partidaActual);
+
+			Stage ventana = new Stage();
+			ventana.setTitle("All Ten - Partida completada");
+			ventana.initModality(Modality.APPLICATION_MODAL);
+			ventana.setResizable(false);
+			ventana.setScene(new Scene(root));
+
+			ventana.showAndWait();
+
+		} catch (IOException e) {
+			lblError.setText("No se pudo mostrar la ventana de resultados.");
+			e.printStackTrace();
+		}
 	}
 
 }
