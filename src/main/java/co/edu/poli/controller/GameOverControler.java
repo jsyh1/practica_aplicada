@@ -1,27 +1,39 @@
 
 package co.edu.poli.controller;
 
+
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import javax.imageio.ImageIO;
 
 import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoResultadoImplementado;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
+
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 /**
  * Controlador de la ventana que se muestra al finalizar una partida.
  *
@@ -199,38 +211,256 @@ public class GameOverControler {
 	/**
 	 * Exporta el resumen de la partida a un archivo de texto.
 	 */
+	/**
+	 * Exporta el resumen de la partida a una imagen PNG.
+	 */
 	@FXML
 	private void exportar() {
 
-		if (partidaActual == null) {
-			lblMensaje.setText("No hay una partida para exportar.");
-			return;
-		}
+	    if (partidaActual == null) {
+	        lblMensaje.setText("No hay una partida para exportar.");
+	        return;
+	    }
 
-		FileChooser selector = new FileChooser();
-		selector.setTitle("Exportar resultados de la partida");
-		selector.setInitialFileName("resultados_partida.txt");
+	    FileChooser selector = new FileChooser();
+	    selector.setTitle("Exportar resultados de la partida");
+	    selector.setInitialFileName("resultados_partida.png");
 
-		selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo de texto", "*.txt"));
+	    selector.getExtensionFilters().add(
+	        new FileChooser.ExtensionFilter("Imagen PNG", "*.png")
+	    );
 
-		Stage ventana = (Stage) btnExportar.getScene().getWindow();
+	    Stage ventana = (Stage) btnExportar.getScene().getWindow();
 
-		java.io.File archivo = selector.showSaveDialog(ventana);
+	    File archivo = selector.showSaveDialog(ventana);
 
-		if (archivo == null) {
-			lblMensaje.setText("Exportación cancelada.");
-			return;
-		}
+	    if (archivo == null) {
+	        lblMensaje.setText("Exportación cancelada.");
+	        return;
+	    }
 
-		try {
-			Files.writeString(Path.of(archivo.getAbsolutePath()), generarResumen());
+	    // Garantiza que el archivo termine en .png.
+	    if (!archivo.getName().toLowerCase(Locale.ROOT).endsWith(".png")) {
+	        archivo = new File(
+	            archivo.getParentFile(),
+	            archivo.getName() + ".png"
+	        );
+	    }
 
-			lblMensaje.setText("Resultados exportados correctamente.");
+	    try {
+	        WritableImage imagen = crearReportePNG();
 
-		} catch (IOException e) {
-			lblMensaje.setText("No se pudo exportar el archivo.");
-			e.printStackTrace();
-		}
+	        boolean guardado = ImageIO.write(
+	            SwingFXUtils.fromFXImage(imagen, null),
+	            "png",
+	            archivo
+	        );
+
+	        if (!guardado) {
+	            throw new IOException(
+	                "No se encontró un codificador PNG disponible."
+	            );
+	        }
+
+	        lblMensaje.setText("Imagen PNG exportada correctamente.");
+
+	    } catch (IOException | RuntimeException e) {
+	        lblMensaje.setText("No se pudo exportar la imagen PNG.");
+	        e.printStackTrace();
+	    }
+	}
+	
+	/**
+	 * Construye una vista independiente del informe y la convierte
+	 * en una imagen que puede guardarse como PNG.
+	 *
+	 * @return imagen PNG preparada para exportar
+	 */
+	private WritableImage crearReportePNG() {
+
+	    String nombreJugador = "Sin nombre";
+
+	    if (partidaActual.getJugador() != null
+	            && partidaActual.getJugador().getNombre() != null
+	            && !partidaActual.getJugador().getNombre().isBlank()) {
+
+	        nombreJugador = partidaActual.getJugador().getNombre();
+	    }
+
+	    // Contenedor principal del informe.
+	    VBox reporte = new VBox(16);
+	    reporte.setPadding(new Insets(32));
+	    reporte.setPrefWidth(820);
+	    reporte.setStyle(
+	        "-fx-background-color: #f1f5f9;" +
+	        "-fx-font-family: 'Arial';"
+	    );
+
+	    // Encabezado.
+	    Label marca = new Label("ALL TEN");
+	    marca.setStyle(
+	        "-fx-text-fill: #64748b;" +
+	        "-fx-font-size: 14px;" +
+	        "-fx-font-weight: bold;"
+	    );
+
+	    Label titulo = new Label("Resumen de partida");
+	    titulo.setStyle(
+	        "-fx-text-fill: #182235;" +
+	        "-fx-font-size: 28px;" +
+	        "-fx-font-weight: bold;"
+	    );
+
+	    // Tarjetas con los datos de la partida.
+	    HBox datos = new HBox(12);
+	    datos.setAlignment(Pos.CENTER_LEFT);
+
+	    datos.getChildren().addAll(
+	        crearTarjetaDato("JUGADOR", nombreJugador),
+	        crearTarjetaDato(
+	            "PARTIDA",
+	            "#" + partidaActual.getId()
+	        ),
+	        crearTarjetaDato(
+	            "PUNTAJE",
+	            partidaActual.getPuntaje() + "/10"
+	        ),
+	        crearTarjetaDato(
+	            "TIEMPO",
+	            partidaActual.getTiempoEjecucion() + " segundos"
+	        )
+	    );
+
+	    Label tituloResultados = new Label("Resultados obtenidos");
+	    tituloResultados.setStyle(
+	        "-fx-text-fill: #182235;" +
+	        "-fx-font-size: 18px;" +
+	        "-fx-font-weight: bold;"
+	    );
+
+	    // Agrega todas las ecuaciones, no solamente las visibles
+	    // en el TextArea de la ventana.
+	    VBox listaResultados = new VBox(8);
+
+	    if (resultadosActuales == null || resultadosActuales.isEmpty()) {
+
+	        Label vacio = new Label(
+	            "No se encontraron resultados para esta partida."
+	        );
+
+	        vacio.setWrapText(true);
+	        listaResultados.getChildren().add(vacio);
+
+	    } else {
+
+	        for (int i = 0; i < resultadosActuales.size(); i++) {
+
+	            Resultado resultado = resultadosActuales.get(i);
+
+	            Label ecuacion = new Label(
+	                (i + 1) + ". "
+	                + resultado.getResultado()
+	                + " = "
+	                + resultado.getDato()
+	            );
+
+	            ecuacion.setWrapText(true);
+	            ecuacion.setMaxWidth(Double.MAX_VALUE);
+	            ecuacion.setPadding(new Insets(12));
+
+	            ecuacion.setStyle(
+	                "-fx-background-color: white;" +
+	                "-fx-text-fill: #26354d;" +
+	                "-fx-font-size: 14px;" +
+	                "-fx-background-radius: 6;" +
+	                "-fx-border-color: #e2e8f0;" +
+	                "-fx-border-radius: 6;"
+	            );
+
+	            listaResultados.getChildren().add(ecuacion);
+	        }
+	    }
+
+	    Label pie = new Label("Informe generado por All Ten");
+	    pie.setStyle(
+	        "-fx-text-fill: #64748b;" +
+	        "-fx-font-size: 11px;"
+	    );
+
+	    reporte.getChildren().addAll(
+	        marca,
+	        titulo,
+	        new Separator(),
+	        datos,
+	        tituloResultados,
+	        listaResultados,
+	        pie
+	    );
+
+	    // Crea una escena temporal para que JavaFX pueda aplicar
+	    // los estilos y calcular las dimensiones de la vista.
+	    Scene escenaTemporal = new Scene(reporte);
+
+	    reporte.applyCss();
+
+	    double ancho = 820;
+	    double alto = Math.ceil(reporte.prefHeight(ancho));
+
+	    reporte.resize(ancho, alto);
+	    escenaTemporal.getRoot().applyCss();
+	    reporte.layout();
+
+	    WritableImage imagen = new WritableImage(
+	        (int) Math.ceil(ancho),
+	        (int) Math.ceil(alto)
+	    );
+
+	    reporte.snapshot(new SnapshotParameters(), imagen);
+
+	    return imagen;
+	}
+
+	/**
+	 * Construye una tarjeta visual para un dato de la partida.
+	 *
+	 * @param etiqueta nombre del dato
+	 * @param valor valor que se mostrará
+	 * @return tarjeta visual
+	 */
+	private VBox crearTarjetaDato(String etiqueta, String valor) {
+
+	    Label lblEtiqueta = new Label(etiqueta);
+
+	    lblEtiqueta.setStyle(
+	        "-fx-text-fill: #64748b;" +
+	        "-fx-font-size: 10px;" +
+	        "-fx-font-weight: bold;"
+	    );
+
+	    Label lblValor = new Label(valor);
+	    lblValor.setWrapText(true);
+
+	    lblValor.setStyle(
+	        "-fx-text-fill: #182235;" +
+	        "-fx-font-size: 14px;" +
+	        "-fx-font-weight: bold;"
+	    );
+
+	    VBox tarjeta = new VBox(6, lblEtiqueta, lblValor);
+
+	    tarjeta.setPadding(new Insets(12));
+	    tarjeta.setPrefWidth(170);
+	    tarjeta.setMinWidth(150);
+	    tarjeta.setMaxWidth(170);
+
+	    tarjeta.setStyle(
+	        "-fx-background-color: white;" +
+	        "-fx-background-radius: 8;" +
+	        "-fx-border-color: #e2e8f0;" +
+	        "-fx-border-radius: 8;"
+	    );
+
+	    return tarjeta;
 	}
 
 	/**
