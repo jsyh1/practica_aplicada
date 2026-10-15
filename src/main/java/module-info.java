@@ -17,6 +17,8 @@
  */
 module co.edu.poli.juego {
 
+	
+	requires javafx.swing;
     /**
      * Permite utilizar los componentes y controles de JavaFX.
      */
