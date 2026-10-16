@@ -6,67 +6,74 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/26"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="co.edu.poli.controller.GameOverControler"
-      alignment="CENTER"
-      spacing="12"
-      prefWidth="440"
-      prefHeight="520">
+<StackPane stylesheets="@style.css"
+           xmlns="http://javafx.com/javafx/26"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="co.edu.poli.controller.GameOverControler">
+    <VBox alignment="CENTER"
+          spacing="12"
+          prefWidth="440"
+          prefHeight="520"
+          styleClass="card">
 
-    <padding>
-        <Insets top="20" right="24" bottom="20" left="24"/>
-    </padding>
+        <padding>
+            <Insets top="20" right="24" bottom="20" left="24"/>
+        </padding>
 
-    <Label text="¡Partida completada!"
-           style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+        <Label text="¡Partida completada!" styleClass="titulo"/>
 
-    <Label text="Ingresa el nombre del jugador:"/>
+        <Label text="Ingresa el nombre del jugador:" styleClass="subtitulo"/>
 
-    <HBox spacing="8" alignment="CENTER">
-        <TextField fx:id="txtNombre"
-                   promptText="Nombre del jugador"
-                   HBox.hgrow="ALWAYS"/>
+        <HBox spacing="8" alignment="CENTER">
+            <TextField fx:id="txtNombre"
+                       promptText="Nombre del jugador"
+                       HBox.hgrow="ALWAYS"/>
 
-        <Button fx:id="btnCargar"
-                text="Cargar"
-                onAction="#cargarNombre"/>
-    </HBox>
+            <Button fx:id="btnCargar"
+                    text="Cargar"
+                    onAction="#cargarNombre"
+                    styleClass="btn-comprobar"/>
+        </HBox>
 
-    <Label fx:id="lblPuntaje"
-           text="Puntaje: pendiente"
-           style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+        <Label fx:id="lblPuntaje"
+               text="Puntaje: pendiente"
+               styleClass="subtitulo"/>
 
-    <Label fx:id="lblTiempo"
-           text="Tiempo de juego: pendiente"
-           style="-fx-font-size: 15px;"/>
+        <Label fx:id="lblTiempo"
+               text="Tiempo de juego: pendiente"
+               styleClass="subtitulo"/>
 
-    <Label text="Resultados de la partida:"
-           style="-fx-font-weight: bold;"/>
+        <Label text="Resultados de la partida:" styleClass="subtitulo"/>
 
-    <TextArea fx:id="lblResultados"
-              editable="false"
-              wrapText="true"
-              prefHeight="220"
-              VBox.vgrow="ALWAYS"
-              promptText="Aquí aparecerán los resultados"/>
+        <TextArea fx:id="lblResultados"
+                  editable="false"
+                  wrapText="true"
+                  prefHeight="220"
+                  VBox.vgrow="ALWAYS"
+                  promptText="Aquí aparecerán los resultados"
+                  styleClass="area-resultados"/>
 
-    <HBox spacing="12" alignment="CENTER">
-        <Button fx:id="btnCompartir"
-                text="Compartir"
-                onAction="#compartir"
-                disable="true"/>
+        <HBox spacing="12" alignment="CENTER">
+            <Button fx:id="btnCompartir"
+                    text="Compartir"
+                    onAction="#compartir"
+                    disable="true"
+                    styleClass="btn-compartir"/>
 
-        <Button fx:id="btnExportar"
-                text="Exportar"
-                onAction="#exportar"
-                disable="true"/>
-    </HBox>
+            <Button fx:id="btnExportar"
+                    text="Exportar"
+                    onAction="#exportar"
+                    disable="true"
+                    styleClass="btn-compartir"/>
+        </HBox>
 
-    <Label fx:id="lblMensaje"
-           wrapText="true"
-           text="Escribe el nombre para cargar los resultados."/>
+        <Label fx:id="lblMensaje"
+               wrapText="true"
+               text="Escribe el nombre para cargar los resultados."
+               styleClass="progreso"/>
 
-</VBox>
+    </VBox>
+</StackPane>

@@ -147,6 +147,14 @@
     -fx-padding: 16;
 }
 
+.area-resultados {
+    -fx-control-inner-background: #ada6c9;
+    -fx-background-color: #ada6c9;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-text-fill: #1a1a1a;
+}
+
 .texto-reglas {
     -fx-text-fill: #1a1a1a;
     -fx-font-size: 13px;
