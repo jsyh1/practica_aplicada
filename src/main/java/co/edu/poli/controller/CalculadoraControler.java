@@ -200,7 +200,7 @@ public class CalculadoraControler {
 	/**
 	 * Indica si la opción de ayuda está disponible.
 	 */
-	private boolean ayudaDisponible = true;
+	private boolean ayudaDisponible = false;
 
 	/**
 	 * Generador de ecuaciones de la partida.
@@ -211,6 +211,8 @@ public class CalculadoraControler {
 	 * Contador utilizado para habilitar la ayuda.
 	 */
 	private int count = 1;
+
+	private Timeline cronometro;
 
 	/**
 	 * Inicializa el juego, registra el jugador y la partida, genera los números y
@@ -276,7 +278,7 @@ public class CalculadoraControler {
 		btnBorrarUltimo.setText(simbolos[7]);
 		btnBorrarTodo.setText(simbolos[8]);
 
-		Timeline cronometro = new Timeline(new KeyFrame(Duration.seconds(1), evento -> actualizarCronometro()));
+		cronometro = new Timeline(new KeyFrame(Duration.seconds(1), evento -> actualizarCronometro()));
 
 		cronometro.setCycleCount(Timeline.INDEFINITE);
 		cronometro.play();
@@ -435,6 +437,7 @@ public class CalculadoraControler {
 		DaoScoreImplementado dao = new DaoScoreImplementado();
 
 		boolean actualizada = dao.actualizar(partidaActual);
+		cronometro.stop();
 
 		if (actualizada) {
 
@@ -597,7 +600,7 @@ public class CalculadoraControler {
 
 	/**
 	 * Elimina el último elemento de la expresión y libera el botón numérico
-	 * correspondiente cuando se elimina un número.
+	 * correspondiente cuando se elimina un número completo.
 	 */
 	@FXML
 	private void borrarUltimo() {
@@ -606,37 +609,61 @@ public class CalculadoraControler {
 			return;
 		}
 
-		char ultimoCaracter = exprecion.charAt(exprecion.length() - 1);
+		int longitud = exprecion.length();
+		char ultimoCaracter = exprecion.charAt(longitud - 1);
 
 		if (Character.isDigit(ultimoCaracter)) {
 
-			exprecion = exprecion.substring(0, exprecion.length() - 1);
+			// Identificar el número completo al que pertenece el último dígito.
+			int inicioNumero = longitud - 1;
 
-			if (!numerosUtilizados.isEmpty()) {
+			while (inicioNumero > 0 && Character.isDigit(exprecion.charAt(inicioNumero - 1))) {
+				inicioNumero--;
+			}
 
-				Button ultimoBoton = numerosUtilizados.remove(numerosUtilizados.size() - 1);
+			String numeroCompleto = exprecion.substring(inicioNumero);
 
-				if (!contenedorNumeros.getChildren().contains(ultimoBoton)) {
-					contenedorNumeros.getChildren().add(ultimoBoton);
+			// Eliminar el último dígito de la expresión.
+			exprecion = exprecion.substring(0, longitud - 1);
+
+			/*
+			 * Liberar el botón únicamente si se ha eliminado el número completo. Si todavía
+			 * quedan dígitos del mismo número, no se libera.
+			 */
+			if (inicioNumero == longitud - 1 && !numerosUtilizados.isEmpty()) {
+
+				Button botonLiberado = null;
+
+				// Buscar el botón cuyo texto coincide con el número eliminado.
+				for (int i = numerosUtilizados.size() - 1; i >= 0; i--) {
+					Button boton = numerosUtilizados.get(i);
+
+					if (boton.getText().equals(numeroCompleto)) {
+						botonLiberado = numerosUtilizados.remove(i);
+						break;
+					}
+				}
+
+				if (botonLiberado != null && !contenedorNumeros.getChildren().contains(botonLiberado)) {
+					contenedorNumeros.getChildren().add(botonLiberado);
 				}
 			}
 
 		} else if (ultimoCaracter == ')') {
 
-			exprecion = exprecion.substring(0, exprecion.length() - 1);
+			exprecion = exprecion.substring(0, longitud - 1);
 
 		} else if (ultimoCaracter == '(') {
 
-			exprecion = exprecion.substring(0, exprecion.length() - 1);
+			exprecion = exprecion.substring(0, longitud - 1);
 
 			if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '*') {
-
 				exprecion = exprecion.substring(0, exprecion.length() - 1);
 			}
 
 		} else if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/') {
 
-			exprecion = exprecion.substring(0, exprecion.length() - 1);
+			exprecion = exprecion.substring(0, longitud - 1);
 		}
 
 		txtValor1.setText(exprecion);
@@ -736,15 +763,16 @@ public class CalculadoraControler {
 
 			if (contenedorNumeros.getChildren().size() == 1) {
 
-				if (resultado > 10 || resultado != Math.floor(resultado)) {
+				if (resultado > 10 || resultado != Math.floor(resultado) || resultado == 0) {
 
-					lblError.setText("No es válido números > 10 o fracciones no exactas");
+					lblError.setText("No es válido números > 10 o fracciones no exactas o = 0");
 
 					count++;
+					System.out.println(count + "A");
 
 					reiniciarNumeros();
 
-					if (count >= 20) {
+					if (count >= 10) {
 						ayudaDisponible = true;
 					}
 
@@ -784,8 +812,13 @@ public class CalculadoraControler {
 						}
 
 					} else {
+						
 
 						count++;
+						System.out.println(count + "B");
+						if (count >= 10) {
+							ayudaDisponible = true;
+						}
 					}
 
 					System.out.println(partidaActual.getResultados());
@@ -842,25 +875,20 @@ public class CalculadoraControler {
 	 */
 	private boolean todosLosNumerosEncontrados() {
 
-	    Label[] etiquetas = {
-	        lblResultado1, lblResultado2, lblResultado3,
-	        lblResultado4, lblResultado5, lblResultado6,
-	        lblResultado7, lblResultado8, lblResultado9,
-	        lblResultado10
-	    };
+		Label[] etiquetas = { lblResultado1, lblResultado2, lblResultado3, lblResultado4, lblResultado5, lblResultado6,
+				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
 
-	    for (Label etiqueta : etiquetas) {
+		for (Label etiqueta : etiquetas) {
 
-	        Node celda = etiqueta.getParent();
+			Node celda = etiqueta.getParent();
 
-	        if (celda == null ||
-	                !celda.getStyleClass().contains("casilla-resuelta")) {
+			if (celda == null || !celda.getStyleClass().contains("casilla-resuelta")) {
 
-	            return false;
-	        }
-	    }
+				return false;
+			}
+		}
 
-	    return true;
+		return true;
 	}
 
 	/**

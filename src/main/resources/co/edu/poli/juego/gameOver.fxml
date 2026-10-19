@@ -68,6 +68,9 @@
                     onAction="#exportar"
                     disable="true"
                     styleClass="btn-compartir"/>
+            <Button fx:id="btnVolver"
+        text="Volver a jugar"
+        onAction="#volverAJugar" />
         </HBox>
 
         <Label fx:id="lblMensaje"
