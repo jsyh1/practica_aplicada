@@ -58,10 +58,15 @@ public class RankingControler {
         Label nombreJugador = new Label(nombre);
         nombreJugador.getStyleClass().add("nombre-jugador");
 
+        Label fechaPartida = new Label(partida.getFechaPartida() != null
+                ? partida.getFechaPartida().toString()
+                : "Fecha no disponible");
+        fechaPartida.getStyleClass().add("fecha-partida");
+
         Label datosPartida = new Label(
                 "Puntaje: " + partida.getPuntaje() + "/10 - Tiempo: " + partida.getTiempoEjecucion() + " s");
 
-        VBox detalles = new VBox(4, nombreJugador, datosPartida);
+        VBox detalles = new VBox(4, nombreJugador, fechaPartida, datosPartida);
         HBox.setHgrow(detalles, Priority.ALWAYS);
 
         Region espacio = new Region();
