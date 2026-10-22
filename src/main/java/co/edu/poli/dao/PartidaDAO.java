@@ -13,4 +13,5 @@ import co.edu.poli.modelo.Partida;
 
 public interface PartidaDAO extends DAO<Partida> {
 	List<Partida> ultimasPartidas(int cantidad);
+	List<Partida> ranking(int cantidad);
 }
