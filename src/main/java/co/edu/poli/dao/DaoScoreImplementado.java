@@ -2,7 +2,6 @@
 package co.edu.poli.dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -91,6 +90,54 @@ public class DaoScoreImplementado implements PartidaDAO {
 
         return partidas;
     }
+
+    /**
+     * Genera el RAnking.
+     *
+     * @param cantidad cantidad máxima de partidas a consultar
+     * @return 
+     */
+    public List<Partida> ranking (int cantidad) {
+    List<Partida> partidas = new ArrayList<>();
+
+        String sql = """
+                SELECT
+                    p.id AS partida_id,
+                    p.jugador_id,
+                    p.fecha AS fecha_partida,
+                    p.tiempo,
+                    p.puntaje,
+                    j.nombre AS jugador_nombre,
+                    j.fecha AS fecha_jugador
+                FROM partida p
+                INNER JOIN jugador j ON p.jugador_id = j.id
+                WHERE (SELECT COUNT(*) FROM resultado r WHERE r.partida_id = p.id) = 10
+                ORDER BY p.tiempo ASC, p.id ASC
+                LIMIT ?
+                """;
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setInt(1, cantidad);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    partidas.add(crearPartidaDesdeResultadoSet(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println(
+                    "Error al consultar Ranking: " + e.getMessage()
+            );
+        }
+
+        return partidas;    
+        
+    }
+
+    
 
     /**
      * Crea un objeto Partida a partir de un registro de la base de datos.

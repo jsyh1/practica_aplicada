@@ -28,6 +28,8 @@
             </content>
         </ScrollPane>
         <Label fx:id="lblMensaje" text="" />
+        <!-- Ranking -->
+        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#verRanking" text="RANKING" styleClass="btn-comprobar"/>
         <!-- Volver -->
         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#calljuego" text="VOLVER" styleClass="btn-comprobar"/>
 

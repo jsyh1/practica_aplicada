@@ -15,7 +15,6 @@ import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
 import co.edu.poli.vista.App;
-
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -382,6 +381,14 @@ public class ConsultarControler {
 				+ "-fx-border-radius: 8;");
 
 		return tarjeta;
+	}
+	@FXML
+	private void verRanking() {
+    try {
+        App.setRoot("ranking");
+    } catch (IOException e) {
+        lblMensaje.setText("No se pudo abrir el ranking");
+    }
 	}
 
 	/**
