@@ -129,6 +129,15 @@
         <Button fx:id="btnResta" onAction="#seleccionarResta" text="-" styleClass="btn-base, btn-operador"/>
         <Button fx:id="btnMultiplicacion" onAction="#seleccionarMultiplicacion" text="*" styleClass="btn-base, btn-operador"/>
         <Button fx:id="btnDivision" onAction="#seleccionarDivision" text="÷" styleClass="btn-base, btn-operador"/>
+        <Button fx:id="btnRaiz"
+            onAction="#seleccionarRaiz"
+            text="√"
+            styleClass="btn-base, btn-operador"/>
+
+   		<Button fx:id="btnPotencia"
+            onAction="#seleccionarPotencia"
+            text="^"
+            styleClass="btn-base, btn-operador"/>
         </HBox>
 
         <!-- Comprobar -->

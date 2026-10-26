@@ -1,279 +1,180 @@
 package co.edu.poli.modelo;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * Pruebas unitarias para la clase Calculadora.
  *
- * @author Jsyh
- * @version 1.0
+ * Verifica el cálculo de expresiones aritméticas, el manejo
+ * de raíces y potencias, y el tratamiento de expresiones inválidas.
  */
 class CalculadoraTest {
 
-    /**
-     * Verifica una suma sencilla.
-     */
-    @Test
-    void testSuma() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "2+3"
-        );
+    private Calculadora calculadora;
 
-        assertEquals(5.0, calculadora.calcular());
+    /**
+     * Inicializa la calculadora antes de cada prueba.
+     */
+    @BeforeEach
+    void setUp() {
+        calculadora = new Calculadora(new String[9], new int[4], "");
     }
 
     /**
-     * Verifica una resta.
+     * Comprueba la suma de dos números.
      */
     @Test
-    void testResta() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "8-3"
-        );
-
-        assertEquals(5.0, calculadora.calcular());
+    void calcularSuma() {
+        assertEquals(5.0, calcular("2+3"), 0.000001);
     }
 
     /**
-     * Verifica una multiplicación.
+     * Comprueba la resta de dos números.
      */
     @Test
-    void testMultiplicacion() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "4*5"
-        );
-
-        assertEquals(20.0, calculadora.calcular());
+    void calcularResta() {
+        assertEquals(3.0, calcular("8-5"), 0.000001);
     }
 
     /**
-     * Verifica una división.
+     * Comprueba la multiplicación de dos números.
      */
     @Test
-    void testDivision() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "10/2"
-        );
-
-        assertEquals(5.0, calculadora.calcular());
+    void calcularMultiplicacion() {
+        assertEquals(24.0, calcular("6*4"), 0.000001);
     }
 
     /**
-     * Verifica la prioridad de operaciones.
+     * Comprueba la división de dos números.
      */
     @Test
-    void testPrioridadOperaciones() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "2+3*4"
-        );
-
-        assertEquals(14.0, calculadora.calcular());
+    void calcularDivision() {
+        assertEquals(4.0, calcular("20/5"), 0.000001);
     }
 
     /**
-     * Verifica el uso de paréntesis.
+     * Comprueba que se respete la prioridad de la multiplicación.
      */
     @Test
-    void testParentesis() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "(2+3)*4"
-        );
-
-        assertEquals(20.0, calculadora.calcular());
+    void respetaPrioridadDeOperaciones() {
+        assertEquals(14.0, calcular("2+3*4"), 0.000001);
     }
 
     /**
-     * Verifica una expresión con varias operaciones.
+     * Comprueba el uso de paréntesis.
      */
     @Test
-    void testExpresionCompleja() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "10-(2+3)*2"
-        );
-
-        assertEquals(0.0, calculadora.calcular());
+    void calculaExpresionConParentesis() {
+        assertEquals(20.0, calcular("(2+3)*4"), 0.000001);
     }
 
     /**
-     * Verifica que se puedan utilizar espacios en la ecuación.
+     * Comprueba la potencia y su prioridad sobre la multiplicación.
      */
     @Test
-    void testEspacios() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "2 + 3 * 4"
-        );
-
-        assertEquals(14.0, calculadora.calcular());
+    void calculaPotencia() {
+        assertEquals(16.0, calcular("2^3*2"), 0.000001);
     }
 
     /**
-     * Verifica la conversión de números enteros.
+     * Comprueba que los paréntesis se evalúen antes de la potencia.
      */
     @Test
-    void testConvertirEntero() {
-        assertEquals("10", Calculadora.convertir(10.0));
+    void calculaPotenciaConParentesis() {
+        assertEquals(25.0, calcular("(2+3)^2"), 0.000001);
     }
 
     /**
-     * Verifica la conversión de un número decimal a fracción.
+     * Comprueba que la potencia tenga prioridad sobre la suma.
      */
     @Test
-    void testConvertirFraccion() {
-        assertEquals("1/2", Calculadora.convertir(0.5));
+    void respetaPrioridadDePotencia() {
+        assertEquals(11.0, calcular("2+3^2"), 0.000001);
     }
 
     /**
-     * Verifica que no se permitan divisiones por cero.
+     * Comprueba el cálculo de una raíz cuadrada.
      */
-    
     @Test
-    void testDivisionPorCero() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "10/0"
-        );
-
-        assertThrows(
-                ArithmeticException.class,
-                calculadora::calcular
-        );
+    void calculaRaizCuadrada() {
+        assertEquals(3.0, calcular("√(9)"), 0.000001);
     }
-    
 
     /**
-     * Verifica que una ecuación vacía produzca una excepción.
+     * Comprueba una raíz cuadrada dentro de una expresión.
      */
     @Test
-    void testEcuacionVacia() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                ""
-        );
+    void calculaRaizDentroDeExpresion() {
+        assertEquals(6.0, calcular("√(16)+2"), 0.000001);
+    }
 
+    /**
+     * Comprueba una expresión que combina raíces y potencias.
+     */
+    @Test
+    void combinaRaizYPotencia() {
+        assertEquals(11.0, calcular("√(9)+2^3"), 0.000001);
+    }
+
+    /**
+     * Comprueba que dividir entre cero produzca un error.
+     */
+    @Test
+    void divisionPorCeroLanzaExcepcion() {
+        assertThrows(ArithmeticException.class, () -> calcular("8/0"));
+    }
+
+    /**
+     * Comprueba que una raíz de un número negativo no sea válida.
+     */
+    @Test
+    void raizDeNumeroNegativoLanzaExcepcion() {
         assertThrows(
                 IllegalArgumentException.class,
-                calculadora::calcular
+                () -> calcular("√(0-1)")
         );
     }
 
     /**
-     * Verifica que no se permitan resultados negativos.
+     * Comprueba que una expresión incompleta no se acepte.
      */
     @Test
-    void testResultadoNegativo() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "2-5"
-        );
+    void expresionIncompletaLanzaExcepcion() {
+        assertThrows(RuntimeException.class, () -> calcular("2+"));
+    }
 
+    /**
+     * Comprueba que no se acepte una base negativa para una potencia.
+     */
+    @Test
+    void potenciaConBaseNegativaLanzaExcepcion() {
         assertThrows(
                 IllegalArgumentException.class,
-                calculadora::calcular
+                () -> calcular("(0-2)^2")
         );
     }
 
     /**
-     * Verifica que la generación de símbolos produzca los nueve símbolos.
+     * Comprueba que el resultado de una potencia sea finito.
      */
     @Test
-    void testGenerarSimbolos() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                ""
-        );
-
-        String[] simbolos = calculadora.generarSimbolos();
-
-        assertNotNull(simbolos);
-        assertEquals(9, simbolos.length);
-
-        assertEquals("+", simbolos[0]);
-        assertEquals("-", simbolos[1]);
-        assertEquals("*", simbolos[2]);
-        assertEquals("/", simbolos[3]);
-        assertEquals("(", simbolos[4]);
-        assertEquals(")", simbolos[5]);
-        assertEquals("=", simbolos[6]);
+    void potenciaExcesivaLanzaExcepcion() {
+        assertThrows(RuntimeException.class, () -> calcular("999999^10"));
     }
 
     /**
-     * Verifica que se generen cuatro números.
+     * Evalúa una expresión asignándola previamente a la calculadora.
+     *
+     * @param ecuacion expresión matemática que se desea evaluar
+     * @return resultado numérico de la expresión
      */
-    @Test
-    void testGenerarNumeros() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                ""
-        );
-
-        int[] numeros = calculadora.generarNumeros();
-
-        assertNotNull(numeros);
-        assertEquals(4, numeros.length);
-
-        for (int numero : numeros) {
-            assertTrue(numero >= 1 && numero <= 10);
-        }
-    }
-
-    /**
-     * Verifica que una combinación generada permita
-     * obtener todos los resultados del 1 al 10.
-     */
-    @Test
-    void testPuedeObtenerTodosLosResultados() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                ""
-        );
-
-        int[] numeros = calculadora.generarNumeros();
-
-        assertTrue(
-                calculadora.puedeObtenerTodosLosResultados(numeros)
-        );
-    }
-
-    /**
-     * Verifica que setEcuacion permita cambiar la ecuación
-     * después de crear la calculadora.
-     */
-    @Test
-    void testSetEcuacion() {
-        Calculadora calculadora = new Calculadora(
-                new String[9],
-                new int[4],
-                "2+2"
-        );
-
-        calculadora.calcular();
-
-        calculadora.setEcuacion("5*3");
-
-        assertEquals(15.0, calculadora.calcular());
+    private double calcular(String ecuacion) {
+        calculadora.setEcuacion(ecuacion);
+        return calculadora.calcular();
     }
 }

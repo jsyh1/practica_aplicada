@@ -21,6 +21,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -136,6 +137,18 @@ public class CalculadoraControler {
 	@FXML
 	private Button btnDivision;
 
+	/**
+	 * Botón utilizado para seleccionar la operación de raíz cuadrada.
+	 */
+	@FXML
+	private Button btnRaiz;
+
+	/**
+	 * Botón utilizado para seleccionar la operación de potencia.
+	 */
+	@FXML
+	private Button btnPotencia;
+
 	@FXML
 	private Button btnParentesisAbre;
 
@@ -200,7 +213,7 @@ public class CalculadoraControler {
 	/**
 	 * Indica si la opción de ayuda está disponible.
 	 */
-	private boolean ayudaDisponible = false;
+	private boolean ayudaDisponible = true;
 
 	/**
 	 * Generador de ecuaciones de la partida.
@@ -214,6 +227,33 @@ public class CalculadoraControler {
 
 	private Timeline cronometro;
 
+	/**
+	 * Indica si está activada la dificultad avanzada.
+	 *
+	 * <p>
+	 * Cuando es true, se permiten raíces y potencias.
+	 * </p>
+	 */
+	private boolean dificultadAvanzada = false;
+
+	
+	/**
+	 * Constructor predeterminado utilizado por JavaFX cuando no se especifica
+	 * una dificultad inicial.
+	 */
+	public CalculadoraControler() {
+	}
+
+	/**
+	 * Crea un controlador con la dificultad inicial indicada.
+	 *
+	 * @param dificultadAvanzada true para activar la dificultad avanzada.
+	 */
+	public CalculadoraControler(boolean dificultadAvanzada) {
+	    this.dificultadAvanzada = dificultadAvanzada;
+	}
+	
+	
 	/**
 	 * Inicializa el juego, registra el jugador y la partida, genera los números y
 	 * configura los controles de la interfaz.
@@ -234,7 +274,7 @@ public class CalculadoraControler {
 
 		calculadora = new Calculadora(new String[9], new int[4], "");
 
-		numerosOriginales = calculadora.generarNumeros();
+		generarNumerosPorDificultad();
 
 		String[] simbolos = calculadora.generarSimbolos();
 
@@ -277,6 +317,8 @@ public class CalculadoraControler {
 		btnParentesisCierra.setText(simbolos[5]);
 		btnBorrarUltimo.setText(simbolos[7]);
 		btnBorrarTodo.setText(simbolos[8]);
+		btnRaiz.setText(simbolos[9]);
+		btnPotencia.setText(simbolos[10]);
 
 		cronometro = new Timeline(new KeyFrame(Duration.seconds(1), evento -> actualizarCronometro()));
 
@@ -302,6 +344,60 @@ public class CalculadoraControler {
 		btnDivision.setGraphic(crearIcono(
 				"M5 12 L19 12 " + "M11 6 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0 " + "M11 18 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0"));
 		btnDivision.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		actualizarBotonesDificultad();
+	}
+	
+	/**
+	 * Recarga la interfaz e inicia una nueva partida con la dificultad elegida.
+	 *
+	 * @param dificultadAvanzada true para activar la dificultad avanzada.
+	 */
+	private void recargarPartida(boolean dificultadAvanzada) {
+	    if (cronometro != null) {
+	        cronometro.stop();
+	    }
+
+	    try {
+	        FXMLLoader loader = new FXMLLoader(
+	            getClass().getResource("/co/edu/poli/juego/juego.fxml")
+	        );
+
+	        loader.setControllerFactory(tipo -> {
+	            if (tipo == CalculadoraControler.class) {
+	                return new CalculadoraControler(dificultadAvanzada);
+	            }
+
+	            try {
+	                return tipo.getDeclaredConstructor().newInstance();
+	            } catch (ReflectiveOperationException ex) {
+	                throw new RuntimeException(
+	                    "No se pudo crear el controlador: " + tipo.getName(), ex
+	                );
+	            }
+	        });
+
+	        Parent root = loader.load();
+
+	        // Actualiza la vista usando la escena que administra App.
+	        App.actualizarJuego(root);
+
+	    } catch (IOException ex) {
+	        lblError.setText("No se pudo reiniciar la partida.");
+	        ex.printStackTrace();
+	    }
+	}
+	
+	
+	/**
+	 * Actualiza la visibilidad de los operadores avanzados según la dificultad
+	 * seleccionada.
+	 */
+	private void actualizarBotonesDificultad() {
+		btnRaiz.setVisible(dificultadAvanzada);
+		btnRaiz.setManaged(dificultadAvanzada);
+
+		btnPotencia.setVisible(dificultadAvanzada);
+		btnPotencia.setManaged(dificultadAvanzada);
 	}
 
 	/**
@@ -386,6 +482,80 @@ public class CalculadoraControler {
 	}
 
 	/**
+	 * Inserta una raíz cuadrada en la expresión.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void seleccionarRaiz(ActionEvent event) {
+		if (partidaFinalizada) {
+			lblError.setText("La partida ya terminó");
+			return;
+		}
+
+		if (!dificultadAvanzada) {
+			lblError.setText("Active la dificultad avanzada para usar raíces");
+			return;
+		}
+
+		if (exprecion.isEmpty()) {
+			exprecion = "√(";
+		} else {
+			char ultimo = exprecion.charAt(exprecion.length() - 1);
+
+			if (Character.isDigit(ultimo) || ultimo == ')') {
+				exprecion += "*√(";
+			} else if (ultimo == '+' || ultimo == '-' || ultimo == '*' || ultimo == '/' || ultimo == '^'
+					|| ultimo == '(') {
+				exprecion += "√(";
+			} else {
+				lblError.setText("No se puede insertar la raíz aquí");
+				return;
+			}
+		}
+
+		txtValor1.setText(exprecion);
+		txtValor1.positionCaret(exprecion.length());
+		lblError.setText("");
+	}
+
+	/**
+	 * Inserta el operador de potencia.
+	 *
+	 * @param event evento del botón
+	 */
+	@FXML
+	private void seleccionarPotencia(ActionEvent event) {
+		if (partidaFinalizada) {
+			lblError.setText("La partida ya terminó");
+			return;
+		}
+
+		if (!dificultadAvanzada) {
+			lblError.setText("Active la dificultad avanzada para usar potencias");
+			return;
+		}
+
+		if (exprecion.isEmpty()) {
+			lblError.setText("Seleccione primero un número");
+			return;
+		}
+
+		char ultimo = exprecion.charAt(exprecion.length() - 1);
+
+		if (!Character.isDigit(ultimo) && ultimo != ')') {
+			lblError.setText("La potencia debe ir después de un número o paréntesis");
+			return;
+		}
+
+		exprecion += "^";
+
+		txtValor1.setText(exprecion);
+		txtValor1.positionCaret(exprecion.length());
+		lblError.setText("");
+	}
+
+	/**
 	 * Agrega un operador a la expresión actual.
 	 *
 	 * @param nuevoOperador operador que se agregará
@@ -404,7 +574,8 @@ public class CalculadoraControler {
 
 		char ultimoCaracter = exprecion.charAt(exprecion.length() - 1);
 
-		if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/') {
+		if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/'
+				|| ultimoCaracter == '^') {
 
 			lblError.setText("No puede colocar dos operadores seguidos");
 			return;
@@ -452,6 +623,43 @@ public class CalculadoraControler {
 			partidaFinalizada = false;
 			lblError.setText("No se pudo finalizar la partida");
 		}
+	}
+
+	/**
+	 * Genera los números según la dificultad seleccionada.
+	 *
+	 * En dificultad normal utiliza el generador existente. En dificultad avanzada
+	 * busca una combinación que permita obtener todos los objetivos del 1 al 10.
+	 */
+	private void generarNumerosPorDificultad() {
+		if (!dificultadAvanzada) {
+			numerosOriginales = calculadora.generarNumeros();
+			return;
+		}
+
+		final int MAX_INTENTOS = 10000;
+		java.util.Random random = new java.util.Random();
+
+		for (int intento = 0; intento < MAX_INTENTOS; intento++) {
+			int[] candidatos = new int[4];
+
+			for (int i = 0; i < candidatos.length; i++) {
+				candidatos[i] = random.nextInt(10) + 1;
+			}
+
+			List<String> soluciones = calculadora.buscarSolucionesConRaicesYPotencias(candidatos);
+
+			if (soluciones != null && soluciones.size() == 10) {
+				numerosOriginales = candidatos;
+
+				calculadora.getEcuacionesResultados().clear();
+				calculadora.getEcuacionesResultados().addAll(soluciones);
+
+				return;
+			}
+		}
+
+		throw new IllegalStateException("No se encontró una combinación válida para la dificultad avanzada.");
 	}
 
 	/**
@@ -623,18 +831,14 @@ public class CalculadoraControler {
 
 			String numeroCompleto = exprecion.substring(inicioNumero);
 
-			// Eliminar el último dígito de la expresión.
+			// Eliminar el último dígito.
 			exprecion = exprecion.substring(0, longitud - 1);
 
-			/*
-			 * Liberar el botón únicamente si se ha eliminado el número completo. Si todavía
-			 * quedan dígitos del mismo número, no se libera.
-			 */
+			// Liberar el botón si se eliminó un número de un solo dígito.
 			if (inicioNumero == longitud - 1 && !numerosUtilizados.isEmpty()) {
 
 				Button botonLiberado = null;
 
-				// Buscar el botón cuyo texto coincide con el número eliminado.
 				for (int i = numerosUtilizados.size() - 1; i >= 0; i--) {
 					Button boton = numerosUtilizados.get(i);
 
@@ -651,21 +855,38 @@ public class CalculadoraControler {
 
 		} else if (ultimoCaracter == ')') {
 
+			// Eliminar el paréntesis de cierre.
 			exprecion = exprecion.substring(0, longitud - 1);
 
 		} else if (ultimoCaracter == '(') {
 
+			// Eliminar el paréntesis de apertura.
 			exprecion = exprecion.substring(0, longitud - 1);
 
-			if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '*') {
+			// Si pertenece a una raíz, eliminar también el símbolo √.
+			if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '√') {
+
+				exprecion = exprecion.substring(0, exprecion.length() - 1);
+
+				// Eliminar la multiplicación implícita anterior a la raíz.
+				if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '*') {
+					exprecion = exprecion.substring(0, exprecion.length() - 1);
+				}
+
+			} else if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '*') {
+
+				// Eliminar la multiplicación implícita anterior al paréntesis.
 				exprecion = exprecion.substring(0, exprecion.length() - 1);
 			}
 
-		} else if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/') {
+		} else if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/'
+				|| ultimoCaracter == '^' || ultimoCaracter == '√') {
 
+			// Eliminar operadores y símbolos de raíz.
 			exprecion = exprecion.substring(0, longitud - 1);
 		}
 
+		// Actualizar la expresión mostrada.
 		txtValor1.setText(exprecion);
 		txtValor1.positionCaret(exprecion.length());
 
@@ -812,7 +1033,6 @@ public class CalculadoraControler {
 						}
 
 					} else {
-						
 
 						count++;
 						System.out.println(count + "B");
@@ -938,7 +1158,7 @@ public class CalculadoraControler {
 
 		Button btnConsultar = new Button("Consultar Partida");
 
-		Button btnDificultad = new Button("Dificultad");
+		Button btnDificultad = new Button(dificultadAvanzada ? "Dificultad: Avanzada" : "Dificultad: Normal");
 
 		btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
 		btnInstrucciones.getStyleClass().add("btn-menu-item");
@@ -966,7 +1186,13 @@ public class CalculadoraControler {
 			}
 		});
 
-		btnDificultad.setOnAction(e -> popup.hide());
+		// nuevo boton
+		btnDificultad.setOnAction(e -> {
+		    boolean nuevaDificultad = !dificultadAvanzada;
+
+		    popup.hide();
+		    recargarPartida(nuevaDificultad);
+		});
 
 		VBox contenedor = new VBox(8);
 		contenedor.setPrefWidth(160);
