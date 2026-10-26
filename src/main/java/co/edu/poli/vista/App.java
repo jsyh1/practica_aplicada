@@ -67,6 +67,38 @@ public class App extends Application {
 		nuevoJuego.requestLayout();
 	}
 
+
+	/**
+	 * Actualiza la vista del juego conservando la escena principal.
+	 *
+	 * @param nuevoJuego nueva raíz de la interfaz del juego
+	 */
+	public static void actualizarJuego(Parent nuevoJuego) {
+	    if (scene == null || scene.getWindow() == null) {
+	        throw new IllegalStateException(
+	            "La escena principal no está asociada a una ventana."
+	        );
+	    }
+
+	    Stage stage = (Stage) scene.getWindow();
+
+	    vistas.put("juego", nuevoJuego);
+	    scene.setRoot(nuevoJuego);
+
+	    nuevoJuego.applyCss();
+	    nuevoJuego.requestLayout();
+
+	    if (!stage.isMaximized() && !stage.isFullScreen()) {
+	        double alturaNecesaria = nuevoJuego.prefHeight(scene.getWidth());
+
+	        if (alturaNecesaria > 0) {
+	            double decoracion = stage.getHeight() - scene.getHeight();
+	            stage.setHeight(alturaNecesaria + decoracion);
+	        }
+	    }
+	}
+	
+	
 	/**
 	 * Cambia la vista principal de la aplicación.
 	 *
