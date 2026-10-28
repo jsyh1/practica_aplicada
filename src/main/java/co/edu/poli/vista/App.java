@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import co.edu.poli.controller.CalculadoraControler;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
@@ -203,5 +204,10 @@ public class App extends Application {
 		contenedor.heightProperty().addListener(ajustar);
 		tarjeta.widthProperty().addListener(ajustar);
 		tarjeta.heightProperty().addListener(ajustar);
+	}
+
+	@Override
+	public void stop() {
+    	CalculadoraControler.abandonarPartidaActual();
 	}
 }

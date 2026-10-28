@@ -97,9 +97,11 @@ public class ConsultarControler {
 
 		HBox encabezado = new HBox(10, jugador, crearEspacio(), fecha);
 		encabezado.setAlignment(Pos.CENTER_LEFT);
+		jugador.setWrapText(true);
 
 		Label infoLinea = new Label(
 				"Puntaje: " + partida.getPuntaje() + "/10 - Tiempo: " + partida.getTiempoEjecucion() + " s");
+		infoLinea.setWrapText(true);
 
 		String resultadosTexto;
 		try {
@@ -110,24 +112,26 @@ public class ConsultarControler {
 		}
 
 		Label lblResultados = new Label("Resultados: " + resultadosTexto);
+		lblResultados.setWrapText(true);
 
 		VBox columnaTexto = new VBox(4, encabezado, infoLinea, lblResultados);
-		HBox.setHgrow(columnaTexto, Priority.ALWAYS);
 
 		Button btnCompartir = new Button("Compartir");
 		btnCompartir.getStyleClass().add("btn-compartir");
+		btnCompartir.setMaxWidth(Double.MAX_VALUE);
 		btnCompartir.setOnAction(e -> compartir(partida));
 
 		Button btnExportar = new Button("Exportar PNG");
+		btnExportar.getStyleClass().add("btn-compartir");
+		btnExportar.setMaxWidth(Double.MAX_VALUE);
 		btnExportar.setOnAction(e -> exportarPNG(partida));
 
 		HBox botones = new HBox(8, btnCompartir, btnExportar);
-		botones.setAlignment(Pos.CENTER_RIGHT);
+		botones.setAlignment(Pos.CENTER);
+		HBox.setHgrow(btnCompartir, Priority.ALWAYS);
+		HBox.setHgrow(btnExportar, Priority.ALWAYS);
 
-		HBox filaCompleta = new HBox(12, columnaTexto, botones);
-		filaCompleta.setAlignment(Pos.CENTER_LEFT);
-
-		fila.getChildren().add(filaCompleta);
+		fila.getChildren().addAll(columnaTexto, botones);
 		return fila;
 	}
 
