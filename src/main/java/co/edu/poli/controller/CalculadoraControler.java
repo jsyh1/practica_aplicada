@@ -11,6 +11,7 @@ import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoResultadoImplementado;
 import co.edu.poli.dao.DaoScoreImplementado;
 import co.edu.poli.modelo.Calculadora;
+import co.edu.poli.modelo.EstadoPartida;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
@@ -220,6 +221,8 @@ public class CalculadoraControler {
 	 */
 	private final GeneradorEcuaciones generadorEcuaciones = new GeneradorEcuaciones();
 
+	private static CalculadoraControler actual;
+
 	/**
 	 * Contador utilizado para habilitar la ayuda.
 	 */
@@ -260,6 +263,8 @@ public class CalculadoraControler {
 	 */
 	@FXML
 	public void initialize() {
+		
+		actual = this;
 
 		DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
 
@@ -344,6 +349,12 @@ public class CalculadoraControler {
 		btnDivision.setGraphic(crearIcono(
 				"M5 12 L19 12 " + "M11 6 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0 " + "M11 18 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0"));
 		btnDivision.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnRaiz.setGraphic(crearIcono("M2 13 L6 13 L9 20 L14 4 L22 4"));
+		btnRaiz.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnPotencia.setGraphic(crearIcono("M4 13 L10 20 M10 13 L4 20 M14 5 L21 5 L14 10 L21 10"));
+		btnPotencia.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		actualizarBotonesDificultad();
 	}
 	
@@ -377,7 +388,10 @@ public class CalculadoraControler {
 	        });
 
 	        Parent root = loader.load();
-
+			// La partida anterior no se terminó: queda abandonada.
+			// Se llama por instancia (no la versión estática), porque tras load()
+			// "actual" ya apunta al controlador nuevo.
+			abandonarPartida();
 	        // Actualiza la vista usando la escena que administra App.
 	        App.actualizarJuego(root);
 
@@ -604,9 +618,9 @@ public class CalculadoraControler {
 		partidaActual.setTiempoEjecucion(partidaActual.obtenerTiempoEjecucion());
 
 		partidaActual.setPuntaje(puntaje);
-
+		partidaActual.setEstado(EstadoPartida.FINALIZADA);
+		
 		DaoScoreImplementado dao = new DaoScoreImplementado();
-
 		boolean actualizada = dao.actualizar(partidaActual);
 		cronometro.stop();
 
@@ -621,8 +635,31 @@ public class CalculadoraControler {
 		} else {
 
 			partidaFinalizada = false;
+			partidaActual.setEstado(EstadoPartida.EN_CURSO);
 			lblError.setText("No se pudo finalizar la partida");
 		}
+	}
+
+	/**
+ 	* Marca como ABANDONADA la partida de la pantalla de juego activa, si
+ 	* todavía está en curso. La usa App al cerrar la ventana.
+ 	*/
+	public static void abandonarPartidaActual() {
+    	if (actual != null) {
+        	actual.abandonarPartida();
+    	}
+	}
+
+	private void abandonarPartida() {
+
+    	if (partidaActual == null
+            	|| partidaActual.getEstado() != EstadoPartida.EN_CURSO) {
+        	return;
+    	}
+
+    	partidaActual.setEstado(EstadoPartida.ABANDONADA);
+
+    	new DaoScoreImplementado().actualizar(partidaActual);
 	}
 
 	/**
@@ -1195,7 +1232,7 @@ public class CalculadoraControler {
 		});
 
 		VBox contenedor = new VBox(8);
-		contenedor.setPrefWidth(160);
+		contenedor.setPrefWidth(220);
 
 		java.net.URL css = getClass().getResource("/co/edu/poli/juego/style.css");
 
