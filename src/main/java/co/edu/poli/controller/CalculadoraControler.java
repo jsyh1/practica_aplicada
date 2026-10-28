@@ -349,6 +349,12 @@ public class CalculadoraControler {
 		btnDivision.setGraphic(crearIcono(
 				"M5 12 L19 12 " + "M11 6 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0 " + "M11 18 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0"));
 		btnDivision.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnRaiz.setGraphic(crearIcono("M2 13 L6 13 L9 20 L14 4 L22 4"));
+		btnRaiz.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+		btnPotencia.setGraphic(crearIcono("M4 13 L10 20 M10 13 L4 20 M14 5 L21 5 L14 10 L21 10"));
+		btnPotencia.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		actualizarBotonesDificultad();
 	}
 	
