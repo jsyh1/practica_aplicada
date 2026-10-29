@@ -1,6 +1,7 @@
 package co.edu.poli.vista;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
@@ -21,6 +23,10 @@ import javafx.stage.Stage;
 public class App extends Application {
 
 	private static Scene scene;
+	private static final String[] FUENTES_NUNITO = {
+			"Nunito-Regular.ttf",
+			"Nunito-Bold.ttf"
+	};
 	// Guarda las vistas que ya fueron cargadas
 	private static final Map<String, Parent> vistas = new HashMap<>();
 
@@ -33,6 +39,7 @@ public class App extends Application {
 	@Override
 	public void start(Stage stage) throws IOException {
 
+		cargarFuentesNunito();
 		Parent juego = loadFXML("juego");
 
 		// Guardamos la vista del juego
@@ -47,6 +54,22 @@ public class App extends Application {
 
 		stage.setScene(scene);
 		stage.show();
+	}
+
+	private static void cargarFuentesNunito() {
+		for (String nombreFuente : FUENTES_NUNITO) {
+			String recurso = "/co/edu/poli/juego/fonts/" + nombreFuente;
+			try (InputStream fuente = App.class.getResourceAsStream(recurso)) {
+				if (fuente == null) {
+					throw new IllegalStateException("No se encontró la fuente Nunito: " + recurso);
+				}
+				if (Font.loadFont(fuente, 12) == null) {
+					throw new IllegalStateException("No se pudo cargar la fuente Nunito: " + recurso);
+				}
+			} catch (IOException ex) {
+				throw new IllegalStateException("Error al cargar la fuente Nunito: " + recurso, ex);
+			}
+		}
 	}
 
 	/**

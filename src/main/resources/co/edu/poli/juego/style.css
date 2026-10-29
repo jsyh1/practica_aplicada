@@ -1,9 +1,10 @@
 .root {
-    -fx-background-color: #d9d9d9;
+    -fx-background-color: #e8e6ed;
+    -fx-font-family: "Nunito";
 }
 .card {
-    -fx-background-color: #d9d9d9;
-    -fx-padding: 20;
+    -fx-background-color: #f0edf7;
+    -fx-padding: 18;
 }
 
 .scroll-pane {
@@ -19,86 +20,103 @@
 }
 
 .titulo {
-    -fx-font-size: 32px;
+    -fx-font-size: 29px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1a1a1a;
+    -fx-text-fill: #252238;
 }
 .subtitulo{
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1a1a1a;
+    -fx-text-fill: #62548f;
 }
 .progreso {
     -fx-font-size: 11px;
-    -fx-text-fill: #6b6b6b;
+    -fx-text-fill: #777386;
 }
 .casilla-pendiente{
-    -fx-background-color: #867CA3;
-    -fx-background-radius: 6px;
-    -fx-text-fill: #4F378A;
-    -fx-padding: 4 8 4 8;
+    -fx-background-color: #ded9ee;
+    -fx-background-radius: 12px;
+    -fx-padding: 6 10 6 10;
+    -fx-min-height: 47px;
+}
+.casilla-pendiente .label {
+    -fx-text-fill: #62548f;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
 }
 .casilla-resuelta{
     -fx-background-color: #3ecf6e;
-    -fx-background-radius: 6px;
-    -fx-text-fill: #04342C;
-    -fx-padding: 4 8 4 8;
+    -fx-background-radius: 12px;
+    -fx-padding: 6 10 6 10;
+    -fx-min-height: 47px;
+}
+.casilla-resuelta .label {
+    -fx-text-fill: #073c2d;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
 }
 .barra-resultado{
     -fx-background-color: #4a4458;
-    -fx-padding: 10;
+    -fx-background-radius: 12px;
+    -fx-padding: 10 14 10 14;
     -fx-text-fill: white;
-    -fx-font-size: 16px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(38, 31, 52, 0.22), 8, 0, 0, 3);
 }
 .lbl-error {
     -fx-text-fill: #ff6b6b;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
 .btn-base{
-    -fx-background-radius: 8;
+    -fx-background-radius: 10;
     -fx-text-fill: white;
-    -fx-pref-width: 60;
+    -fx-pref-width: 58;
     -fx-pref-height: 44;
     -fx-cursor: hand;
-    -fx-border-color: black;
-    -fx-border-radius: 8;
     -fx-font-size: 15px;
 }
 .btn-numero{
     -fx-background-color: #5b4e94;
     -fx-font-weight: bold;
-
 }
 .btn-numero:hover{
     -fx-background-color: #6f5eb0;
 }
 .btn-operador{
     -fx-background-color: #2b2b2b;
+    -fx-pref-width: 42;
+    -fx-pref-height: 40;
+    -fx-background-radius: 10;
 }
 .btn-operador:hover{
     -fx-background-color: #3a3a3a;
 }
+.btn-edicion {
+    -fx-pref-width: 56;
+}
 .btn-comprobar{
-    -fx-background-color: #2b2b2b;
-    -fx-background-radius: 8;
-    -fx-text-fill: white;
+    -fx-background-color: #3ecf6e;
+    -fx-background-radius: 12;
+    -fx-text-fill: #073c2d;
     -fx-font-size: 16px;
+    -fx-font-weight: bold;
     -fx-pref-height: 48;
     -fx-cursor: hand;
 }
 .btn-comprobar:hover{
-    -fx-background-color: #3a3a3a;
+    -fx-background-color: #34bd62;
 }
 .btn-menu{
     -fx-background-color: #2b2b2b;
     -fx-text-fill: white;
-    -fx-background-radius: 8;
+    -fx-background-radius: 10;
     -fx-cursor: hand;
 }
 .menu-popup {
-    -fx-background-color: #d9d9d9;
+    -fx-background-color: #f0edf7;
+    -fx-font-family: "Nunito";
     -fx-padding: 14;
     -fx-background-radius: 10;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 12, 0, 0, 4);
@@ -116,11 +134,6 @@
 .btn-menu-item:hover {
     -fx-background-color: #3a3a3a;
 }
-.fila-partida {
-    -fx-background-color: #3ecf6e;
-    -fx-background-radius: 10;
-    -fx-padding: 12;
-}
 .btn-compartir{ -fx-background-color: #2b2b2b;
     -fx-text-fill: white;
     -fx-background-radius: 6;
@@ -131,14 +144,356 @@
 .btn-compartir:hover{
     -fx-background-color: #3a3a3a;
 }
-.nombre-jugador {
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #04342C;
+
+.btn-compartir-historial {
+    -fx-background-radius: 8;
+    -fx-padding: 7 8 7 8;
+    -fx-font-size: 10px;
+    -fx-pref-height: 32;
 }
 
-.fecha-partida {
-    -fx-text-fill: #085041;
+.card-listado {
+    -fx-spacing: 12;
+}
+
+.seccion-etiqueta {
+    -fx-text-fill: #7567a6;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.listado-subtitulo {
+    -fx-text-fill: #777386;
+    -fx-font-size: 13px;
+}
+
+.scroll-listado {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-listado > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-listado > .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 7px;
+}
+
+.scroll-listado > .scroll-bar:vertical > .thumb {
+    -fx-background-color: #c9c3d9;
+    -fx-background-radius: 6;
+}
+
+.mensaje-listado {
+    -fx-text-fill: #777386;
+    -fx-font-size: 11px;
+    -fx-min-height: 14px;
+}
+
+.tarjeta-historial,
+.tarjeta-ranking {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(47, 37, 68, 0.13), 8, 0, 0, 3);
+}
+
+.tarjeta-historial {
+    -fx-spacing: 7;
+}
+
+.historial-jugador,
+.ranking-jugador {
+    -fx-text-fill: #29263a;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.historial-fecha,
+.ranking-fecha {
+    -fx-text-fill: #777386;
+    -fx-font-size: 11px;
+}
+
+.insignia-historial {
+    -fx-background-radius: 8;
+    -fx-padding: 4 7 4 7;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.insignia-puntaje {
+    -fx-background-color: #e5def3;
+    -fx-text-fill: #62548f;
+}
+
+.insignia-puntaje-perfecto {
+    -fx-background-color: #d7f4e6;
+    -fx-text-fill: #216448;
+}
+
+.insignia-tiempo,
+.insignia-resultados {
+    -fx-background-color: #eee9f7;
+    -fx-text-fill: #62548f;
+}
+
+.btn-ranking,
+.btn-listado-volver {
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-pref-height: 44;
+    -fx-cursor: hand;
+}
+
+.btn-ranking {
+    -fx-background-color: #5b4e94;
+}
+
+.btn-ranking:hover {
+    -fx-background-color: #6f5eb0;
+}
+
+.btn-listado-volver {
+    -fx-background-color: #2b2b2b;
+}
+
+.btn-listado-volver:hover {
+    -fx-background-color: #3a3a3a;
+}
+
+.tarjeta-ranking {
+    -fx-spacing: 12;
+    -fx-min-height: 76;
+}
+
+.tarjeta-ranking-primero {
+    -fx-border-color: #f3bb35;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 16;
+}
+
+.medalla-ranking {
+    -fx-background-radius: 20;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-pref-width: 36;
+    -fx-pref-height: 36;
+    -fx-alignment: center;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.medalla-ranking-1 {
+    -fx-background-color: #f7c843;
+    -fx-text-fill: #684d11;
+}
+
+.medalla-ranking-2 {
+    -fx-background-color: #cdd0d8;
+    -fx-text-fill: #424653;
+}
+
+.medalla-ranking-3 {
+    -fx-background-color: #e9aa69;
+    -fx-text-fill: #613813;
+}
+
+.medalla-ranking-4,
+.medalla-ranking-5,
+.medalla-ranking-6,
+.medalla-ranking-7,
+.medalla-ranking-8,
+.medalla-ranking-9,
+.medalla-ranking-10 {
+    -fx-background-color: #ded9ee;
+    -fx-text-fill: #62548f;
+}
+
+.ranking-tiempo {
+    -fx-text-fill: #62548f;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.ranking-puntaje {
+    -fx-text-fill: #777386;
+    -fx-font-size: 11px;
+}
+
+.card-game-over {
+    -fx-spacing: 12;
+}
+
+.icono-completado {
+    -fx-background-color: #3ecf78;
+    -fx-background-radius: 24;
+    -fx-text-fill: #073c2d;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-pref-width: 40;
+    -fx-pref-height: 40;
+}
+
+.game-over-subtitulo {
+    -fx-text-fill: #777386;
+    -fx-font-size: 12px;
+}
+
+.etiqueta-game-over,
+.etiqueta-estadistica {
+    -fx-text-fill: #7567a6;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.fila-nombre .text-field {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #7060a8;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-font-size: 13px;
+    -fx-pref-height: 42;
+}
+
+.btn-cargar-nombre {
+    -fx-background-color: #5b4e94;
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 78;
+    -fx-pref-height: 42;
+    -fx-cursor: hand;
+}
+
+.btn-cargar-nombre:hover {
+    -fx-background-color: #6f5eb0;
+}
+
+.resumen-estadisticas {
+    -fx-fill-height: true;
+}
+
+.estadistica-card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-padding: 12;
+    -fx-min-height: 70;
+}
+
+.estadistica-puntaje {
+    -fx-background-color: #d7f4e6;
+}
+
+.estadistica-tiempo .etiqueta-estadistica {
+    -fx-text-fill: #777386;
+}
+
+.valor-estadistica {
+    -fx-text-fill: #29263a;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.estadistica-puntaje .valor-estadistica {
+    -fx-text-fill: #174b37;
+}
+
+.titulo-resultados {
+    -fx-text-fill: #29263a;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.lista-resultados-game-over {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(47, 37, 68, 0.13), 8, 0, 0, 3);
+}
+
+.columnas-resultados-game-over,
+.columna-resultados {
+    -fx-spacing: 5;
+}
+
+.fila-resultado-game-over {
+    -fx-min-height: 24;
+}
+
+.numero-resultado-game-over {
+    -fx-background-color: #ded9ee;
+    -fx-background-radius: 14;
+    -fx-text-fill: #62548f;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-min-width: 22;
+    -fx-min-height: 22;
+    -fx-pref-width: 22;
+    -fx-pref-height: 22;
+}
+
+.expresion-resultado-game-over {
+    -fx-text-fill: #29263a;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.mensaje-resultados-vacio {
+    -fx-text-fill: #777386;
+    -fx-font-size: 12px;
+}
+
+.acciones-game-over {
+    -fx-fill-height: true;
+}
+
+.btn-accion-game-over,
+.btn-volver-juego {
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-pref-height: 40;
+    -fx-cursor: hand;
+}
+
+.btn-accion-game-over {
+    -fx-background-color: #2b2b2b;
+}
+
+.btn-accion-game-over:hover {
+    -fx-background-color: #3a3a3a;
+}
+
+.btn-accion-game-over:disabled {
+    -fx-opacity: 0.55;
+}
+
+.btn-volver-juego {
+    -fx-background-color: #3ecf78;
+    -fx-text-fill: #073c2d;
+}
+
+.btn-volver-juego:hover {
+    -fx-background-color: #34bd68;
+}
+
+.mensaje-game-over {
+    -fx-text-fill: #777386;
+    -fx-font-size: 10px;
+    -fx-min-height: 14;
 }
 
 .caja-reglas {
@@ -160,29 +515,71 @@
     -fx-font-size: 13px;
 }
 
+.ayuda-subtitulo {
+    -fx-text-fill: #777386;
+    -fx-font-size: 13px;
+}
+
 .tabla-ayuda {
-    -fx-background-color: #ada6c9;
-    -fx-background-radius: 10;
-    -fx-control-inner-background: #ada6c9;
-    -fx-control-inner-background-alt: #b9b3d3;
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-control-inner-background: white;
+    -fx-control-inner-background-alt: #f5f2fa;
     -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(47, 37, 68, 0.16), 10, 0, 0, 4);
 }
 
 .tabla-ayuda .column-header-background {
-    -fx-background-color: transparent;
+    -fx-background-color: #2b2b2b;
+    -fx-background-radius: 14 14 0 0;
 }
 
 .tabla-ayuda .column-header {
+    -fx-size: 32px;
     -fx-background-color: #2b2b2b;
+    -fx-border-color: transparent;
+}
+
+.tabla-ayuda .column-header:first-child {
+    -fx-background-radius: 14 0 0 0;
+}
+
+.tabla-ayuda .column-header:last-visible {
+    -fx-background-radius: 0 14 0 0;
 }
 
 .tabla-ayuda .column-header .label {
     -fx-text-fill: white;
     -fx-font-weight: bold;
+    -fx-font-size: 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.tabla-ayuda .table-row-cell {
+    -fx-cell-size: 39px;
+    -fx-border-color: transparent;
 }
 
 .tabla-ayuda .table-cell {
-    -fx-text-fill: #1a1a1a;
+    -fx-text-fill: #29263a;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+    -fx-padding: 0 10 0 10;
+}
+
+.tabla-ayuda .numero-resultado-ayuda {
+    -fx-background-color: #ded9ee;
+    -fx-background-radius: 20;
+    -fx-text-fill: #62548f;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+    -fx-min-width: 26px;
+    -fx-min-height: 26px;
+    -fx-pref-width: 26px;
+    -fx-pref-height: 26px;
 }
 
 .tabla-ayuda .table-row-cell:filled:selected {
@@ -191,6 +588,20 @@
 
 .tabla-ayuda .table-row-cell:filled:selected .table-cell {
     -fx-text-fill: white;
+}
+
+.btn-volver {
+    -fx-background-color: #2b2b2b;
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-pref-height: 44;
+    -fx-cursor: hand;
+}
+
+.btn-volver:hover {
+    -fx-background-color: #3a3a3a;
 }
 
 .text{
@@ -202,4 +613,177 @@
     -fx-stroke-width: 2;
     -fx-stroke-line-cap: round;
     -fx-stroke-line-join: round;
+}
+
+.reglas-card {
+    -fx-background-color: #f0edf7;
+}
+
+.reglas-etiqueta,
+.reglas-etiqueta-clara {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.reglas-etiqueta {
+    -fx-text-fill: #7567a6;
+}
+
+.reglas-etiqueta-clara {
+    -fx-text-fill: #ded8f2;
+}
+
+.reglas-titulo {
+    -fx-text-fill: #252238;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.reglas-subtitulo {
+    -fx-text-fill: #777386;
+    -fx-font-size: 14px;
+}
+
+.reglas-objetivo {
+    -fx-background-color: #7161ae;
+    -fx-background-radius: 18;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(47, 37, 68, 0.18), 9, 0, 0, 4);
+}
+
+.reglas-texto-objetivo {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.reglas-numero-objetivo {
+    -fx-background-color: #8d7fc1;
+    -fx-background-radius: 9;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-min-height: 31px;
+    -fx-pref-height: 31px;
+    -fx-max-width: infinity;
+}
+
+.reglas-encabezado {
+    -fx-text-fill: #29263a;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.reglas-lista {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 3 0 3 0;
+    -fx-effect: dropshadow(gaussian, rgba(47, 37, 68, 0.13), 8, 0, 0, 3);
+}
+
+.reglas-fila {
+    -fx-border-color: transparent transparent #eeeaf4 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 10 14 10 14;
+}
+
+.reglas-fila-final {
+    -fx-border-color: transparent;
+}
+
+.reglas-numero {
+    -fx-background-color: #e2dcf1;
+    -fx-background-radius: 16;
+    -fx-text-fill: #62548f;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-min-width: 27px;
+    -fx-min-height: 27px;
+    -fx-pref-width: 27px;
+    -fx-pref-height: 27px;
+}
+
+.reglas-texto {
+    -fx-text-fill: #29263a;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.reglas-ejemplo {
+    -fx-background-color: #e1dcf0;
+    -fx-background-radius: 16;
+    -fx-padding: 14;
+}
+
+.reglas-numero-ejemplo,
+.reglas-resultado-ejemplo {
+    -fx-background-radius: 9;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-pref-width: 38px;
+    -fx-pref-height: 38px;
+}
+
+.reglas-numero-ejemplo {
+    -fx-background-color: white;
+    -fx-text-fill: #62548f;
+}
+
+.reglas-flecha {
+    -fx-text-fill: #62548f;
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+}
+
+.reglas-resultado-ejemplo {
+    -fx-background-color: #3ecf6e;
+    -fx-text-fill: #073c2d;
+}
+
+.reglas-nota-ejemplo {
+    -fx-text-fill: #62548f;
+    -fx-font-size: 12px;
+}
+
+.reglas-completado {
+    -fx-background-color: #d7f4e3;
+    -fx-background-radius: 16;
+    -fx-padding: 13;
+}
+
+.reglas-check {
+    -fx-background-color: #3ecf78;
+    -fx-background-radius: 18;
+    -fx-text-fill: #073c2d;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+}
+
+.reglas-texto-completado {
+    -fx-text-fill: #244b3b;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.reglas-volver {
+    -fx-background-color: #2b2b2b;
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-pref-height: 46px;
+    -fx-cursor: hand;
+}
+
+.reglas-volver:hover {
+    -fx-background-color: #3a3a3a;
 }

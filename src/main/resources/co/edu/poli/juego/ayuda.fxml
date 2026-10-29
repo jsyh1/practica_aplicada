@@ -12,24 +12,24 @@
            fx:controller="co.edu.poli.controller.AyudaControler"
            stylesheets="@style.css">
 
-    <VBox alignment="CENTER" prefWidth="320.0" spacing="14.0" styleClass="card" StackPane.alignment="CENTER">
+    <VBox alignment="CENTER_LEFT" maxWidth="340.0" prefWidth="340.0" spacing="12.0" styleClass="card" StackPane.alignment="CENTER">
 
         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
         </padding>
 
         <Label text="Ayuda" styleClass="titulo" />
-        <Label text="Expresiones para obtener los resultados" styleClass="subtitulo" wrapText="true" />
+        <Label text="Expresiones para obtener los resultados" maxWidth="Infinity" styleClass="ayuda-subtitulo" wrapText="true" />
 
-        <TableView fx:id="tablaEcuaciones" prefHeight="300.0" styleClass="tabla-ayuda">
+        <TableView fx:id="tablaEcuaciones" minHeight="420.0" prefHeight="420.0" styleClass="tabla-ayuda" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="colResultado" text="Resultado" />
-                <TableColumn fx:id="colExpresion" text="Expresión" />
+                <TableColumn fx:id="colResultado" text="RESULTADO" />
+                <TableColumn fx:id="colExpresion" text="EXPRESIÓN" />
             </columns>
         </TableView>
 
         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#calljuego"
-                styleClass="btn-comprobar" text="Volver" />
+                styleClass="btn-volver" text="Volver" />
 
     </VBox>
 </StackPane>

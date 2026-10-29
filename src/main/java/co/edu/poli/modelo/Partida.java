@@ -63,6 +63,11 @@ public class Partida {
      * Lista de resultados obtenidos durante la partida.
      */
     private List<Resultado> resultados;
+    
+    /**
+     * Estados.
+     */
+    
     private EstadoPartida estado = EstadoPartida.EN_CURSO;
     private EstadoPartida estado1 = EstadoPartida.FINALIZADA;
     private EstadoPartida estado2 = EstadoPartida.ABANDONADA;
@@ -329,7 +334,7 @@ public class Partida {
 
         return this.tiempoEjecucion;
     }
-    public EstadoPartida getEstado() {
+        public EstadoPartida getEstado() {
     return estado;
     }
 

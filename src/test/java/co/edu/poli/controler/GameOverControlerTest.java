@@ -25,6 +25,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
 class GameOverControlerTest {
 
@@ -55,7 +56,10 @@ class GameOverControlerTest {
 			Label lblMensaje = new Label();
 			Label lblPuntaje = new Label();
 			Label lblTiempo = new Label();
+			Label lblPuntajeValor = new Label();
+			Label lblTiempoValor = new Label();
 			Label lblResultados = new Label();
+			VBox contenedorResultados = new VBox();
 
 			Button btnCargar = new Button();
 			Button btnCompartir = new Button();
@@ -65,6 +69,9 @@ class GameOverControlerTest {
 			asignarCampo(controlador, "lblMensaje", lblMensaje);
 			asignarCampo(controlador, "lblPuntaje", lblPuntaje);
 			asignarCampo(controlador, "lblTiempo", lblTiempo);
+			asignarCampo(controlador, "lblPuntajeValor", lblPuntajeValor);
+			asignarCampo(controlador, "lblTiempoValor", lblTiempoValor);
+			asignarCampo(controlador, "contenedorResultados", contenedorResultados);
 			asignarCampo(controlador, "lblResultados", lblResultados);
 			asignarCampo(controlador, "btnCargar", btnCargar);
 			asignarCampo(controlador, "btnCompartir", btnCompartir);
@@ -89,10 +96,13 @@ class GameOverControlerTest {
 				assertEquals("Nombre guardado correctamente.", lblMensaje.getText());
 
 				assertEquals("Puntaje: 8", lblPuntaje.getText());
+				assertEquals("8/10", lblPuntajeValor.getText());
 
 				assertEquals("Tiempo de juego: 87 segundos", lblTiempo.getText());
+				assertEquals("01:27", lblTiempoValor.getText());
 
 				assertTrue(lblResultados.getText().contains("2+3"), "Debe mostrar el resultado de la partida.");
+				assertFalse(contenedorResultados.getChildren().isEmpty());
 
 				assertTrue(btnCargar.isDisabled());
 				assertFalse(btnCompartir.isDisabled());

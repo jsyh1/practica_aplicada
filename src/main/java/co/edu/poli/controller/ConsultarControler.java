@@ -29,7 +29,6 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -81,48 +80,49 @@ public class ConsultarControler {
 	 */
 	private VBox crearFila(Partida partida) {
 		VBox fila = new VBox(6);
-		fila.getStyleClass().add("fila-partida");
+		fila.getStyleClass().add("tarjeta-historial");
 
 		Jugador jugadorPartida = partida.getJugador();
 
 		String nombre = obtenerNombreJugador(partida);
 
-		Label jugador = new Label(
-				"Jugador: " + nombre + (jugadorPartida != null ? " (#" + jugadorPartida.getId() + ")" : ""));
-		jugador.getStyleClass().add("nombre-jugador");
+		Label jugador = new Label(nombre + (jugadorPartida != null ? " (#" + jugadorPartida.getId() + ")" : ""));
+		jugador.getStyleClass().add("historial-jugador");
 
 		Label fecha = new Label(
 				partida.getFechaPartida() != null ? partida.getFechaPartida().toString() : "Fecha no disponible");
-		fecha.getStyleClass().add("fecha-partida");
-
-		HBox encabezado = new HBox(10, jugador, crearEspacio(), fecha);
-		encabezado.setAlignment(Pos.CENTER_LEFT);
-		jugador.setWrapText(true);
-
-		Label infoLinea = new Label(
-				"Puntaje: " + partida.getPuntaje() + "/10 - Tiempo: " + partida.getTiempoEjecucion() + " s");
-		infoLinea.setWrapText(true);
+		fecha.getStyleClass().add("historial-fecha");
 
 		String resultadosTexto;
 		try {
 			List<Resultado> resultados = cargarResultados(partida);
-			resultadosTexto = resultados.isEmpty() ? "Sin resultados" : resultados.size() + " resultado(s)";
+			resultadosTexto = resultados.size() + (resultados.size() == 1 ? " resultado" : " resultados");
 		} catch (RuntimeException e) {
-			resultadosTexto = "No se pudieron consultar los resultados";
+			resultadosTexto = "Resultados no disponibles";
 		}
 
-		Label lblResultados = new Label("Resultados: " + resultadosTexto);
-		lblResultados.setWrapText(true);
+		Label puntaje = new Label("Puntaje " + partida.getPuntaje() + "/10");
+		puntaje.getStyleClass().addAll("insignia-historial",
+				partida.getPuntaje() == 10 ? "insignia-puntaje-perfecto" : "insignia-puntaje");
 
-		VBox columnaTexto = new VBox(4, encabezado, infoLinea, lblResultados);
+		Label tiempo = new Label("Tiempo " + partida.getTiempoEjecucion() + " s");
+		tiempo.getStyleClass().addAll("insignia-historial", "insignia-tiempo");
+
+		Label cantidadResultados = new Label(resultadosTexto);
+		cantidadResultados.getStyleClass().addAll("insignia-historial", "insignia-resultados");
+
+		HBox insignias = new HBox(6, puntaje, tiempo, cantidadResultados);
+		insignias.setAlignment(Pos.CENTER_LEFT);
+
+		VBox columnaTexto = new VBox(1, jugador, fecha);
 
 		Button btnCompartir = new Button("Compartir");
-		btnCompartir.getStyleClass().add("btn-compartir");
+		btnCompartir.getStyleClass().addAll("btn-compartir", "btn-compartir-historial");
 		btnCompartir.setMaxWidth(Double.MAX_VALUE);
 		btnCompartir.setOnAction(e -> compartir(partida));
 
 		Button btnExportar = new Button("Exportar PNG");
-		btnExportar.getStyleClass().add("btn-compartir");
+		btnExportar.getStyleClass().addAll("btn-compartir", "btn-compartir-historial");
 		btnExportar.setMaxWidth(Double.MAX_VALUE);
 		btnExportar.setOnAction(e -> exportarPNG(partida));
 
@@ -131,14 +131,8 @@ public class ConsultarControler {
 		HBox.setHgrow(btnCompartir, Priority.ALWAYS);
 		HBox.setHgrow(btnExportar, Priority.ALWAYS);
 
-		fila.getChildren().addAll(columnaTexto, botones);
+		fila.getChildren().addAll(columnaTexto, insignias, botones);
 		return fila;
-	}
-
-	private Region crearEspacio() {
-		Region espacio = new Region();
-		HBox.setHgrow(espacio, Priority.ALWAYS);
-		return espacio;
 	}
 
 	/**
@@ -295,7 +289,7 @@ public class ConsultarControler {
 		VBox reporte = new VBox(16);
 		reporte.setPadding(new Insets(32));
 		reporte.setPrefWidth(820);
-		reporte.setStyle("-fx-background-color: #f1f5f9;" + "-fx-font-family: 'Arial';");
+		reporte.setStyle("-fx-background-color: #f1f5f9;" + "-fx-font-family: 'Nunito';");
 
 		Label marca = new Label("ALL TEN");
 		marca.setStyle("-fx-text-fill: #64748b;" + "-fx-font-size: 14px;" + "-fx-font-weight: bold;");

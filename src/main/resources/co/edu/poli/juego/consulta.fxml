@@ -9,29 +9,30 @@
 
 <StackPane stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.poli.controller.ConsultarControler">
 
-    <VBox alignment="CENTER" prefWidth="360.0" spacing="14.0" styleClass="card" VBox.vgrow="ALWAYS">
+    <VBox alignment="CENTER" prefWidth="360.0" spacing="12.0" styleClass="card, card-listado" VBox.vgrow="ALWAYS">
 
         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
         </padding>
 
         <!-- Encabezado -->
         <VBox alignment="CENTER_LEFT" spacing="2.0">
+            <Label styleClass="seccion-etiqueta" text="HISTORIAL" />
             <Label styleClass="titulo" text="Consulta de partidas" textOverrun="CLIP" wrapText="true" />
-            <Label styleClass="subtitulo" text="Últimas 5 registradas" />
+            <Label styleClass="listado-subtitulo" text="Últimas 5 registradas" />
         </VBox>
 
         <!-- Lista de partidas (se llena desde el controlador) -->
-        <ScrollPane fitToWidth="true" prefHeight="420.0" VBox.vgrow="ALWAYS" >
+        <ScrollPane fitToWidth="true" prefHeight="420.0" styleClass="scroll-listado" VBox.vgrow="ALWAYS">
             <content>
                 <VBox fx:id="contenedorPartidas" spacing="10.0" />
             </content>
         </ScrollPane>
-        <Label fx:id="lblMensaje" text="" />
+        <Label fx:id="lblMensaje" maxWidth="Infinity" styleClass="mensaje-listado" text="" wrapText="true" />
         <!-- Ranking -->
-        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#verRanking" text="RANKING" styleClass="btn-comprobar"/>
+        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#verRanking" text="RANKING" styleClass="btn-ranking"/>
         <!-- Volver -->
-        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#calljuego" text="VOLVER" styleClass="btn-comprobar"/>
+        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#calljuego" text="VOLVER" styleClass="btn-listado-volver"/>
 
     </VBox>
 </StackPane>
