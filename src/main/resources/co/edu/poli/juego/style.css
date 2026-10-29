@@ -226,11 +226,6 @@
 }
 
 .insignia-puntaje {
-    -fx-background-color: #e5def3;
-    -fx-text-fill: #62548f;
-}
-
-.insignia-puntaje-perfecto {
     -fx-background-color: #d7f4e6;
     -fx-text-fill: #216448;
 }

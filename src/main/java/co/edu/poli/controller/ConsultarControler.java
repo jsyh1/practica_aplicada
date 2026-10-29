@@ -102,8 +102,8 @@ public class ConsultarControler {
 		}
 
 		Label puntaje = new Label("Puntaje " + partida.getPuntaje() + "/10");
-		puntaje.getStyleClass().addAll("insignia-historial",
-				partida.getPuntaje() == 10 ? "insignia-puntaje-perfecto" : "insignia-puntaje");
+		puntaje.getStyleClass().addAll("insignia-historial", "insignia-puntaje"
+				);
 
 		Label tiempo = new Label("Tiempo " + partida.getTiempoEjecucion() + " s");
 		tiempo.getStyleClass().addAll("insignia-historial", "insignia-tiempo");
