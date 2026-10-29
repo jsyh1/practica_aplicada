@@ -52,22 +52,22 @@
         <Label text="Reglas" styleClass="reglas-encabezado" />
 
         <VBox styleClass="reglas-lista">
-            <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-fila">
+            <HBox alignment="CENTER_LEFT" minHeight="58.0" prefHeight="58.0" spacing="11.0" styleClass="reglas-fila">
                 <Label text="1" styleClass="reglas-numero" />
                 <Label text="Usa cada uno de los 4 números exactamente una vez por expresión."
                        styleClass="reglas-texto" wrapText="true" HBox.hgrow="ALWAYS" />
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-fila">
+            <HBox alignment="CENTER_LEFT" minHeight="58.0" prefHeight="58.0" spacing="11.0" styleClass="reglas-fila">
                 <Label text="2" styleClass="reglas-numero" />
                 <Label text="Puedes usar +, -, ×, ÷ y paréntesis."
                        styleClass="reglas-texto" wrapText="true" HBox.hgrow="ALWAYS" />
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-fila">
+            <HBox alignment="CENTER_LEFT" minHeight="58.0" prefHeight="58.0" spacing="11.0" styleClass="reglas-fila">
                 <Label text="3" styleClass="reglas-numero" />
                 <Label text="Se permiten fracciones y resultados negativos intermedios."
                        styleClass="reglas-texto" wrapText="true" HBox.hgrow="ALWAYS" />
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-fila reglas-fila-final">
+            <HBox alignment="CENTER_LEFT" minHeight="58.0" prefHeight="58.0" spacing="11.0" styleClass="reglas-fila">
                 <Label text="4" styleClass="reglas-numero" />
                 <Label text="Puedes unir dos números para formar uno de varias cifras."
                        styleClass="reglas-texto" wrapText="true" HBox.hgrow="ALWAYS" />

@@ -536,12 +536,30 @@
     -fx-border-color: transparent;
 }
 
-.tabla-ayuda .column-header:first-child {
+.tabla-ayuda .column-header-background .nested-column-header .column-header:first-child {
     -fx-background-radius: 14 0 0 0;
+    -fx-background-insets: 0;
 }
 
 .tabla-ayuda .column-header:last-visible {
     -fx-background-radius: 0 14 0 0;
+}
+
+.tabla-ayuda .column-header-background .filler {
+    -fx-background-color: #2b2b2b;
+    -fx-background-radius: 0 14 0 0;
+}
+
+.tabla-ayuda .scroll-bar:vertical,
+.tabla-ayuda .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-padding: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+    -fx-min-width: 0;
+    -fx-min-height: 0;
+    -fx-max-width: 0;
+    -fx-max-height: 0;
 }
 
 .tabla-ayuda .column-header .label {
@@ -679,11 +697,8 @@
 .reglas-fila {
     -fx-border-color: transparent transparent #eeeaf4 transparent;
     -fx-border-width: 0 0 1 0;
+    -fx-min-height: 58px;
     -fx-padding: 10 14 10 14;
-}
-
-.reglas-fila-final {
-    -fx-border-color: transparent;
 }
 
 .reglas-numero {
