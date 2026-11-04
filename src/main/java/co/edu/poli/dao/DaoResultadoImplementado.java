@@ -118,6 +118,43 @@ public class DaoResultadoImplementado implements ResultadoDAO {
 
         return false;
     }
+
+    
+/**
+ * Comprueba si una ecuación ya fue utilizada durante una partida.
+ *
+ * @param partidaId identificador de la partida
+ * @param ecuacion expresión matemática que se desea comprobar
+ * @return true si la ecuación ya existe; false en caso contrario
+ */
+public boolean existePorPartidaYEcuacion(int partidaId, String ecuacion) {
+
+    String sql = """
+            SELECT 1
+            FROM resultado
+            WHERE partida_id = ?
+              AND REPLACE(resultado, ' ', '') = ?
+            LIMIT 1
+            """;
+
+    try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+        ps.setInt(1, partidaId);
+        ps.setString(2, ecuacion.replaceAll("\\s+", ""));
+
+        try (ResultSet rs = ps.executeQuery()) {
+            return rs.next();
+        }
+
+    } catch (SQLException e) {
+        System.out.println(
+                "Error al comprobar la ecuación: " + e.getMessage()
+        );
+    }
+
+    return false;
+}
+
     
     /**
      * Consulta los resultados asociados a una partida.
