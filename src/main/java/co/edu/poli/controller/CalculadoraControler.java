@@ -845,89 +845,101 @@ public class CalculadoraControler {
 
 	/**
 	 * Elimina el último elemento de la expresión y libera el botón numérico
-	 * correspondiente cuando se elimina un número completo.
+	 * correspondiente cuando se elimina un número.
 	 */
 	@FXML
 	private void borrarUltimo() {
 
-		if (exprecion == null || exprecion.isEmpty()) {
-			return;
-		}
+	    if (exprecion == null || exprecion.isEmpty()) {
+	        return;
+	    }
 
-		int longitud = exprecion.length();
-		char ultimoCaracter = exprecion.charAt(longitud - 1);
+	    int longitud = exprecion.length();
+	    char ultimoCaracter = exprecion.charAt(longitud - 1);
 
-		if (Character.isDigit(ultimoCaracter)) {
+	    if (Character.isDigit(ultimoCaracter)) {
 
-			// Identificar el número completo al que pertenece el último dígito.
-			int inicioNumero = longitud - 1;
+	        /*
+	         * Obtener el último botón numérico seleccionado.
+	         * No se buscan los dígitos consecutivos porque pueden pertenecer
+	         * a varios botones concatenados.
+	         */
+	        if (!numerosUtilizados.isEmpty()) {
 
-			while (inicioNumero > 0 && Character.isDigit(exprecion.charAt(inicioNumero - 1))) {
-				inicioNumero--;
-			}
+	            Button botonLiberado = numerosUtilizados.get(
+	                numerosUtilizados.size() - 1
+	            );
 
-			String numeroCompleto = exprecion.substring(inicioNumero);
+	            String numero = botonLiberado.getText();
 
-			// Eliminar el último dígito.
-			exprecion = exprecion.substring(0, longitud - 1);
+	            /*
+	             * Eliminar exactamente los caracteres agregados por ese botón.
+	             * Ejemplo: si la expresión es "108" y el último botón fue "8",
+	             * se elimina solamente el "8".
+	             */
+	            if (exprecion.endsWith(numero)) {
 
-			// Liberar el botón si se eliminó un número de un solo dígito.
-			if (inicioNumero == longitud - 1 && !numerosUtilizados.isEmpty()) {
+	                exprecion = exprecion.substring(
+	                    0,
+	                    longitud - numero.length()
+	                );
 
-				Button botonLiberado = null;
+	                // Liberar el botón para que pueda seleccionarse nuevamente.
+	                numerosUtilizados.remove(numerosUtilizados.size() - 1);
 
-				for (int i = numerosUtilizados.size() - 1; i >= 0; i--) {
-					Button boton = numerosUtilizados.get(i);
+	            }
+	        }
 
-					if (boton.getText().equals(numeroCompleto)) {
-						botonLiberado = numerosUtilizados.remove(i);
-						break;
-					}
-				}
+	    } else if (ultimoCaracter == ')') {
 
-				if (botonLiberado != null && !contenedorNumeros.getChildren().contains(botonLiberado)) {
-					contenedorNumeros.getChildren().add(botonLiberado);
-				}
-			}
+	        // Eliminar el paréntesis de cierre.
+	        exprecion = exprecion.substring(0, longitud - 1);
 
-		} else if (ultimoCaracter == ')') {
+	        // Comprobar si queda una raíz sin contenido.
+	        if (!exprecion.isEmpty()
+	                && exprecion.charAt(exprecion.length() - 1) == '√') {
 
-			// Eliminar el paréntesis de cierre.
-			exprecion = exprecion.substring(0, longitud - 1);
+	            exprecion = exprecion.substring(0, exprecion.length() - 1);
 
-		} else if (ultimoCaracter == '(') {
+	            // Eliminar también la multiplicación implícita anterior.
+	            if (!exprecion.isEmpty()
+	                    && exprecion.charAt(exprecion.length() - 1) == '*') {
 
-			// Eliminar el paréntesis de apertura.
-			exprecion = exprecion.substring(0, longitud - 1);
+	                exprecion = exprecion.substring(0, exprecion.length() - 1);
+	            }
 
-			// Si pertenece a una raíz, eliminar también el símbolo √.
-			if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '√') {
+	        } else if (!exprecion.isEmpty()
+	                && exprecion.charAt(exprecion.length() - 1) == '*') {
 
-				exprecion = exprecion.substring(0, exprecion.length() - 1);
+	            // Eliminar la multiplicación implícita anterior al paréntesis.
+	            exprecion = exprecion.substring(0, exprecion.length() - 1);
+	        }
 
-				// Eliminar la multiplicación implícita anterior a la raíz.
-				if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '*') {
-					exprecion = exprecion.substring(0, exprecion.length() - 1);
-				}
+	    } else if (ultimoCaracter == '(') {
 
-			} else if (!exprecion.isEmpty() && exprecion.charAt(exprecion.length() - 1) == '*') {
+	        // Eliminar el paréntesis de apertura.
+	        exprecion = exprecion.substring(0, longitud - 1);
 
-				// Eliminar la multiplicación implícita anterior al paréntesis.
-				exprecion = exprecion.substring(0, exprecion.length() - 1);
-			}
+	        // Si pertenece a una raíz, eliminar también el símbolo √.
+	        if (!exprecion.isEmpty()
+	                && exprecion.charAt(exprecion.length() - 1) == '√') {
 
-		} else if (ultimoCaracter == '+' || ultimoCaracter == '-' || ultimoCaracter == '*' || ultimoCaracter == '/'
-				|| ultimoCaracter == '^' || ultimoCaracter == '√') {
+	            exprecion = exprecion.substring(0, exprecion.length() - 1);
+	        }
 
-			// Eliminar operadores y símbolos de raíz.
-			exprecion = exprecion.substring(0, longitud - 1);
-		}
+	    } else if (ultimoCaracter == '+' || ultimoCaracter == '-'
+	            || ultimoCaracter == '*' || ultimoCaracter == '/'
+	            || ultimoCaracter == '^' || ultimoCaracter == '√') {
 
-		// Actualizar la expresión mostrada.
-		txtValor1.setText(exprecion);
-		txtValor1.positionCaret(exprecion.length());
+	        // Eliminar operadores y símbolos de raíz.
+	        exprecion = exprecion.substring(0, longitud - 1);
+	    }
 
-		lblError.setText("");
+	    // Actualizar la expresión mostrada.
+	    txtValor1.setText(exprecion);
+	    txtValor1.positionCaret(exprecion.length());
+
+	    lblError.setText("");
 	}
 
 	/**
