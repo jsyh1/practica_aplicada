@@ -13,21 +13,27 @@
            xmlns="http://javafx.com/javafx/26"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="co.edu.poli.controller.GameOverControler">
-    <VBox alignment="CENTER"
+    <VBox alignment="CENTER_LEFT"
           spacing="12"
           prefWidth="440"
-          prefHeight="520"
-          styleClass="card">
+          prefHeight="550"
+          styleClass="card, card-game-over">
 
         <padding>
-            <Insets top="20" right="24" bottom="20" left="24"/>
+            <Insets top="22" right="22" bottom="18" left="22"/>
         </padding>
 
-        <Label text="¡Partida completada!" styleClass="titulo"/>
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label text="✓" styleClass="icono-completado"/>
+            <VBox spacing="1">
+                <Label text="¡Partida completada!" styleClass="titulo"/>
+                <Label text="Guarda tu marca con tu nombre" styleClass="game-over-subtitulo"/>
+            </VBox>
+        </HBox>
 
-        <Label text="Ingresa el nombre del jugador:" styleClass="subtitulo"/>
+        <Label text="NOMBRE DEL JUGADOR" styleClass="etiqueta-game-over"/>
 
-        <HBox spacing="8" alignment="CENTER">
+        <HBox spacing="8" alignment="CENTER_LEFT" styleClass="fila-nombre">
             <TextField fx:id="txtNombre"
                        promptText="Nombre del jugador"
                        HBox.hgrow="ALWAYS"/>
@@ -35,48 +41,65 @@
             <Button fx:id="btnCargar"
                     text="Cargar"
                     onAction="#cargarNombre"
-                    styleClass="btn-comprobar"/>
+                    styleClass="btn-cargar-nombre"/>
         </HBox>
 
-        <Label fx:id="lblPuntaje"
-               text="Puntaje: pendiente"
-               styleClass="subtitulo"/>
+        <HBox spacing="10" styleClass="resumen-estadisticas">
+            <VBox spacing="2" styleClass="estadistica-card, estadistica-puntaje" HBox.hgrow="ALWAYS">
+                <Label text="PUNTAJE" styleClass="etiqueta-estadistica"/>
+                <Label fx:id="lblPuntajeValor" text="0/10" styleClass="valor-estadistica"/>
+            </VBox>
+            <VBox spacing="2" styleClass="estadistica-card, estadistica-tiempo" HBox.hgrow="ALWAYS">
+                <Label text="TIEMPO" styleClass="etiqueta-estadistica"/>
+                <Label fx:id="lblTiempoValor" text="00:00" styleClass="valor-estadistica"/>
+            </VBox>
+        </HBox>
 
-        <Label fx:id="lblTiempo"
-               text="Tiempo de juego: pendiente"
-               styleClass="subtitulo"/>
+        <Label text="Resultados de la partida" styleClass="titulo-resultados"/>
 
-        <Label text="Resultados de la partida:" styleClass="subtitulo"/>
+        <VBox fx:id="contenedorResultados"
+              spacing="5"
+              minHeight="165"
+              prefHeight="165"
+              styleClass="lista-resultados-game-over"
+              VBox.vgrow="ALWAYS"/>
 
-        <TextArea fx:id="lblResultados"
-                  editable="false"
-                  wrapText="true"
-                  prefHeight="220"
-                  VBox.vgrow="ALWAYS"
-                  promptText="Aquí aparecerán los resultados"
-                  styleClass="area-resultados"/>
-
-        <HBox spacing="12" alignment="CENTER">
+        <HBox spacing="8" alignment="CENTER" styleClass="acciones-game-over">
             <Button fx:id="btnCompartir"
                     text="Compartir"
                     onAction="#compartir"
                     disable="true"
-                    styleClass="btn-compartir"/>
+                    maxWidth="Infinity"
+                    HBox.hgrow="ALWAYS"
+                    styleClass="btn-accion-game-over"/>
 
             <Button fx:id="btnExportar"
                     text="Exportar"
                     onAction="#exportar"
                     disable="true"
-                    styleClass="btn-compartir"/>
+                    maxWidth="Infinity"
+                    HBox.hgrow="ALWAYS"
+                    styleClass="btn-accion-game-over"/>
             <Button fx:id="btnVolver"
-        text="Volver a jugar"
-        onAction="#volverAJugar" />
+                    text="Volver a jugar"
+                    onAction="#volverAJugar"
+                    maxWidth="Infinity"
+                    HBox.hgrow="ALWAYS"
+                    styleClass="btn-volver-juego"/>
         </HBox>
 
         <Label fx:id="lblMensaje"
+               maxWidth="Infinity"
                wrapText="true"
                text="Escribe el nombre para cargar los resultados."
-               styleClass="progreso"/>
+               styleClass="mensaje-game-over"/>
+
+        <TextArea fx:id="lblResultados"
+                  editable="false"
+                  managed="false"
+                  visible="false"/>
+        <Label fx:id="lblPuntaje" managed="false" visible="false"/>
+        <Label fx:id="lblTiempo" managed="false" visible="false"/>
 
     </VBox>
 </StackPane>

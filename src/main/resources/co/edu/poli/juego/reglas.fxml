@@ -3,28 +3,95 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.Region?>
 
 <StackPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="co.edu.poli.controller.ReglasControler"
            stylesheets="@style.css">
 
-    <VBox alignment="CENTER" prefWidth="320.0" spacing="14.0" styleClass="card" StackPane.alignment="CENTER">
-
+    <VBox alignment="TOP_LEFT" prefWidth="347.0" spacing="12.0" styleClass="card reglas-card">
         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="20.0" left="19.0" right="19.0" top="20.0" />
         </padding>
 
-        <Label text="Reglas del juego" styleClass="titulo" wrapText="true" />
-        <VBox styleClass="caja-reglas">
-            <Label fx:id="lblReglas" styleClass="texto-reglas" wrapText="true" />
+        <VBox spacing="2.0">
+            <Label text="INSTRUCCIONES" styleClass="reglas-etiqueta" />
+            <Label text="Reglas del juego" styleClass="reglas-titulo" wrapText="true" />
+            <Label text="Cómo se juega All Ten" styleClass="reglas-subtitulo" wrapText="true" />
         </VBox>
 
-        <Region VBox.vgrow="ALWAYS" />
+        <VBox spacing="9.0" styleClass="reglas-objetivo">
+            <Label text="OBJETIVO" styleClass="reglas-etiqueta-clara" />
+            <Label text="Con los 4 números de la ronda, arma una expresión matemática distinta para lograr cada resultado del 1 al 10."
+                   styleClass="reglas-texto-objetivo" wrapText="true" />
+            <GridPane hgap="6.0" vgap="6.0">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="20.0" />
+                    <ColumnConstraints percentWidth="20.0" />
+                    <ColumnConstraints percentWidth="20.0" />
+                    <ColumnConstraints percentWidth="20.0" />
+                    <ColumnConstraints percentWidth="20.0" />
+                </columnConstraints>
+                <Label text="1" styleClass="reglas-numero-objetivo" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Label text="2" styleClass="reglas-numero-objetivo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label text="3" styleClass="reglas-numero-objetivo" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <Label text="4" styleClass="reglas-numero-objetivo" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                <Label text="5" styleClass="reglas-numero-objetivo" GridPane.columnIndex="4" GridPane.rowIndex="0" />
+                <Label text="6" styleClass="reglas-numero-objetivo" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Label text="7" styleClass="reglas-numero-objetivo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="8" styleClass="reglas-numero-objetivo" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <Label text="9" styleClass="reglas-numero-objetivo" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <Label text="10" styleClass="reglas-numero-objetivo" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            </GridPane>
+        </VBox>
+
+        <Label text="Reglas" styleClass="reglas-encabezado" />
+
+        <VBox styleClass="reglas-lista">
+            <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-fila">
+                <Label text="1" styleClass="reglas-numero" />
+                <Label text="Usa cada uno de los 4 números exactamente una vez por expresión."
+                       styleClass="reglas-texto" wrapText="true" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-fila">
+                <Label text="2" styleClass="reglas-numero" />
+                <Label text="Puedes usar +, -, ×, ÷ y paréntesis."
+                       styleClass="reglas-texto" wrapText="true" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-fila">
+                <Label text="3" styleClass="reglas-numero" />
+                <Label text="Se permiten fracciones y resultados negativos intermedios."
+                       styleClass="reglas-texto" wrapText="true" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-fila reglas-fila-final">
+                <Label text="4" styleClass="reglas-numero" />
+                <Label text="Puedes unir dos números para formar uno de varias cifras."
+                       styleClass="reglas-texto" wrapText="true" HBox.hgrow="ALWAYS" />
+            </HBox>
+        </VBox>
+
+        <VBox spacing="7.0" styleClass="reglas-ejemplo">
+            <Label text="EJEMPLO" styleClass="reglas-etiqueta" />
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Label text="1" styleClass="reglas-numero-ejemplo" />
+                <Label text="2" styleClass="reglas-numero-ejemplo" />
+                <Label text="→" styleClass="reglas-flecha" />
+                <Label text="12" styleClass="reglas-resultado-ejemplo" />
+            </HBox>
+            <Label text="Unir el 1 y el 2 forma el número 12." styleClass="reglas-nota-ejemplo" wrapText="true" />
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="11.0" styleClass="reglas-completado">
+            <Label text="✓" styleClass="reglas-check" />
+            <Label text="Completas la ronda cuando encuentres los 10 resultados usando siempre los mismos 4 números."
+                   styleClass="reglas-texto-completado" wrapText="true" HBox.hgrow="ALWAYS" />
+        </HBox>
 
         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#calljuego"
-                styleClass="btn-comprobar" text="Volver" />
-            </VBox>
+                styleClass="reglas-volver" text="Volver" />
+    </VBox>
 </StackPane>

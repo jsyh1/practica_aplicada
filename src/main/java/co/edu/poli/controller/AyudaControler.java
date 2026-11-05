@@ -7,6 +7,10 @@ import java.util.List;
 import co.edu.poli.vista.App;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -37,6 +41,26 @@ public class AyudaControler {
         colResultado.setCellValueFactory(
             dato -> new SimpleStringProperty(dato.getValue()[1])
         );
+        colResultado.setCellFactory(columna -> new TableCell<>() {
+            private final Label resultado = new Label();
+
+            {
+                resultado.getStyleClass().add("numero-resultado-ayuda");
+                setAlignment(Pos.CENTER);
+                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            }
+
+            @Override
+            protected void updateItem(String valor, boolean vacio) {
+                super.updateItem(valor, vacio);
+                if (vacio || valor == null) {
+                    setGraphic(null);
+                } else {
+                    resultado.setText(valor);
+                    setGraphic(resultado);
+                }
+            }
+        });
 
         colExpresion.setCellValueFactory(
             dato -> new SimpleStringProperty(dato.getValue()[0])
@@ -45,6 +69,9 @@ public class AyudaControler {
         tablaEcuaciones.setColumnResizePolicy(
             TableView.CONSTRAINED_RESIZE_POLICY
         );
+        colResultado.setMinWidth(70);
+        colResultado.setPrefWidth(85);
+        colExpresion.setMinWidth(150);
 
         for (String ecuacion : ecuaciones) {
 

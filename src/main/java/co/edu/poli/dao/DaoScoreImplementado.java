@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.edu.poli.modelo.Calculadora;
+import co.edu.poli.modelo.EstadoPartida;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
@@ -63,17 +64,19 @@ public class DaoScoreImplementado implements PartidaDAO {
                     p.fecha AS fecha_partida,
                     p.tiempo,
                     p.puntaje,
+                    p.estado,
                     j.nombre AS jugador_nombre,
                     j.fecha AS fecha_jugador
                 FROM partida p
                 INNER JOIN jugador j ON p.jugador_id = j.id
+                WHERE p.estado = ?
                 ORDER BY p.id DESC
                 LIMIT ?
                 """;
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-
-            ps.setInt(1, cantidad);
+            ps.setString(1, EstadoPartida.FINALIZADA.name());
+            ps.setInt(2, cantidad);
 
             try (ResultSet rs = ps.executeQuery()) {
 
@@ -107,18 +110,19 @@ public class DaoScoreImplementado implements PartidaDAO {
                     p.fecha AS fecha_partida,
                     p.tiempo,
                     p.puntaje,
+                    p.estado,
                     j.nombre AS jugador_nombre,
                     j.fecha AS fecha_jugador
                 FROM partida p
                 INNER JOIN jugador j ON p.jugador_id = j.id
-                WHERE (SELECT COUNT(*) FROM resultado r WHERE r.partida_id = p.id) = 10
+                WHERE p.estado = ?
                 ORDER BY p.tiempo ASC, p.id ASC
                 LIMIT ?
                 """;
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-
-            ps.setInt(1, cantidad);
+            ps.setString(1, EstadoPartida.FINALIZADA.name());
+            ps.setInt(2, cantidad);
 
             try (ResultSet rs = ps.executeQuery()) {
 
@@ -147,8 +151,9 @@ public class DaoScoreImplementado implements PartidaDAO {
      * @throws SQLException si ocurre un error al leer los datos
      */
     private Partida crearPartidaDesdeResultadoSet(ResultSet rs)
+    
             throws SQLException {
-
+                
         int idJugador = rs.getInt("jugador_id");
 
         String nombreJugador = rs.getString("jugador_nombre");
@@ -177,7 +182,7 @@ public class DaoScoreImplementado implements PartidaDAO {
         );
 
         cargarResultados(partida);
-
+        partida.setEstado(EstadoPartida.valueOf(rs.getString("estado")));
         jugador.agregarPartida(partida);
 
         return partida;
@@ -234,8 +239,8 @@ public class DaoScoreImplementado implements PartidaDAO {
 
         String sql = """
                 INSERT INTO partida
-                    (jugador_id, fecha, tiempo, puntaje)
-                VALUES (?, ?, ?, ?)
+                (jugador_id, fecha, tiempo, puntaje, estado)
+                VALUES (?, ?, ?, ?, ?)
                 """;
 
         try (PreparedStatement ps = conexion.prepareStatement(
@@ -260,6 +265,7 @@ public class DaoScoreImplementado implements PartidaDAO {
             );
 
             ps.setInt(4, objeto.getPuntaje());
+            ps.setString(5, objeto.getEstado().name());
 
             int filas = ps.executeUpdate();
 
@@ -306,6 +312,7 @@ public class DaoScoreImplementado implements PartidaDAO {
                     p.fecha AS fecha_partida,
                     p.tiempo,
                     p.puntaje,
+                    p.estado,
                     j.nombre AS jugador_nombre,
                     j.fecha AS fecha_jugador
                 FROM partida p
@@ -345,6 +352,7 @@ public class DaoScoreImplementado implements PartidaDAO {
                     p.fecha AS fecha_partida,
                     p.tiempo,
                     p.puntaje,
+                    p.estado,
                     j.nombre AS jugador_nombre,
                     j.fecha AS fecha_jugador
                 FROM partida p
@@ -384,9 +392,10 @@ public class DaoScoreImplementado implements PartidaDAO {
         String sql = """
                 UPDATE partida
                 SET jugador_id = ?,
-                    fecha = ?,
-                    tiempo = ?,
-                    puntaje = ?
+                fecha = ?,
+                tiempo = ?,
+                puntaje = ?,
+                estado = ?
                 WHERE id = ?
                 """;
 
@@ -411,7 +420,8 @@ public class DaoScoreImplementado implements PartidaDAO {
             );
 
             ps.setInt(4, objeto.getPuntaje());
-            ps.setInt(5, objeto.getId());
+            ps.setString(5, objeto.getEstado().name());
+            ps.setInt(6, objeto.getId());
 
             return ps.executeUpdate() > 0;
 

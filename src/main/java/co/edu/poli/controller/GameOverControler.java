@@ -30,6 +30,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -56,6 +58,15 @@ public class GameOverControler {
 
 	@FXML
 	private Label lblTiempo;
+
+	@FXML
+	private Label lblPuntajeValor;
+
+	@FXML
+	private Label lblTiempoValor;
+
+	@FXML
+	private VBox contenedorResultados;
 
 	@FXML
 	private TextArea lblResultados;
@@ -102,8 +113,11 @@ public class GameOverControler {
 		lblPuntaje.setText("Puntaje: " + partidaActual.getPuntaje() + "/10");
 
 		lblTiempo.setText("Tiempo de juego: " + partidaActual.getTiempoEjecucion() + " segundos");
+		lblPuntajeValor.setText(partidaActual.getPuntaje() + "/10");
+		lblTiempoValor.setText(formatearTiempo(partidaActual.getTiempoEjecucion()));
 
 		lblResultados.setText(construirTextoResultados());
+		mostrarListaResultados();
 
 		System.out.println("Partida consultada: " + partidaActual.getId());
 
@@ -162,8 +176,61 @@ public class GameOverControler {
 		lblPuntaje.setText("Puntaje: " + partidaActual.getPuntaje() + "/10");
 
 		lblTiempo.setText("Tiempo de juego: " + partidaActual.getTiempoEjecucion() + " segundos");
+		lblPuntajeValor.setText(partidaActual.getPuntaje() + "/10");
+		lblTiempoValor.setText(formatearTiempo(partidaActual.getTiempoEjecucion()));
 
 		lblResultados.setText(construirTextoResultados());
+		mostrarListaResultados();
+	}
+
+	private String formatearTiempo(long segundosTotales) {
+		long minutos = segundosTotales / 60;
+		long segundos = segundosTotales % 60;
+		return String.format(Locale.ROOT, "%02d:%02d", minutos, segundos);
+	}
+
+	private void mostrarListaResultados() {
+		contenedorResultados.getChildren().clear();
+
+		if (resultadosActuales == null || resultadosActuales.isEmpty()) {
+			Label vacio = new Label("No se encontraron resultados para esta partida.");
+			vacio.getStyleClass().add("mensaje-resultados-vacio");
+			vacio.setWrapText(true);
+			contenedorResultados.getChildren().add(vacio);
+			return;
+		}
+
+		int resultadosPorColumna = (resultadosActuales.size() + 1) / 2;
+		VBox columnaIzquierda = new VBox(5);
+		VBox columnaDerecha = new VBox(5);
+		columnaIzquierda.getStyleClass().add("columna-resultados");
+		columnaDerecha.getStyleClass().add("columna-resultados");
+		HBox.setHgrow(columnaIzquierda, Priority.ALWAYS);
+		HBox.setHgrow(columnaDerecha, Priority.ALWAYS);
+
+		for (int i = 0; i < resultadosActuales.size(); i++) {
+			Resultado resultado = resultadosActuales.get(i);
+
+			Label numero = new Label(String.valueOf(i + 1));
+			numero.getStyleClass().add("numero-resultado-game-over");
+
+			Label expresion = new Label(resultado.getResultado());
+			expresion.getStyleClass().add("expresion-resultado-game-over");
+			expresion.setWrapText(true);
+			expresion.setMaxWidth(Double.MAX_VALUE);
+			HBox.setHgrow(expresion, Priority.ALWAYS);
+
+			HBox fila = new HBox(7, numero, expresion);
+			fila.setAlignment(Pos.CENTER_LEFT);
+			fila.getStyleClass().add("fila-resultado-game-over");
+
+			(i < resultadosPorColumna ? columnaIzquierda : columnaDerecha)
+					.getChildren().add(fila);
+		}
+
+		HBox columnas = new HBox(10, columnaIzquierda, columnaDerecha);
+		columnas.getStyleClass().add("columnas-resultados-game-over");
+		contenedorResultados.getChildren().add(columnas);
 	}
 
 	/**
@@ -282,7 +349,7 @@ public class GameOverControler {
 		VBox reporte = new VBox(16);
 		reporte.setPadding(new Insets(32));
 		reporte.setPrefWidth(820);
-		reporte.setStyle("-fx-background-color: #f1f5f9;" + "-fx-font-family: 'Arial';");
+		reporte.setStyle("-fx-background-color: #f1f5f9;" + "-fx-font-family: 'Nunito';");
 
 		// Encabezado.
 		Label marca = new Label("ALL TEN");

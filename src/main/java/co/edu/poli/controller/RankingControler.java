@@ -12,7 +12,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
@@ -34,7 +33,7 @@ public class RankingControler {
     private void cargarRanking() {
         contenedorRanking.getChildren().clear();
 
-        List<Partida> partidas = new DaoScoreImplementado().ranking(10);
+        List<Partida> partidas = new DaoScoreImplementado().ranking(5);
 
         if (partidas.isEmpty()) {
             contenedorRanking.getChildren().add(new Label("No hay partidas completas para mostrar."));
@@ -52,29 +51,35 @@ public class RankingControler {
                 ? jugador.getNombre()
                 : "Sin nombre";
 
-        Label puesto = new Label("#" + posicion);
-        puesto.getStyleClass().add("nombre-jugador");
+        Label puesto = new Label(String.valueOf(posicion));
+        puesto.getStyleClass().addAll("medalla-ranking", "medalla-ranking-" + posicion);
 
         Label nombreJugador = new Label(nombre);
-        nombreJugador.getStyleClass().add("nombre-jugador");
+        nombreJugador.getStyleClass().add("ranking-jugador");
 
         Label fechaPartida = new Label(partida.getFechaPartida() != null
                 ? partida.getFechaPartida().toString()
                 : "Fecha no disponible");
-        fechaPartida.getStyleClass().add("fecha-partida");
+        fechaPartida.getStyleClass().add("ranking-fecha");
 
-        Label datosPartida = new Label(
-                "Puntaje: " + partida.getPuntaje() + "/10 - Tiempo: " + partida.getTiempoEjecucion() + " s");
+        Label tiempo = new Label(partida.getTiempoEjecucion() + " s");
+        tiempo.getStyleClass().add("ranking-tiempo");
 
-        VBox detalles = new VBox(4, nombreJugador, fechaPartida, datosPartida);
+        Label puntaje = new Label(partida.getPuntaje() + "/10");
+        puntaje.getStyleClass().add("ranking-puntaje");
+
+        VBox detalles = new VBox(1, nombreJugador, fechaPartida);
         HBox.setHgrow(detalles, Priority.ALWAYS);
 
-        Region espacio = new Region();
-        HBox.setHgrow(espacio, Priority.ALWAYS);
+        VBox estadisticas = new VBox(1, tiempo, puntaje);
+        estadisticas.setAlignment(Pos.CENTER_RIGHT);
 
-        HBox fila = new HBox(12, puesto, detalles, espacio);
+        HBox fila = new HBox(12, puesto, detalles, estadisticas);
         fila.setAlignment(Pos.CENTER_LEFT);
-        fila.getStyleClass().add("fila-partida");
+        fila.getStyleClass().add("tarjeta-ranking");
+        if (posicion == 1) {
+            fila.getStyleClass().add("tarjeta-ranking-primero");
+        }
         return fila;
     }
 
