@@ -642,9 +642,17 @@ public class CalculadoraControler {
 
 		for (int intento = 0; intento < MAX_INTENTOS; intento++) {
 			int[] candidatos = new int[4];
+			boolean[] numerosGenerados = new boolean[11];
 
 			for (int i = 0; i < candidatos.length; i++) {
-				candidatos[i] = random.nextInt(10) + 1;
+				int candidato;
+
+				do {
+					candidato = random.nextInt(10) + 1;
+				} while (numerosGenerados[candidato]);
+
+				candidatos[i] = candidato;
+				numerosGenerados[candidato] = true;
 			}
 
 			List<String> soluciones = calculadora.buscarSolucionesConRaicesYPotencias(candidatos);
@@ -807,8 +815,9 @@ public class CalculadoraControler {
 	}
 
 	/**
-	 * Elimina el último elemento de la expresión y libera el botón numérico
-	 * correspondiente cuando se elimina un número completo.
+	 * Elimina el último elemento de la expresión y libera inmediatamente el botón
+	 * numérico correspondiente. Los números de varios dígitos se eliminan como un
+	 * único elemento, evitando que permanezcan activos en el estado interno.
 	 */
 	@FXML
 	private void borrarUltimo() {
@@ -822,35 +831,24 @@ public class CalculadoraControler {
 
 		if (Character.isDigit(ultimoCaracter)) {
 
-			// Identificar el número completo al que pertenece el último dígito.
-			int inicioNumero = longitud - 1;
+			if (!numerosUtilizados.isEmpty()) {
 
-			while (inicioNumero > 0 && Character.isDigit(exprecion.charAt(inicioNumero - 1))) {
-				inicioNumero--;
-			}
+				Button botonLiberado = numerosUtilizados.remove(numerosUtilizados.size() - 1);
+				String numeroEliminado = botonLiberado.getText();
 
-			String numeroCompleto = exprecion.substring(inicioNumero);
-
-			// Eliminar el último dígito.
-			exprecion = exprecion.substring(0, longitud - 1);
-
-			// Liberar el botón si se eliminó un número de un solo dígito.
-			if (inicioNumero == longitud - 1 && !numerosUtilizados.isEmpty()) {
-
-				Button botonLiberado = null;
-
-				for (int i = numerosUtilizados.size() - 1; i >= 0; i--) {
-					Button boton = numerosUtilizados.get(i);
-
-					if (boton.getText().equals(numeroCompleto)) {
-						botonLiberado = numerosUtilizados.remove(i);
-						break;
-					}
+				if (exprecion.endsWith(numeroEliminado)) {
+					exprecion = exprecion.substring(0, longitud - numeroEliminado.length());
+				} else {
+					// Mantener la expresión consistente incluso si el texto fue alterado.
+					exprecion = exprecion.substring(0, longitud - 1);
 				}
 
-				if (botonLiberado != null && !contenedorNumeros.getChildren().contains(botonLiberado)) {
+				if (!contenedorNumeros.getChildren().contains(botonLiberado)) {
 					contenedorNumeros.getChildren().add(botonLiberado);
 				}
+
+			} else {
+				exprecion = exprecion.substring(0, longitud - 1);
 			}
 
 		} else if (ultimoCaracter == ')') {
@@ -1118,6 +1116,8 @@ public class CalculadoraControler {
 
 		try {
 
+			actualizarEcuacionesDeAyuda();
+
 			AyudaControler.setEcuaciones(calculadora.getEcuacionesResultados());
 
 			App.setRoot("ayuda");
@@ -1126,6 +1126,41 @@ public class CalculadoraControler {
 
 			lblError.setText("Error al abrir la ayuda");
 		}
+	}
+
+	/**
+	 * Actualiza la ayuda usando únicamente los números visibles y disponibles.
+	 * La operación trabaja sobre un arreglo nuevo y no modifica los controles de
+	 * la partida ni el arreglo original de números.
+	 */
+	private void actualizarEcuacionesDeAyuda() {
+
+		List<Integer> disponibles = new ArrayList<>();
+
+		for (Node nodo : contenedorNumeros.getChildren()) {
+
+			if (!(nodo instanceof Button)) {
+				continue;
+			}
+
+			try {
+				disponibles.add(Integer.parseInt(((Button) nodo).getText()));
+			} catch (NumberFormatException ex) {
+				// Los resultados no enteros no forman parte de una sugerencia válida.
+			}
+		}
+
+		int[] numerosDisponibles = disponibles.stream().mapToInt(Integer::intValue).toArray();
+		List<String> soluciones;
+
+		if (dificultadAvanzada) {
+			soluciones = calculadora.buscarSolucionesConRaicesYPotencias(numerosDisponibles);
+		} else {
+			soluciones = calculadora.buscarSoluciones(numerosDisponibles);
+		}
+
+		calculadora.getEcuacionesResultados().clear();
+		calculadora.getEcuacionesResultados().addAll(soluciones);
 	}
 
 	/**
