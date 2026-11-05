@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -165,6 +167,36 @@ class CalculadoraTest {
     @Test
     void potenciaExcesivaLanzaExcepcion() {
         assertThrows(RuntimeException.class, () -> calcular("999999^10"));
+    }
+
+    /**
+     * Comprueba que la ayuda pueda calcularse con los números que aún están
+     * disponibles sin exigir volver a utilizar los números ya retirados.
+     */
+    @Test
+    void buscaSolucionesConNumerosDisponibles() {
+        int[] disponibles = {2, 3};
+
+        List<String> soluciones = calculadora.buscarSoluciones(disponibles);
+
+        assertTrue(soluciones.contains("(2 + 3) = 5") || soluciones.contains("(3 + 2) = 5"));
+        assertEquals(2, disponibles.length);
+        assertEquals(2, disponibles[0]);
+        assertEquals(3, disponibles[1]);
+    }
+
+    /**
+     * Comprueba que la búsqueda avanzada acepte una cantidad parcial de números
+     * para representar el estado actual de la partida.
+     */
+    @Test
+    void buscaAyudaAvanzadaConNumerosDisponibles() {
+        int[] disponibles = {2, 3};
+
+        List<String> soluciones = calculadora.buscarSolucionesConRaicesYPotencias(disponibles);
+
+        assertTrue(soluciones.stream().anyMatch(solucion -> solucion.endsWith(" = 5")));
+        assertEquals(2, disponibles.length);
     }
 
     /**

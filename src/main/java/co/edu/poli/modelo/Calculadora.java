@@ -479,6 +479,33 @@ public class Calculadora {
 	}
 
 	/**
+	 * Busca las ecuaciones posibles para los números que permanecen disponibles.
+	 * Cada número recibido se puede utilizar como máximo una vez en cada ecuación.
+	 *
+	 * @param numeros números actualmente disponibles
+	 * @return ecuaciones encontradas para los objetivos del 1 al 10
+	 */
+	public List<String> buscarSoluciones(int[] numeros) {
+
+		List<String> soluciones = new ArrayList<>();
+
+		if (numeros == null || numeros.length == 0 || numeros.length > 4) {
+			return soluciones;
+		}
+
+		for (int objetivo = 1; objetivo <= 10; objetivo++) {
+
+			String ecuacionEncontrada = buscarEcuacion(numeros, objetivo);
+
+			if (ecuacionEncontrada != null) {
+				soluciones.add(ecuacionEncontrada + " = " + objetivo);
+			}
+		}
+
+		return soluciones;
+	}
+
+	/**
 	 * Busca expresiones para obtener los resultados del 1 al 10 utilizando
 	 * operaciones básicas, potencias y raíces cuadradas.
 	 *
@@ -495,7 +522,26 @@ public class Calculadora {
 
 		List<String> soluciones = new ArrayList<>();
 
-		if (numeros == null || numeros.length != 4) {
+		if (numeros == null || numeros.length == 0 || numeros.length > 4) {
+			return soluciones;
+		}
+
+		if (numeros.length < 4) {
+			for (int objetivo = 1; objetivo <= 10; objetivo++) {
+
+				List<Expresion> valores = new ArrayList<>();
+
+				for (int numero : numeros) {
+					valores.add(new Expresion(numero, String.valueOf(numero)));
+				}
+
+				String ecuacionEncontrada = buscarConRaicesYPotencias(valores, objetivo);
+
+				if (ecuacionEncontrada != null) {
+					soluciones.add(ecuacionEncontrada + " = " + objetivo);
+				}
+			}
+
 			return soluciones;
 		}
 
