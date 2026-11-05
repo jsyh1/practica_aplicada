@@ -493,25 +493,6 @@ public class Calculadora {
 			return soluciones;
 		}
 
-		if (numeros.length < 4) {
-			for (int objetivo = 1; objetivo <= 10; objetivo++) {
-
-				List<Expresion> valores = new ArrayList<>();
-
-				for (int numero : numeros) {
-					valores.add(new Expresion(numero, String.valueOf(numero)));
-				}
-
-				String ecuacionEncontrada = buscarConRaicesYPotencias(valores, objetivo);
-
-				if (ecuacionEncontrada != null) {
-					soluciones.add(ecuacionEncontrada + " = " + objetivo);
-				}
-			}
-
-			return soluciones;
-		}
-
 		for (int objetivo = 1; objetivo <= 10; objetivo++) {
 
 			String ecuacionEncontrada = buscarEcuacion(numeros, objetivo);
@@ -542,6 +523,25 @@ public class Calculadora {
 		List<String> soluciones = new ArrayList<>();
 
 		if (numeros == null || numeros.length == 0 || numeros.length > 4) {
+			return soluciones;
+		}
+
+		if (numeros.length < 4) {
+			for (int objetivo = 1; objetivo <= 10; objetivo++) {
+
+				List<Expresion> valores = new ArrayList<>();
+
+				for (int numero : numeros) {
+					valores.add(new Expresion(numero, String.valueOf(numero)));
+				}
+
+				String ecuacionEncontrada = buscarConRaicesYPotencias(valores, objetivo);
+
+				if (ecuacionEncontrada != null) {
+					soluciones.add(ecuacionEncontrada + " = " + objetivo);
+				}
+			}
+
 			return soluciones;
 		}
 

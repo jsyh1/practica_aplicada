@@ -679,9 +679,17 @@ public class CalculadoraControler {
 
 		for (int intento = 0; intento < MAX_INTENTOS; intento++) {
 			int[] candidatos = new int[4];
+			boolean[] numerosGenerados = new boolean[11];
 
 			for (int i = 0; i < candidatos.length; i++) {
-				candidatos[i] = random.nextInt(10) + 1;
+				int candidato;
+
+				do {
+					candidato = random.nextInt(10) + 1;
+				} while (numerosGenerados[candidato]);
+
+				candidatos[i] = candidato;
+				numerosGenerados[candidato] = true;
 			}
 
 			List<String> soluciones = calculadora.buscarSolucionesConRaicesYPotencias(candidatos);
@@ -1171,6 +1179,8 @@ public class CalculadoraControler {
 
 		try {
 
+			actualizarEcuacionesDeAyuda();
+
 			AyudaControler.setEcuaciones(calculadora.getEcuacionesResultados());
 
 			App.setRoot("ayuda");
@@ -1179,6 +1189,41 @@ public class CalculadoraControler {
 
 			lblError.setText("Error al abrir la ayuda");
 		}
+	}
+
+	/**
+	 * Actualiza la ayuda usando Ãºnicamente los nÃºmeros visibles y disponibles.
+	 * La operaciÃ³n trabaja sobre un arreglo nuevo y no modifica los controles de
+	 * la partida ni el arreglo original de nÃºmeros.
+	 */
+	private void actualizarEcuacionesDeAyuda() {
+
+		List<Integer> disponibles = new ArrayList<>();
+
+		for (Node nodo : contenedorNumeros.getChildren()) {
+
+			if (!(nodo instanceof Button)) {
+				continue;
+			}
+
+			try {
+				disponibles.add(Integer.parseInt(((Button) nodo).getText()));
+			} catch (NumberFormatException ex) {
+				// Los resultados no enteros no forman parte de una sugerencia vÃ¡lida.
+			}
+		}
+
+		int[] numerosDisponibles = disponibles.stream().mapToInt(Integer::intValue).toArray();
+		List<String> soluciones;
+
+		if (dificultadAvanzada) {
+			soluciones = calculadora.buscarSolucionesConRaicesYPotencias(numerosDisponibles);
+		} else {
+			soluciones = calculadora.buscarSoluciones(numerosDisponibles);
+		}
+
+		calculadora.getEcuacionesResultados().clear();
+		calculadora.getEcuacionesResultados().addAll(soluciones);
 	}
 
 	/**
