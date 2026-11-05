@@ -1256,7 +1256,8 @@ public class CalculadoraControler {
 
 		Button btnConsultar = new Button("Consultar Partida");
 
-		Button btnDificultad = new Button(dificultadAvanzada ? "Dificultad: Avanzada" : "Dificultad: Normal");
+		// El texto indica la dificultad a la que se cambiará al pulsar el botón.
+		Button btnDificultad = new Button(dificultadAvanzada ? "Dificultad: Normal" : "Dificultad: Avanzada");
 
 		btnInstrucciones.setMaxWidth(Double.MAX_VALUE);
 		btnInstrucciones.getStyleClass().add("btn-menu-item");
