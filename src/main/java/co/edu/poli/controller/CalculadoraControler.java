@@ -47,7 +47,7 @@ import javafx.util.Duration;
  * de realizar las operaciones matemáticas.
  *
  * Permite ingresar números, operadores y paréntesis; calcular expresiones;
- * registrar resultados; consultar ayuda y reglas; y finalizar la partida.
+ * registrar s; consultar ayuda y reglas; y finalizar la partida.
  *
  * @author Jsyh
  * @version 1.0
@@ -94,31 +94,31 @@ public class CalculadoraControler {
 	private Label lblTiempo;
 
 	@FXML
-	private Label lblResultado1;
+	private Label lbl1;
 
 	@FXML
-	private Label lblResultado2;
+	private Label lbl2;
 
 	@FXML
-	private Label lblResultado3;
+	private Label lbl3;
 
 	@FXML
-	private Label lblResultado4;
+	private Label lbl4;
 
 	@FXML
-	private Label lblResultado5;
+	private Label lbl5;
 
 	@FXML
-	private Label lblResultado6;
+	private Label lbl6;
 
 	@FXML
-	private Label lblResultado7;
+	private Label lbl7;
 
 	@FXML
-	private Label lblResultado8;
+	private Label lbl8;
 
 	@FXML
-	private Label lblResultado9;
+	private Label lbl9;
 
 	@FXML
 	private Label lblResultado10;
@@ -996,140 +996,164 @@ public class CalculadoraControler {
 		txtValor1.setText("");
 	}
 
-	/**
-	 * Calcula la expresión, registra los resultados válidos y actualiza el puntaje
-	 * y el estado de la partida.
-	 */
-	@FXML
-	private void resultado() {
 
-		if (partidaFinalizada) {
-			lblError.setText("La partida ya terminó");
-			lblError.setWrapText(true);
-			return;
-		}
+/**
+ * Calcula la expresión, registra los resultados válidos y actualiza el puntaje
+ * y el estado de la partida.
+ */
+@FXML
+private void resultado() {
 
-		if (exprecion.isEmpty()) {
-			lblError.setText("Ingrese una expresión");
-			lblError.setWrapText(true);
-			return;
-		}
+    if (partidaFinalizada) {
+        lblError.setText("La partida ya terminó");
+        lblError.setWrapText(true);
+        return;
+    }
 
-		try {
+    if (exprecion.isEmpty()) {
+        lblError.setText("Ingrese una expresión");
+        lblError.setWrapText(true);
+        return;
+    }
 
-			System.out.println("Expresión: " + exprecion);
+    try {
 
-			calculadora.setEcuacion(exprecion);
+        System.out.println("Expresión: " + exprecion);
 
-			double resultado = calculadora.calcular();
+        calculadora.setEcuacion(exprecion);
 
-			String resultadoTexto = Calculadora.convertir(resultado);
+        double resultado = calculadora.calcular();
 
-			generadorEcuaciones.agregarParte(exprecion, resultadoTexto);
+        String resultadoTexto = Calculadora.convertir(resultado);
 
-			Button botonResultado = new Button(resultadoTexto);
+        generadorEcuaciones.agregarParte(exprecion, resultadoTexto);
 
-			botonResultado.getStyleClass().addAll("btn-base", "btn-numero");
+        Button botonResultado = new Button(resultadoTexto);
 
-			botonResultado.setOnAction(this::seleccionarNumero);
+        botonResultado.getStyleClass().addAll("btn-base", "btn-numero");
+        botonResultado.setOnAction(this::seleccionarNumero);
 
-			contenedorNumeros.getChildren().removeAll(numerosUtilizados);
+        contenedorNumeros.getChildren().removeAll(numerosUtilizados);
+        contenedorNumeros.getChildren().add(botonResultado);
 
-			contenedorNumeros.getChildren().add(botonResultado);
+        txtValor1.setText("");
+        lblError.setText("");
 
-			txtValor1.setText("");
-			lblError.setText("");
+        exprecion = "";
+        numerosUtilizados.clear();
 
-			exprecion = "";
-			numerosUtilizados.clear();
+        if (contenedorNumeros.getChildren().size() == 1) {
 
-			if (contenedorNumeros.getChildren().size() == 1) {
+            if (resultado > 10 || resultado != Math.floor(resultado) || resultado == 0) {
 
-				if (resultado > 10 || resultado != Math.floor(resultado) || resultado == 0) {
+                lblError.setText(
+                    "No es válido números > 10 o fracciones no exactas o = 0"
+                );
 
-					lblError.setText("No es válido números > 10 o fracciones no exactas o = 0");
+                count++;
 
-					count++;
-					System.out.println(count + "A");
+                if (count >= 10) {
+                    ayudaDisponible = true;
+                }
 
-					reiniciarNumeros();
+                reiniciarNumeros();
+                return;
+            }
 
-					if (count >= 10) {
-						ayudaDisponible = true;
-					}
+            if (resultado >= 1 && resultado <= 10
+                    && resultado == Math.floor(resultado)) {
 
-					return;
-				}
+                int resultadoFinal = (int) resultado;
 
-				if (resultado >= 1 && resultado <= 10 && resultado == Math.floor(resultado)) {
+                // Obtener la ecuación completa antes de limpiar el generador.
+                String ecuacionCompleta = generadorEcuaciones.obtenerEcuacion();
 
-					puntaje++;
+                generadorEcuaciones.limpiar();
 
-					lblResultado.setText(puntaje + "/10");
+                DaoResultadoImplementado daoResultado =
+                        new DaoResultadoImplementado();
 
-					int resultadoFinal = (int) resultado;
+                // Comprobar si el resultado numérico ya fue encontrado.
+                boolean yaExisteResultado =
+                        daoResultado.existePorPartidaYDato(
+                                partidaActual.getId(),
+                                resultadoFinal
+                        );
 
-					DaoResultadoImplementado daoResultado = new DaoResultadoImplementado();
+                // Comprobar si la ecuación ya fue utilizada.
+                boolean yaExisteEcuacion =
+                        daoResultado.existePorPartidaYEcuacion(
+                                partidaActual.getId(),
+                                ecuacionCompleta
+                        );
 
-					boolean yaExiste = daoResultado.existePorPartidaYDato(partidaActual.getId(), resultadoFinal);
+                if (!yaExisteResultado && !yaExisteEcuacion) {
 
-					exprecion = generadorEcuaciones.obtenerEcuacion();
+                    // Solo se incrementa el puntaje si es un resultado nuevo.
+                    puntaje++;
 
-					generadorEcuaciones.limpiar();
+                    lblResultado.setText(puntaje + "/10");
 
-					System.out.println("Ecuación completa: " + exprecion);
+                    marcarResultado(resultadoFinal);
 
-					if (!yaExiste) {
+                    Resultado nuevoResultado = new Resultado(
+                            0,
+                            partidaActual,
+                            ecuacionCompleta,
+                            resultadoFinal
+                    );
 
-						marcarResultado(resultadoFinal);
+                    partidaActual.agregarResultado(nuevoResultado);
 
-						Resultado nuevoResultado = new Resultado(0, partidaActual, exprecion, resultadoFinal);
+                    boolean resultadoCreado = daoResultado.crear(nuevoResultado);
 
-						partidaActual.agregarResultado(nuevoResultado);
+                    if (!resultadoCreado) {
+                        lblError.setText("No se pudo guardar el resultado");
+                    }
 
-						boolean resultadoCreado = daoResultado.crear(nuevoResultado);
+                } else {
 
-						if (!resultadoCreado) {
-							lblError.setText("No se pudo guardar el resultado");
-						}
+                    lblError.setText(
+                            "Esta ecuación o resultado ya fue utilizado. "
+                            + "No se sumaron puntos."
+                    );
 
-					} else {
+                    count++;
 
-						count++;
-						System.out.println(count + "B");
-						if (count >= 10) {
-							ayudaDisponible = true;
-						}
-					}
+                    if (count >= 10) {
+                        ayudaDisponible = true;
+                    }
+                }
 
-					System.out.println(partidaActual.getResultados());
+                System.out.println(partidaActual.getResultados());
 
-					partidaActual.setPuntaje(puntaje);
+                partidaActual.setPuntaje(puntaje);
 
-					if (todosLosNumerosEncontrados()) {
+                if (todosLosNumerosEncontrados()) {
 
-						finalizarPartida();
+                    finalizarPartida();
 
-					} else {
+                } else {
 
-						DaoScoreImplementado dao = new DaoScoreImplementado();
+                    DaoScoreImplementado dao = new DaoScoreImplementado();
 
-						boolean actualizada = dao.actualizar(partidaActual);
+                    boolean actualizada = dao.actualizar(partidaActual);
 
-						if (!actualizada) {
-							lblError.setText("No se pudo actualizar la partida");
-						}
+                    if (!actualizada) {
+                        lblError.setText("No se pudo actualizar la partida");
+                    }
 
-						reiniciarNumeros();
-					}
-				}
-			}
+                    reiniciarNumeros();
+                }
+            }
+        }
 
-		} catch (IllegalArgumentException | ArithmeticException e) {
+    } catch (IllegalArgumentException | ArithmeticException e) {
 
-			lblError.setText(e.getMessage());
-		}
-	}
+        lblError.setText(e.getMessage());
+    }
+}
+
 
 	/**
 	 * Marca visualmente un resultado encontrado.
