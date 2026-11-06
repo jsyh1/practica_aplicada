@@ -550,18 +550,6 @@
     -fx-background-radius: 0 14 0 0;
 }
 
-.tabla-ayuda .scroll-bar:vertical,
-.tabla-ayuda .scroll-bar:horizontal {
-    -fx-opacity: 0;
-    -fx-padding: 0;
-    -fx-pref-width: 0;
-    -fx-pref-height: 0;
-    -fx-min-width: 0;
-    -fx-min-height: 0;
-    -fx-max-width: 0;
-    -fx-max-height: 0;
-}
-
 .tabla-ayuda .column-header .label {
     -fx-text-fill: white;
     -fx-font-weight: bold;
@@ -570,16 +558,21 @@
 }
 
 .tabla-ayuda .table-row-cell {
-    -fx-cell-size: 39px;
     -fx-border-color: transparent;
 }
 
 .tabla-ayuda .table-cell {
     -fx-text-fill: #29263a;
-    -fx-font-size: 14px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-border-color: transparent;
-    -fx-padding: 0 10 0 10;
+    -fx-padding: 6 8 6 8;
+}
+
+.tabla-ayuda .expresion-ayuda {
+    -fx-text-fill: #29263a;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
 }
 
 .tabla-ayuda .numero-resultado-ayuda {
