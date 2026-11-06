@@ -94,31 +94,31 @@ public class CalculadoraControler {
 	private Label lblTiempo;
 
 	@FXML
-	private Label lbl1;
+	private Label lblResultado1;
 
 	@FXML
-	private Label lbl2;
+	private Label lblResultado2;
 
 	@FXML
-	private Label lbl3;
+	private Label lblResultado3;
 
 	@FXML
-	private Label lbl4;
+	private Label lblResultado4;
 
 	@FXML
-	private Label lbl5;
+	private Label lblResultado5;
 
 	@FXML
-	private Label lbl6;
+	private Label lblResultado6;
 
 	@FXML
-	private Label lbl7;
+	private Label lblResultado7;
 
 	@FXML
-	private Label lbl8;
+	private Label lblResultado8;
 
 	@FXML
-	private Label lbl9;
+	private Label lblResultado9;
 
 	@FXML
 	private Label lblResultado10;
