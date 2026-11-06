@@ -19,6 +19,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.input.Clipboard;
 
+/** Pruebas del flujo de consulta y uso compartido de partidas. */
 class ConsultarControlerTest {
 
     @Test

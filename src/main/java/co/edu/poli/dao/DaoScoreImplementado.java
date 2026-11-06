@@ -32,6 +32,7 @@ import co.edu.poli.servicios.ConexionDB;
  * @author Jsyh
  * @version 1.1
  */
+/** Implementación JDBC del acceso a datos de partidas y puntuaciones. */
 public class DaoScoreImplementado implements PartidaDAO {
 
     /**

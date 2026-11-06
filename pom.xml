@@ -87,7 +87,7 @@
 				<version>0.0.8</version>
 
 				<configuration>
-					<mainClass>co.edu.poli.juego.App</mainClass>
+					<mainClass>co.edu.poli.vista.App</mainClass>
 				</configuration>
 
 			</plugin>
@@ -111,21 +111,10 @@
 					<!-- Evita fallos si tienes alguna etiqueta de comentario
 					mal formateada -->
 					<additionalOptions>-Xdoclint:none</additionalOptions>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.11.2</version>
-				<configuration>
-					<detectModules>true</detectModules>
-					<additionalOptions>-Xdoclint:none</additionalOptions>
-					<!-- Fuerza a generar la documentación de absolutamente
-					todas las clases (public, protected, package y private) -->
 					<show>private</show>
 				</configuration>
 			</plugin>
+
 
 
 		</plugins>

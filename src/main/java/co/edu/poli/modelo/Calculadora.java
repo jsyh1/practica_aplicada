@@ -74,11 +74,16 @@ public class Calculadora {
 	 * @param simbolos arreglo de símbolos disponibles
 	 * @param numeros  arreglo de números disponibles
 	 * @param ecuacion ecuación matemática que se desea procesar
+	 * @throws IllegalArgumentException si la ecuación es nula
 	 */
-	public Calculadora(String[] simbolos, int[] numeros, String ecuacion) {
+	public Calculadora(String[] simbolos, int[] numeros, String ecuacion) throws IllegalArgumentException {
 
 		this.simbolos = simbolos;
 		this.numeros = numeros;
+
+		if (ecuacion == null) {
+			throw new IllegalArgumentException("La ecuación no puede ser nula");
+		}
 
 		String sinEspacios = ecuacion.replace(" ", "");
 
@@ -711,8 +716,9 @@ public class Calculadora {
 	 * Establece la ecuación que será procesada por la calculadora.
 	 *
 	 * @param ecuacion expresión matemática que se desea calcular
+	 * @throws IllegalArgumentException si la ecuación es nula
 	 */
-	public void setEcuacion(String ecuacion) {
+	public void setEcuacion(String ecuacion) throws IllegalArgumentException {
 
 		if (ecuacion == null) {
 
@@ -786,7 +792,7 @@ public class Calculadora {
 	 *                                  estructura incorrecta
 	 * @throws ArithmeticException      si se intenta dividir entre cero
 	 */
-	public double calcular() {
+	public double calcular() throws IllegalArgumentException, ArithmeticException {
 
 		if (ecuacion == null || ecuacion.isEmpty()) {
 
@@ -851,8 +857,10 @@ public class Calculadora {
 	 * Calcula una potencia y valida sus límites.
 	 *
 	 * @return resultado de la potencia
+	 * @throws IllegalArgumentException si la base o el exponente no son válidos
+	 * @throws ArithmeticException si el resultado excede el límite permitido
 	 */
-	private double potencia() {
+	private double potencia() throws IllegalArgumentException, ArithmeticException {
 		double base = factor();
 
 		if (posicion < ecuacion.length() && ecuacion.charAt(posicion) == '^') {
@@ -892,7 +900,7 @@ public class Calculadora {
 	 * @return resultado del término matemático
 	 * @throws ArithmeticException si se intenta dividir entre cero
 	 */
-	private double termino() {
+	private double termino() throws ArithmeticException {
 		double resultado = potencia();
 
 		while (posicion < ecuacion.length()) {
@@ -925,8 +933,9 @@ public class Calculadora {
 	 * Procesa un factor: número, expresión entre paréntesis o raíz cuadrada.
 	 *
 	 * @return resultado del factor
+	 * @throws IllegalArgumentException si el factor o su estructura no son válidos
 	 */
-	private double factor() {
+	private double factor() throws IllegalArgumentException {
 		if (posicion >= ecuacion.length()) {
 			throw new IllegalArgumentException("Falta un número");
 		}
@@ -1002,7 +1011,7 @@ public class Calculadora {
 	 * @throws NumberFormatException    si el contenido encontrado no puede
 	 *                                  convertirse en un número
 	 */
-	private double numero() {
+	private double numero() throws IllegalArgumentException, NumberFormatException {
 
 		int inicio = posicion;
 

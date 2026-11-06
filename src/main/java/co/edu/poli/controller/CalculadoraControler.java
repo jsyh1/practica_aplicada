@@ -15,7 +15,6 @@ import co.edu.poli.modelo.EstadoPartida;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
-import co.edu.poli.servicios.ConexionDB;
 import co.edu.poli.servicios.GeneradorEcuaciones;
 import co.edu.poli.vista.App;
 import javafx.animation.KeyFrame;
@@ -59,11 +58,6 @@ public class CalculadoraControler {
 	 */
 	@FXML
 	private TextField txtValor1;
-
-	/**
-	 * Conexión con la base de datos.
-	 */
-	private final ConexionDB db = new ConexionDB();
 
 	/**
 	 * Etiqueta utilizada para mostrar mensajes de error.
@@ -270,8 +264,10 @@ public class CalculadoraControler {
 
 		jugadorActual = new Jugador(0, "", LocalDate.now());
 
-		if (daoJugador.crear(jugadorActual)) {
-			System.out.println("Jugador creado con ID: " + jugadorActual.getId());
+		if (!daoJugador.crear(jugadorActual)) {
+			bloquearControlesDeJuego();
+			lblError.setText("No se pudo registrar el jugador. No se puede iniciar la partida.");
+			return;
 		}
 
 		puntaje = 0;
@@ -295,7 +291,9 @@ public class CalculadoraControler {
 		boolean partidaCreada = daoPartida.crear(partidaActual);
 
 		if (!partidaCreada) {
-			lblError.setText("No se pudo crear la partida");
+			bloquearControlesDeJuego();
+			lblError.setText("No se pudo crear la partida. No se puede iniciar el juego.");
+			return;
 		}
 
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -356,6 +354,21 @@ public class CalculadoraControler {
 		btnPotencia.setGraphic(crearIcono("M4 13 L10 20 M10 13 L4 20 M14 5 L21 5 L14 10 L21 10"));
 		btnPotencia.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		actualizarBotonesDificultad();
+	}
+
+	private void bloquearControlesDeJuego() {
+		partidaFinalizada = true;
+		txtValor1.setDisable(true);
+		contenedorNumeros.setDisable(true);
+
+		Button[] controles = {
+				btnSuma, btnResta, btnMultiplicacion, btnDivision, btnRaiz, btnPotencia,
+				btnParentesisAbre, btnParentesisCierra, btnBorrarUltimo, btnBorrarTodo, btnIgual
+		};
+
+		for (Button control : controles) {
+			control.setDisable(true);
+		}
 	}
 	
 	/**
@@ -626,9 +639,6 @@ public class CalculadoraControler {
 
 		if (actualizada) {
 
-			System.out.println("Partida finalizada. ID: " + partidaActual.getId());
-			System.out.println("Puntaje final: " + puntaje);
-			System.out.println("Tiempo: " + partidaActual.getTiempoEjecucion() + " segundos");
 
 			mostrarAlerta();
 
@@ -963,14 +973,7 @@ public class CalculadoraControler {
 	private void borrarTodo(ActionEvent event) {
 
 		reiniciarNumeros();
-
-		txtValor1.setText("");
 		lblError.setText("");
-
-		exprecion = "";
-		numerosUtilizados.clear();
-
-		generadorEcuaciones.limpiar();
 	}
 
 	/**
@@ -992,6 +995,7 @@ public class CalculadoraControler {
 
 		exprecion = "";
 		numerosUtilizados.clear();
+		generadorEcuaciones.limpiar();
 
 		txtValor1.setText("");
 	}
@@ -1017,8 +1021,6 @@ private void resultado() {
     }
 
     try {
-
-        System.out.println("Expresión: " + exprecion);
 
         calculadora.setEcuacion(exprecion);
 
@@ -1089,13 +1091,6 @@ private void resultado() {
 
                 if (!yaExisteResultado && !yaExisteEcuacion) {
 
-                    // Solo se incrementa el puntaje si es un resultado nuevo.
-                    puntaje++;
-
-                    lblResultado.setText(puntaje + "/10");
-
-                    marcarResultado(resultadoFinal);
-
                     Resultado nuevoResultado = new Resultado(
                             0,
                             partidaActual,
@@ -1103,13 +1098,18 @@ private void resultado() {
                             resultadoFinal
                     );
 
-                    partidaActual.agregarResultado(nuevoResultado);
-
                     boolean resultadoCreado = daoResultado.crear(nuevoResultado);
 
                     if (!resultadoCreado) {
                         lblError.setText("No se pudo guardar el resultado");
+                        reiniciarNumeros();
+                        return;
                     }
+
+                    partidaActual.agregarResultado(nuevoResultado);
+                    puntaje++;
+                    lblResultado.setText(puntaje + "/10");
+                    marcarResultado(resultadoFinal);
 
                 } else {
 
@@ -1124,8 +1124,6 @@ private void resultado() {
                         ayudaDisponible = true;
                     }
                 }
-
-                System.out.println(partidaActual.getResultados());
 
                 partidaActual.setPuntaje(puntaje);
 
@@ -1151,6 +1149,10 @@ private void resultado() {
     } catch (IllegalArgumentException | ArithmeticException e) {
 
         lblError.setText(e.getMessage());
+    } catch (IllegalStateException e) {
+
+        reiniciarNumeros();
+        lblError.setText("No se pudo acceder a la base de datos: " + e.getMessage());
     }
 }
 
@@ -1202,9 +1204,8 @@ private void resultado() {
 	private void mostrarAyuda() {
 
 		try {
-
-			actualizarEcuacionesDeAyuda();
-
+			// La ayuda se genera una sola vez al crear la ronda. No debe depender
+			// de los botones que sigan visibles después de las operaciones.
 			AyudaControler.setEcuaciones(calculadora.getEcuacionesResultados());
 
 			App.setRoot("ayuda");
@@ -1213,41 +1214,6 @@ private void resultado() {
 
 			lblError.setText("Error al abrir la ayuda");
 		}
-	}
-
-	/**
-	 * Actualiza la ayuda usando Ãºnicamente los nÃºmeros visibles y disponibles.
-	 * La operaciÃ³n trabaja sobre un arreglo nuevo y no modifica los controles de
-	 * la partida ni el arreglo original de nÃºmeros.
-	 */
-	private void actualizarEcuacionesDeAyuda() {
-
-		List<Integer> disponibles = new ArrayList<>();
-
-		for (Node nodo : contenedorNumeros.getChildren()) {
-
-			if (!(nodo instanceof Button)) {
-				continue;
-			}
-
-			try {
-				disponibles.add(Integer.parseInt(((Button) nodo).getText()));
-			} catch (NumberFormatException ex) {
-				// Los resultados no enteros no forman parte de una sugerencia vÃ¡lida.
-			}
-		}
-
-		int[] numerosDisponibles = disponibles.stream().mapToInt(Integer::intValue).toArray();
-		List<String> soluciones;
-
-		if (dificultadAvanzada) {
-			soluciones = calculadora.buscarSolucionesConRaicesYPotencias(numerosDisponibles);
-		} else {
-			soluciones = calculadora.buscarSoluciones(numerosDisponibles);
-		}
-
-		calculadora.getEcuacionesResultados().clear();
-		calculadora.getEcuacionesResultados().addAll(soluciones);
 	}
 
 	/**
@@ -1309,7 +1275,6 @@ private void resultado() {
 			}
 		});
 
-		// nuevo boton
 		btnDificultad.setOnAction(e -> {
 		    boolean nuevaDificultad = !dificultadAvanzada;
 

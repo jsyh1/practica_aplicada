@@ -21,12 +21,12 @@ import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
+/** Pruebas del controlador de finalización de partidas. */
 class GameOverControlerTest {
 
 	@Test

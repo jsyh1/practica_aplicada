@@ -64,13 +64,7 @@ public class Partida {
      */
     private List<Resultado> resultados;
     
-    /**
-     * Estados.
-     */
-    
     private EstadoPartida estado = EstadoPartida.EN_CURSO;
-    private EstadoPartida estado1 = EstadoPartida.FINALIZADA;
-    private EstadoPartida estado2 = EstadoPartida.ABANDONADA;
 
     /**
      * Construye una partida sin identificador.
@@ -334,40 +328,20 @@ public class Partida {
 
         return this.tiempoEjecucion;
     }
-        public EstadoPartida getEstado() {
-    return estado;
+    /** Obtiene el estado actual de la partida. */
+    public EstadoPartida getEstado() {
+        return estado;
     }
 
+    /**
+     * Actualiza el estado de la partida.
+     *
+     * @param estado nuevo estado; no puede ser {@code null}
+     */
     public void setEstado(EstadoPartida estado) {
-    if (estado == null) {
-        throw new IllegalArgumentException(
-            "El estado de la partida no puede ser nulo"
-        );
+        if (estado == null) {
+            throw new IllegalArgumentException("El estado de la partida no puede ser nulo");
         }
         this.estado = estado;
-    }
-    public EstadoPartida getEstado1() {
-    return estado1;
-    }
-
-    public void setEstado1(EstadoPartida estado1) {
-    if (estado1 == null) {
-        throw new IllegalArgumentException(
-            "El estado de la partida no puede ser nulo"
-        );
-        }
-        this.estado1 = estado1;
-    }
-    public EstadoPartida getEstado2() {
-    return estado2;
-    }
-
-    public void setEstado2(EstadoPartida estado2) {
-    if (estado2 == null) {
-        throw new IllegalArgumentException(
-            "El estado de la partida no puede ser nulo"
-        );
-        }
-        this.estado2 = estado2;
     }
 }
