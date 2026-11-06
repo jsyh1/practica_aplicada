@@ -102,9 +102,12 @@ public class GameOverControler {
 			return;
 		}
 
-		DaoResultadoImplementado daoResultado = new DaoResultadoImplementado();
-
-		resultadosActuales = daoResultado.listarPorPartida(partidaActual);
+		try {
+			DaoResultadoImplementado daoResultado = new DaoResultadoImplementado();
+			resultadosActuales = daoResultado.listarPorPartida(partidaActual);
+		} catch (IllegalStateException e) {
+			lblMensaje.setText("No se pudieron cargar los resultados de la partida.");
+		}
 
 		btnCompartir.setDisable(true);
 		btnExportar.setDisable(true);

@@ -179,10 +179,7 @@ public class ConsultarControler {
 	 */
 	private List<Resultado> cargarResultados(Partida partida) {
 		DaoResultadoImplementado daoResultado = new DaoResultadoImplementado();
-
-		List<Resultado> resultados = daoResultado.listarPorPartida(partida);
-
-		return resultados != null ? resultados : List.of();
+		return daoResultado.listarPorPartida(partida);
 	}
 
 	/**

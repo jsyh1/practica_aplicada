@@ -264,7 +264,11 @@ public class CalculadoraControler {
 
 		jugadorActual = new Jugador(0, "", LocalDate.now());
 
-		daoJugador.crear(jugadorActual);
+		if (!daoJugador.crear(jugadorActual)) {
+			bloquearControlesDeJuego();
+			lblError.setText("No se pudo registrar el jugador. No se puede iniciar la partida.");
+			return;
+		}
 
 		puntaje = 0;
 		lblResultado.setText("0/10");
@@ -287,7 +291,9 @@ public class CalculadoraControler {
 		boolean partidaCreada = daoPartida.crear(partidaActual);
 
 		if (!partidaCreada) {
-			lblError.setText("No se pudo crear la partida");
+			bloquearControlesDeJuego();
+			lblError.setText("No se pudo crear la partida. No se puede iniciar el juego.");
+			return;
 		}
 
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -348,6 +354,21 @@ public class CalculadoraControler {
 		btnPotencia.setGraphic(crearIcono("M4 13 L10 20 M10 13 L4 20 M14 5 L21 5 L14 10 L21 10"));
 		btnPotencia.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		actualizarBotonesDificultad();
+	}
+
+	private void bloquearControlesDeJuego() {
+		partidaFinalizada = true;
+		txtValor1.setDisable(true);
+		contenedorNumeros.setDisable(true);
+
+		Button[] controles = {
+				btnSuma, btnResta, btnMultiplicacion, btnDivision, btnRaiz, btnPotencia,
+				btnParentesisAbre, btnParentesisCierra, btnBorrarUltimo, btnBorrarTodo, btnIgual
+		};
+
+		for (Button control : controles) {
+			control.setDisable(true);
+		}
 	}
 	
 	/**
@@ -952,14 +973,7 @@ public class CalculadoraControler {
 	private void borrarTodo(ActionEvent event) {
 
 		reiniciarNumeros();
-
-		txtValor1.setText("");
 		lblError.setText("");
-
-		exprecion = "";
-		numerosUtilizados.clear();
-
-		generadorEcuaciones.limpiar();
 	}
 
 	/**
@@ -981,6 +995,7 @@ public class CalculadoraControler {
 
 		exprecion = "";
 		numerosUtilizados.clear();
+		generadorEcuaciones.limpiar();
 
 		txtValor1.setText("");
 	}
@@ -1006,8 +1021,6 @@ private void resultado() {
     }
 
     try {
-
-        System.out.println("Expresión: " + exprecion);
 
         calculadora.setEcuacion(exprecion);
 
@@ -1078,13 +1091,6 @@ private void resultado() {
 
                 if (!yaExisteResultado && !yaExisteEcuacion) {
 
-                    // Solo se incrementa el puntaje si es un resultado nuevo.
-                    puntaje++;
-
-                    lblResultado.setText(puntaje + "/10");
-
-                    marcarResultado(resultadoFinal);
-
                     Resultado nuevoResultado = new Resultado(
                             0,
                             partidaActual,
@@ -1092,13 +1098,18 @@ private void resultado() {
                             resultadoFinal
                     );
 
-                    partidaActual.agregarResultado(nuevoResultado);
-
                     boolean resultadoCreado = daoResultado.crear(nuevoResultado);
 
                     if (!resultadoCreado) {
                         lblError.setText("No se pudo guardar el resultado");
+                        reiniciarNumeros();
+                        return;
                     }
+
+                    partidaActual.agregarResultado(nuevoResultado);
+                    puntaje++;
+                    lblResultado.setText(puntaje + "/10");
+                    marcarResultado(resultadoFinal);
 
                 } else {
 
@@ -1113,8 +1124,6 @@ private void resultado() {
                         ayudaDisponible = true;
                     }
                 }
-
-                System.out.println(partidaActual.getResultados());
 
                 partidaActual.setPuntaje(puntaje);
 
@@ -1140,6 +1149,10 @@ private void resultado() {
     } catch (IllegalArgumentException | ArithmeticException e) {
 
         lblError.setText(e.getMessage());
+    } catch (IllegalStateException e) {
+
+        reiniciarNumeros();
+        lblError.setText("No se pudo acceder a la base de datos: " + e.getMessage());
     }
 }
 
