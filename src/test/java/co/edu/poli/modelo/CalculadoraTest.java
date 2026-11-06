@@ -240,7 +240,8 @@ class CalculadoraTest {
      */
     @Test
     void generadorAvanzadoUsaCadaNumeroUnaSolaVez() {
-        int[] numeros = {1, 2, 3, 4};
+        // Avoid counting the generated square exponent as one of the input numbers.
+        int[] numeros = {1, 3, 4, 5};
 
         List<String> soluciones = calculadora.buscarSolucionesConRaicesYPotencias(numeros);
 

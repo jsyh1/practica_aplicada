@@ -1005,10 +1005,7 @@ private void resultado() {
         return;
     }
 
-<<<<<<< HEAD
-=======
     try {
->>>>>>> origin/main
 
         System.out.println("Expresión: " + exprecion);
 
@@ -1044,13 +1041,9 @@ private void resultado() {
 
                 count++;
 
-<<<<<<< HEAD
-					count++;
-=======
                 if (count >= 10) {
                     ayudaDisponible = true;
                 }
->>>>>>> origin/main
 
                 reiniciarNumeros();
                 return;
@@ -1090,10 +1083,7 @@ private void resultado() {
 
                     lblResultado.setText(puntaje + "/10");
 
-<<<<<<< HEAD
-=======
                     marcarResultado(resultadoFinal);
->>>>>>> origin/main
 
                     Resultado nuevoResultado = new Resultado(
                             0,
@@ -1119,21 +1109,12 @@ private void resultado() {
 
                     count++;
 
-<<<<<<< HEAD
-						count++;
-						if (count >= 10) {
-							ayudaDisponible = true;
-						}
-					}
-
-=======
                     if (count >= 10) {
                         ayudaDisponible = true;
                     }
                 }
 
                 System.out.println(partidaActual.getResultados());
->>>>>>> origin/main
 
                 partidaActual.setPuntaje(puntaje);
 
