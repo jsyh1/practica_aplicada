@@ -133,6 +133,18 @@ class CalculadoraTest {
     }
 
     /**
+     * Comprueba que una ecuación nula se rechace al crear o configurar la calculadora.
+     */
+    @Test
+    void ecuacionNulaLanzaExcepcionDeArgumento() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Calculadora(new String[9], new int[4], null)
+        );
+        assertThrows(IllegalArgumentException.class, () -> calculadora.setEcuacion(null));
+    }
+
+    /**
      * Comprueba que una raíz de un número negativo no sea válida.
      */
     @Test
@@ -148,7 +160,15 @@ class CalculadoraTest {
      */
     @Test
     void expresionIncompletaLanzaExcepcion() {
-        assertThrows(RuntimeException.class, () -> calcular("2+"));
+        assertThrows(IllegalArgumentException.class, () -> calcular("2+"));
+    }
+
+    /**
+     * Comprueba que el contenido numérico mal formado conserve su excepción específica.
+     */
+    @Test
+    void numeroMalFormadoLanzaExcepcionDeFormato() {
+        assertThrows(NumberFormatException.class, () -> calcular("1..2"));
     }
 
     /**
@@ -167,7 +187,7 @@ class CalculadoraTest {
      */
     @Test
     void potenciaExcesivaLanzaExcepcion() {
-        assertThrows(RuntimeException.class, () -> calcular("999999^10"));
+        assertThrows(ArithmeticException.class, () -> calcular("999999^10"));
     }
 
     /**
