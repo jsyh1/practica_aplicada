@@ -536,11 +536,17 @@
     -fx-border-color: transparent;
 }
 
-.tabla-ayuda .column-header:first-child {
+.tabla-ayuda .column-header-background .nested-column-header .column-header:first-child {
     -fx-background-radius: 14 0 0 0;
+    -fx-background-insets: 0;
 }
 
 .tabla-ayuda .column-header:last-visible {
+    -fx-background-radius: 0 14 0 0;
+}
+
+.tabla-ayuda .column-header-background .filler {
+    -fx-background-color: #2b2b2b;
     -fx-background-radius: 0 14 0 0;
 }
 
@@ -552,16 +558,21 @@
 }
 
 .tabla-ayuda .table-row-cell {
-    -fx-cell-size: 39px;
     -fx-border-color: transparent;
 }
 
 .tabla-ayuda .table-cell {
     -fx-text-fill: #29263a;
-    -fx-font-size: 14px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-border-color: transparent;
-    -fx-padding: 0 10 0 10;
+    -fx-padding: 6 8 6 8;
+}
+
+.tabla-ayuda .expresion-ayuda {
+    -fx-text-fill: #29263a;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
 }
 
 .tabla-ayuda .numero-resultado-ayuda {
@@ -679,11 +690,8 @@
 .reglas-fila {
     -fx-border-color: transparent transparent #eeeaf4 transparent;
     -fx-border-width: 0 0 1 0;
+    -fx-min-height: 58px;
     -fx-padding: 10 14 10 14;
-}
-
-.reglas-fila-final {
-    -fx-border-color: transparent;
 }
 
 .reglas-numero {
