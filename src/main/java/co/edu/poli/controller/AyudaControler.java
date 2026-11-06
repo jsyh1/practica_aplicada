@@ -14,6 +14,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+/** Controlador de la pantalla que muestra las ecuaciones de ayuda. */
 public class AyudaControler {
 
     /*

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -197,6 +198,46 @@ class CalculadoraTest {
 
         assertTrue(soluciones.stream().anyMatch(solucion -> solucion.endsWith(" = 5")));
         assertEquals(2, disponibles.length);
+    }
+
+    /**
+     * Comprueba que el generador normal consuma cada uno de los cuatro números
+     * exactamente una vez en cada ecuación encontrada.
+     */
+    @Test
+    void generadorNormalUsaCadaNumeroUnaSolaVez() {
+        int[] numeros = {1, 2, 3, 4};
+
+        List<String> soluciones = calculadora.buscarSoluciones(numeros);
+
+        assertEquals(10, soluciones.size());
+        soluciones.forEach(solucion -> assertUsaCadaNumeroUnaVez(solucion, numeros));
+    }
+
+    /**
+     * Comprueba la misma regla para el generador avanzado, incluyendo raíces y
+     * potencias.
+     */
+    @Test
+    void generadorAvanzadoUsaCadaNumeroUnaSolaVez() {
+        int[] numeros = {1, 2, 3, 4};
+
+        List<String> soluciones = calculadora.buscarSolucionesConRaicesYPotencias(numeros);
+
+        assertEquals(10, soluciones.size());
+        soluciones.forEach(solucion -> assertUsaCadaNumeroUnaVez(solucion, numeros));
+    }
+
+    private void assertUsaCadaNumeroUnaVez(String solucion, int[] numeros) {
+        String expresion = solucion.substring(0, solucion.indexOf(" = "));
+
+        for (int numero : numeros) {
+            long usos = Pattern.compile("(?<!\\d)" + numero + "(?!\\d)")
+                    .matcher(expresion)
+                    .results()
+                    .count();
+            assertEquals(1, usos, () -> "Uso incorrecto de " + numero + " en " + solucion);
+        }
     }
 
     /**

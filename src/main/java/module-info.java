@@ -33,14 +33,14 @@ module co.edu.poli.juego {
      * Permite utilizar las funcionalidades de acceso a bases de datos
      * mediante JDBC.
      */
-    requires java.sql;
+    requires transitive java.sql;
 
     /**
      * Permite gestionar variables de entorno mediante la biblioteca
      * dotenv-java.
      */
     requires io.github.cdimascio.dotenv.java;
-    requires javafx.graphics;
+    requires transitive javafx.graphics;
 
     /**
      * Permite que JavaFX acceda mediante reflexión a las clases
@@ -66,9 +66,7 @@ module co.edu.poli.juego {
      */
     exports co.edu.poli.controller;
     
-    // ====== AÑADE ESTAS LÍNEAS CON TUS PAQUETES FALTANTES ======
-    exports co.edu.poli.modelo;    // Reemplaza si tu paquete se llama diferente (ej. modelo)
-    exports co.edu.poli.servicios;  // Reemplaza si tu paquete se llama diferente (ej. servicios)
-    // ===========================================================
+    exports co.edu.poli.modelo;
+    exports co.edu.poli.servicios;
 
 }

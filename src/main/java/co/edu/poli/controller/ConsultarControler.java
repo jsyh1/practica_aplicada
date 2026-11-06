@@ -40,6 +40,7 @@ import javafx.stage.Stage;
  * @author Jsyh
  * @version 1.0
  */
+/** Controlador de la pantalla de consulta e intercambio de partidas. */
 public class ConsultarControler {
 
 	@FXML

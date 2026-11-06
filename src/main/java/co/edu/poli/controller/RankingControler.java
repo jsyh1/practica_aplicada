@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 /**
  * Controlador de la pantalla de ranking de partidas.
  */
+/** Controlador de la pantalla que presenta el ranking de partidas. */
 public class RankingControler {
 
     @FXML

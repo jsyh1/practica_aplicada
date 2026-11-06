@@ -27,6 +27,7 @@ import co.edu.poli.servicios.ConexionDB;
  * @author Jsyh
  * @version 1.1
  */
+/** Implementación JDBC del acceso a datos de resultados. */
 public class DaoResultadoImplementado implements ResultadoDAO {
 
     /**

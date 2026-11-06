@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 /**
  * Clase principal de la aplicación JavaFX.
  */
+/** Punto de entrada y gestor de las vistas principales de la aplicación. */
 public class App extends Application {
 
 	private static Scene scene;

@@ -15,7 +15,6 @@ import co.edu.poli.modelo.EstadoPartida;
 import co.edu.poli.modelo.Jugador;
 import co.edu.poli.modelo.Partida;
 import co.edu.poli.modelo.Resultado;
-import co.edu.poli.servicios.ConexionDB;
 import co.edu.poli.servicios.GeneradorEcuaciones;
 import co.edu.poli.vista.App;
 import javafx.animation.KeyFrame;
@@ -59,11 +58,6 @@ public class CalculadoraControler {
 	 */
 	@FXML
 	private TextField txtValor1;
-
-	/**
-	 * Conexión con la base de datos.
-	 */
-	private final ConexionDB db = new ConexionDB();
 
 	/**
 	 * Etiqueta utilizada para mostrar mensajes de error.
@@ -270,9 +264,7 @@ public class CalculadoraControler {
 
 		jugadorActual = new Jugador(0, "", LocalDate.now());
 
-		if (daoJugador.crear(jugadorActual)) {
-			System.out.println("Jugador creado con ID: " + jugadorActual.getId());
-		}
+		daoJugador.crear(jugadorActual);
 
 		puntaje = 0;
 		lblResultado.setText("0/10");
@@ -626,9 +618,6 @@ public class CalculadoraControler {
 
 		if (actualizada) {
 
-			System.out.println("Partida finalizada. ID: " + partidaActual.getId());
-			System.out.println("Puntaje final: " + puntaje);
-			System.out.println("Tiempo: " + partidaActual.getTiempoEjecucion() + " segundos");
 
 			mostrarAlerta();
 
@@ -1017,7 +1006,6 @@ public class CalculadoraControler {
 
 		try {
 
-			System.out.println("Expresión: " + exprecion);
 
 			calculadora.setEcuacion(exprecion);
 
@@ -1050,7 +1038,6 @@ public class CalculadoraControler {
 					lblError.setText("No es válido números > 10 o fracciones no exactas o = 0");
 
 					count++;
-					System.out.println(count + "A");
 
 					reiniciarNumeros();
 
@@ -1077,7 +1064,6 @@ public class CalculadoraControler {
 
 					generadorEcuaciones.limpiar();
 
-					System.out.println("Ecuación completa: " + exprecion);
 
 					if (!yaExiste) {
 
@@ -1096,13 +1082,11 @@ public class CalculadoraControler {
 					} else {
 
 						count++;
-						System.out.println(count + "B");
 						if (count >= 10) {
 							ayudaDisponible = true;
 						}
 					}
 
-					System.out.println(partidaActual.getResultados());
 
 					partidaActual.setPuntaje(puntaje);
 
@@ -1178,9 +1162,8 @@ public class CalculadoraControler {
 	private void mostrarAyuda() {
 
 		try {
-
-			actualizarEcuacionesDeAyuda();
-
+			// La ayuda se genera una sola vez al crear la ronda. No debe depender
+			// de los botones que sigan visibles después de las operaciones.
 			AyudaControler.setEcuaciones(calculadora.getEcuacionesResultados());
 
 			App.setRoot("ayuda");
@@ -1189,41 +1172,6 @@ public class CalculadoraControler {
 
 			lblError.setText("Error al abrir la ayuda");
 		}
-	}
-
-	/**
-	 * Actualiza la ayuda usando Ãºnicamente los nÃºmeros visibles y disponibles.
-	 * La operaciÃ³n trabaja sobre un arreglo nuevo y no modifica los controles de
-	 * la partida ni el arreglo original de nÃºmeros.
-	 */
-	private void actualizarEcuacionesDeAyuda() {
-
-		List<Integer> disponibles = new ArrayList<>();
-
-		for (Node nodo : contenedorNumeros.getChildren()) {
-
-			if (!(nodo instanceof Button)) {
-				continue;
-			}
-
-			try {
-				disponibles.add(Integer.parseInt(((Button) nodo).getText()));
-			} catch (NumberFormatException ex) {
-				// Los resultados no enteros no forman parte de una sugerencia vÃ¡lida.
-			}
-		}
-
-		int[] numerosDisponibles = disponibles.stream().mapToInt(Integer::intValue).toArray();
-		List<String> soluciones;
-
-		if (dificultadAvanzada) {
-			soluciones = calculadora.buscarSolucionesConRaicesYPotencias(numerosDisponibles);
-		} else {
-			soluciones = calculadora.buscarSoluciones(numerosDisponibles);
-		}
-
-		calculadora.getEcuacionesResultados().clear();
-		calculadora.getEcuacionesResultados().addAll(soluciones);
 	}
 
 	/**
@@ -1285,7 +1233,6 @@ public class CalculadoraControler {
 			}
 		});
 
-		// nuevo boton
 		btnDificultad.setOnAction(e -> {
 		    boolean nuevaDificultad = !dificultadAvanzada;
 

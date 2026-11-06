@@ -5,6 +5,7 @@ import java.io.IOException;
 import co.edu.poli.vista.App;
 import javafx.fxml.FXML;
 
+/** Controlador de la pantalla con las reglas del juego. */
 public class ReglasControler {
 
     @FXML

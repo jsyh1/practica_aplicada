@@ -32,7 +32,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -119,9 +118,6 @@ public class GameOverControler {
 		lblResultados.setText(construirTextoResultados());
 		mostrarListaResultados();
 
-		System.out.println("Partida consultada: " + partidaActual.getId());
-
-		System.out.println("Resultados cargados: " + resultadosActuales.size());
 	}
 
 	/**
