@@ -36,9 +36,15 @@ public class DaoResultadoImplementado implements ResultadoDAO {
 
     /**
      * Constructor que obtiene la conexión a la base de datos.
+     *
+     * @throws IllegalStateException si no hay una conexión disponible
      */
-    public DaoResultadoImplementado() {
-        conexion = ConexionDB.getInstancia().getConexion();
+    public DaoResultadoImplementado() throws IllegalStateException {
+        Connection conexionActiva = ConexionDB.getInstancia().getConexion();
+        if (conexionActiva == null) {
+            throw new IllegalStateException("No hay una conexión activa con la base de datos");
+        }
+        conexion = conexionActiva;
     }
 
     /**
@@ -46,9 +52,15 @@ public class DaoResultadoImplementado implements ResultadoDAO {
      *
      * @param objeto resultado que se desea crear
      * @return true si se creó correctamente; false en caso contrario
+     * @throws IllegalArgumentException si el resultado o su partida no son válidos
      */
     @Override
-    public boolean crear(Resultado objeto) {
+    public boolean crear(Resultado objeto) throws IllegalArgumentException {
+        if (objeto == null || objeto.getPartida() == null
+                || objeto.getPartida().getId() <= 0
+                || objeto.getResultado() == null || objeto.getResultado().isBlank()) {
+            throw new IllegalArgumentException("El resultado y su partida deben ser válidos");
+        }
 
         String sql = """
                 INSERT INTO resultado (partida_id, resultado, dato)
@@ -90,8 +102,14 @@ public class DaoResultadoImplementado implements ResultadoDAO {
      * @param partidaId identificador de la partida
      * @param dato valor numérico del resultado
      * @return true si existe; false en caso contrario
+     * @throws IllegalArgumentException si el identificador de partida no es válido
+     * @throws IllegalStateException si falla la consulta a la base de datos
      */
-    public boolean existePorPartidaYDato(int partidaId, int dato) {
+    public boolean existePorPartidaYDato(int partidaId, int dato)
+            throws IllegalArgumentException, IllegalStateException {
+        if (partidaId <= 0) {
+            throw new IllegalArgumentException("El identificador de partida debe ser positivo");
+        }
 
         String sql = """
                 SELECT 1
@@ -111,63 +129,61 @@ public class DaoResultadoImplementado implements ResultadoDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println(
-                    "Error al comprobar el resultado: " + e.getMessage()
-            );
+            throw new IllegalStateException("No se pudo comprobar el resultado existente", e);
         }
-
-        return false;
     }
 
-    
-/**
- * Comprueba si una ecuación ya fue utilizada durante una partida.
- *
- * @param partidaId identificador de la partida
- * @param ecuacion expresión matemática que se desea comprobar
- * @return true si la ecuación ya existe; false en caso contrario
- */
-public boolean existePorPartidaYEcuacion(int partidaId, String ecuacion) {
-
-    String sql = """
-            SELECT 1
-            FROM resultado
-            WHERE partida_id = ?
-              AND REPLACE(resultado, ' ', '') = ?
-            LIMIT 1
-            """;
-
-    try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-
-        ps.setInt(1, partidaId);
-        ps.setString(2, ecuacion.replaceAll("\\s+", ""));
-
-        try (ResultSet rs = ps.executeQuery()) {
-            return rs.next();
+    /**
+     * Comprueba si una ecuación ya fue utilizada durante una partida.
+     *
+     * @param partidaId identificador de la partida
+     * @param ecuacion expresión matemática que se desea comprobar
+     * @return true si la ecuación ya existe; false en caso contrario
+     * @throws IllegalArgumentException si la partida o la ecuación no son válidas
+     * @throws IllegalStateException si falla la consulta a la base de datos
+     */
+    public boolean existePorPartidaYEcuacion(int partidaId, String ecuacion)
+            throws IllegalArgumentException, IllegalStateException {
+        if (partidaId <= 0 || ecuacion == null || ecuacion.isBlank()) {
+            throw new IllegalArgumentException("La partida y la ecuación deben ser válidas");
         }
 
-    } catch (SQLException e) {
-        System.out.println(
-                "Error al comprobar la ecuación: " + e.getMessage()
-        );
+        String sql = """
+                SELECT 1
+                FROM resultado
+                WHERE partida_id = ?
+                  AND REPLACE(resultado, ' ', '') = ?
+                LIMIT 1
+                """;
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, partidaId);
+            ps.setString(2, ecuacion.replace(" ", ""));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            throw new IllegalStateException("No se pudo comprobar la ecuación existente", e);
+        }
     }
 
-    return false;
-}
-
-    
     /**
      * Consulta los resultados asociados a una partida.
      *
      * @param partida partida cuyos resultados se consultarán
      * @return lista de resultados de esa partida
+     * @throws IllegalArgumentException si la partida no tiene un identificador válido
+     * @throws IllegalStateException si falla la consulta a la base de datos
      */
-    public List<Resultado> listarPorPartida(Partida partida) {
+    public List<Resultado> listarPorPartida(Partida partida)
+            throws IllegalArgumentException, IllegalStateException {
 
         List<Resultado> resultados = new ArrayList<>();
 
         if (partida == null || partida.getId() <= 0) {
-            return resultados;
+            throw new IllegalArgumentException("La partida debe tener un identificador válido");
         }
 
         String sql = """
@@ -198,10 +214,7 @@ public boolean existePorPartidaYEcuacion(int partidaId, String ecuacion) {
             }
 
         } catch (SQLException e) {
-            System.out.println(
-                    "Error al consultar resultados de la partida: "
-                    + e.getMessage()
-            );
+            throw new IllegalStateException("No se pudieron consultar los resultados de la partida", e);
         }
 
         return resultados;
@@ -439,4 +452,3 @@ public boolean existePorPartidaYEcuacion(int partidaId, String ecuacion) {
         return partida;
     }
 }
-

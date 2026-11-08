@@ -32,7 +32,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -103,9 +102,12 @@ public class GameOverControler {
 			return;
 		}
 
-		DaoResultadoImplementado daoResultado = new DaoResultadoImplementado();
-
-		resultadosActuales = daoResultado.listarPorPartida(partidaActual);
+		try {
+			DaoResultadoImplementado daoResultado = new DaoResultadoImplementado();
+			resultadosActuales = daoResultado.listarPorPartida(partidaActual);
+		} catch (IllegalStateException e) {
+			lblMensaje.setText("No se pudieron cargar los resultados de la partida.");
+		}
 
 		btnCompartir.setDisable(true);
 		btnExportar.setDisable(true);
@@ -119,9 +121,6 @@ public class GameOverControler {
 		lblResultados.setText(construirTextoResultados());
 		mostrarListaResultados();
 
-		System.out.println("Partida consultada: " + partidaActual.getId());
-
-		System.out.println("Resultados cargados: " + resultadosActuales.size());
 	}
 
 	/**

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 
+/** Pruebas de conexión y disponibilidad de la base de datos. */
 class ConexionDBTest {
 
     @Test

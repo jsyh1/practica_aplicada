@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -132,6 +133,18 @@ class CalculadoraTest {
     }
 
     /**
+     * Comprueba que una ecuación nula se rechace al crear o configurar la calculadora.
+     */
+    @Test
+    void ecuacionNulaLanzaExcepcionDeArgumento() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Calculadora(new String[9], new int[4], null)
+        );
+        assertThrows(IllegalArgumentException.class, () -> calculadora.setEcuacion(null));
+    }
+
+    /**
      * Comprueba que una raíz de un número negativo no sea válida.
      */
     @Test
@@ -147,7 +160,15 @@ class CalculadoraTest {
      */
     @Test
     void expresionIncompletaLanzaExcepcion() {
-        assertThrows(RuntimeException.class, () -> calcular("2+"));
+        assertThrows(IllegalArgumentException.class, () -> calcular("2+"));
+    }
+
+    /**
+     * Comprueba que el contenido numérico mal formado conserve su excepción específica.
+     */
+    @Test
+    void numeroMalFormadoLanzaExcepcionDeFormato() {
+        assertThrows(NumberFormatException.class, () -> calcular("1..2"));
     }
 
     /**
@@ -166,7 +187,7 @@ class CalculadoraTest {
      */
     @Test
     void potenciaExcesivaLanzaExcepcion() {
-        assertThrows(RuntimeException.class, () -> calcular("999999^10"));
+        assertThrows(ArithmeticException.class, () -> calcular("999999^10"));
     }
 
     /**
@@ -197,6 +218,47 @@ class CalculadoraTest {
 
         assertTrue(soluciones.stream().anyMatch(solucion -> solucion.endsWith(" = 5")));
         assertEquals(2, disponibles.length);
+    }
+
+    /**
+     * Comprueba que el generador normal consuma cada uno de los cuatro números
+     * exactamente una vez en cada ecuación encontrada.
+     */
+    @Test
+    void generadorNormalUsaCadaNumeroUnaSolaVez() {
+        int[] numeros = {1, 2, 3, 4};
+
+        List<String> soluciones = calculadora.buscarSoluciones(numeros);
+
+        assertEquals(10, soluciones.size());
+        soluciones.forEach(solucion -> assertUsaCadaNumeroUnaVez(solucion, numeros));
+    }
+
+    /**
+     * Comprueba la misma regla para el generador avanzado, incluyendo raíces y
+     * potencias.
+     */
+    @Test
+    void generadorAvanzadoUsaCadaNumeroUnaSolaVez() {
+        // Avoid counting the generated square exponent as one of the input numbers.
+        int[] numeros = {1, 3, 4, 5};
+
+        List<String> soluciones = calculadora.buscarSolucionesConRaicesYPotencias(numeros);
+
+        assertEquals(10, soluciones.size());
+        soluciones.forEach(solucion -> assertUsaCadaNumeroUnaVez(solucion, numeros));
+    }
+
+    private void assertUsaCadaNumeroUnaVez(String solucion, int[] numeros) {
+        String expresion = solucion.substring(0, solucion.indexOf(" = "));
+
+        for (int numero : numeros) {
+            long usos = Pattern.compile("(?<!\\d)" + numero + "(?!\\d)")
+                    .matcher(expresion)
+                    .results()
+                    .count();
+            assertEquals(1, usos, () -> "Uso incorrecto de " + numero + " en " + solucion);
+        }
     }
 
     /**
