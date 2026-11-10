@@ -1070,7 +1070,7 @@ public class CalculadoraControler {
 						partidaActual.agregarResultado(nuevoResultado);
 						puntaje++;
 						lblResultado.setText(puntaje + "/10");
-						marcarResultado(resultadoFinal, ecuacionCompleta);
+						marcarResultado(resultadoFinal);
 
 					} else {
 
@@ -1119,23 +1119,14 @@ public class CalculadoraControler {
 	 * Marca visualmente un resultado encontrado.
 	 *
 	 * @param resultado resultado entre 1 y 10
-	 * @param ecuacion ecuación utilizada para obtener el resultado
 	 */
-	private void marcarResultado(int resultado, String ecuacion) {
+	private void marcarResultado(int resultado) {
 
 		Label[] etiquetas = { lblResultado1, lblResultado2, lblResultado3, lblResultado4, lblResultado5, lblResultado6,
 				lblResultado7, lblResultado8, lblResultado9, lblResultado10 };
 
 		Node celda = etiquetas[resultado - 1].getParent();
-		int posicionResultado = ecuacion.lastIndexOf(" = ");
-		String expresionUsada = posicionResultado >= 0
-				? ecuacion.substring(0, posicionResultado)
-				: ecuacion;
-
-		etiquetas[resultado - 1].setText(expresionUsada);
-		etiquetas[resultado - 1].setWrapText(true);
-		etiquetas[resultado - 1].setMaxWidth(Double.MAX_VALUE);
-		etiquetas[resultado - 1].setMinWidth(0);
+		etiquetas[resultado - 1].setText("Completada");
 
 		celda.getStyleClass().remove("casilla-pendiente");
 		celda.getStyleClass().add("casilla-resuelta");
