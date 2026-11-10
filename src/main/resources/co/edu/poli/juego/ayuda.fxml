@@ -3,8 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -21,12 +21,23 @@
         <Label text="Ayuda" styleClass="titulo" />
         <Label text="Expresiones para obtener los resultados" maxWidth="Infinity" styleClass="ayuda-subtitulo" wrapText="true" />
 
-        <TableView fx:id="tablaEcuaciones" minHeight="420.0" prefHeight="420.0" styleClass="tabla-ayuda" VBox.vgrow="ALWAYS">
-            <columns>
-                <TableColumn fx:id="colResultado" text="RESULTADO" />
-                <TableColumn fx:id="colExpresion" text="EXPRESIÓN" />
-            </columns>
-        </TableView>
+        <VBox minHeight="420.0" prefHeight="420.0" VBox.vgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" minHeight="32.0" prefHeight="32.0"
+                  styleClass="tabla-ayuda-cabecera">
+                <Label minWidth="100.0" prefWidth="100.0" text="RESULTADO"
+                       styleClass="tabla-ayuda-encabezado-resultado" />
+                <Label maxWidth="Infinity" text="EXPRESIÓN"
+                       styleClass="tabla-ayuda-encabezado-expresion"
+                       HBox.hgrow="ALWAYS" />
+            </HBox>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minHeight="0.0"
+                        prefHeight="388.0" styleClass="tabla-ayuda"
+                        VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="contenedorEcuaciones" fillWidth="true" />
+                </content>
+            </ScrollPane>
+        </VBox>
 
         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#calljuego"
                 styleClass="btn-volver" text="Volver" />
