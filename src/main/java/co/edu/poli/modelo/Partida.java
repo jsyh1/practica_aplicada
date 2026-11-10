@@ -63,6 +63,11 @@ public class Partida {
      * Lista de resultados obtenidos durante la partida.
      */
     private List<Resultado> resultados;
+
+    /**
+     * Cantidad de resultados asociados, cargada directamente desde la base de datos.
+     */
+    private int cantidadResultados;
     
     private EstadoPartida estado = EstadoPartida.EN_CURSO;
 
@@ -279,6 +284,24 @@ public class Partida {
     }
 
     /**
+     * Obtiene la cantidad de resultados asociados a la partida.
+     *
+     * @return cantidad de resultados
+     */
+    public int getCantidadResultados() {
+        return cantidadResultados;
+    }
+
+    /**
+     * Actualiza la cantidad de resultados asociada a la partida.
+     *
+     * @param cantidadResultados cantidad de resultados
+     */
+    public void setCantidadResultados(int cantidadResultados) {
+        this.cantidadResultados = cantidadResultados;
+    }
+
+    /**
      * Agrega un resultado a la partida.
      *
      * @param resultado resultado que se desea agregar
@@ -291,6 +314,7 @@ public class Partida {
         }
 
         resultados.add(resultado);
+        cantidadResultados++;
     }
 
     /**

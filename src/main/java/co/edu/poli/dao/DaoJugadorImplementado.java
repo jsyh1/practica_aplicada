@@ -63,7 +63,12 @@ public class DaoJugadorImplementado implements JugadorDAO {
             if (filas > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
-                        objeto.setId(rs.getInt(1));
+                        int idGenerado = rs.getInt(1);
+                        objeto.setId(idGenerado);
+
+                        System.out.println(
+                                "Jugador creado con ID: " + idGenerado
+                        );
                     }
                 }
 
@@ -214,4 +219,3 @@ public class DaoJugadorImplementado implements JugadorDAO {
         return false;
     }
 }
-

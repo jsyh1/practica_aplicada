@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.edu.poli.vista.App;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.control.ContentDisplay;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /** Controlador de la pantalla que muestra las ecuaciones de ayuda. */
 public class AyudaControler {
@@ -24,64 +24,49 @@ public class AyudaControler {
     private static List<String> ecuaciones = new ArrayList<>();
 
     public static void setEcuaciones(List<String> lista) {
-        ecuaciones = new ArrayList<>(lista);
+        ecuaciones = lista == null ? new ArrayList<>() : new ArrayList<>(lista);
     }
 
     @FXML
-    private TableView<String[]> tablaEcuaciones;
-
-    @FXML
-    private TableColumn<String[], String> colResultado;
-
-    @FXML
-    private TableColumn<String[], String> colExpresion;
+    private VBox contenedorEcuaciones;
 
     @FXML
     public void initialize() {
-
-        colResultado.setCellValueFactory(
-            dato -> new SimpleStringProperty(dato.getValue()[1])
-        );
-        colResultado.setCellFactory(columna -> new TableCell<>() {
-            private final Label resultado = new Label();
-
-            {
-                resultado.getStyleClass().add("numero-resultado-ayuda");
-                setAlignment(Pos.CENTER);
-                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-            }
-
-            @Override
-            protected void updateItem(String valor, boolean vacio) {
-                super.updateItem(valor, vacio);
-                if (vacio || valor == null) {
-                    setGraphic(null);
-                } else {
-                    resultado.setText(valor);
-                    setGraphic(resultado);
-                }
-            }
-        });
-
-        colExpresion.setCellValueFactory(
-            dato -> new SimpleStringProperty(dato.getValue()[0])
-        );
-
-        tablaEcuaciones.setColumnResizePolicy(
-            TableView.CONSTRAINED_RESIZE_POLICY
-        );
-        colResultado.setMinWidth(70);
-        colResultado.setPrefWidth(85);
-        colExpresion.setMinWidth(150);
-
-        for (String ecuacion : ecuaciones) {
-
-            String[] partes = ecuacion.split(" = ");
-
+        for (int i = 0; i < ecuaciones.size(); i++) {
+            String[] partes = ecuaciones.get(i).split(" = ", 2);
             if (partes.length == 2) {
-                tablaEcuaciones.getItems().add(partes);
+                contenedorEcuaciones.getChildren().add(
+                        crearFila(partes[0], partes[1], i)
+                );
             }
         }
+    }
+
+    private HBox crearFila(String expresion, String resultado, int indice) {
+        HBox fila = new HBox();
+        fila.setAlignment(Pos.CENTER_LEFT);
+        fila.getStyleClass().add("fila-ayuda");
+        if (indice % 2 == 1) {
+            fila.getStyleClass().add("fila-ayuda-alterna");
+        }
+
+        StackPane celdaResultado = new StackPane();
+        celdaResultado.getStyleClass().add("celda-resultado-ayuda");
+
+        Label numeroResultado = new Label(resultado);
+        numeroResultado.getStyleClass().add("numero-resultado-ayuda");
+        celdaResultado.getChildren().add(numeroResultado);
+
+        Label textoExpresion = new Label(expresion);
+        textoExpresion.getStyleClass().add("expresion-ayuda");
+        textoExpresion.setWrapText(true);
+        textoExpresion.setMaxWidth(Double.MAX_VALUE);
+        textoExpresion.setMinWidth(0);
+        textoExpresion.setPadding(new Insets(10, 8, 10, 8));
+        HBox.setHgrow(textoExpresion, Priority.ALWAYS);
+
+        fila.getChildren().addAll(celdaResultado, textoExpresion);
+        return fila;
     }
 
     @FXML

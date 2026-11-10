@@ -8,7 +8,6 @@ import java.util.Locale;
 
 import javax.imageio.ImageIO;
 
-import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoResultadoImplementado;
 import co.edu.poli.dao.DaoScoreImplementado;
 import co.edu.poli.modelo.Jugador;
@@ -94,13 +93,8 @@ public class ConsultarControler {
 				partida.getFechaPartida() != null ? partida.getFechaPartida().toString() : "Fecha no disponible");
 		fecha.getStyleClass().add("historial-fecha");
 
-		String resultadosTexto;
-		try {
-			List<Resultado> resultados = cargarResultados(partida);
-			resultadosTexto = resultados.size() + (resultados.size() == 1 ? " resultado" : " resultados");
-		} catch (RuntimeException e) {
-			resultadosTexto = "Resultados no disponibles";
-		}
+		int cantidad = partida.getCantidadResultados();
+		String resultadosTexto = cantidad + (cantidad == 1 ? " resultado" : " resultados");
 
 		Label puntaje = new Label("Puntaje " + partida.getPuntaje() + "/10");
 		puntaje.getStyleClass().addAll("insignia-historial", "insignia-puntaje"
@@ -148,20 +142,6 @@ public class ConsultarControler {
 			return "Sin nombre";
 		}
 
-		int idJugador = partida.getJugador().getId();
-
-		if (idJugador > 0) {
-			DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
-
-			Jugador jugadorBD = daoJugador.buscarPorId(idJugador);
-
-			if (jugadorBD != null && jugadorBD.getNombre() != null && !jugadorBD.getNombre().isBlank()) {
-
-				return jugadorBD.getNombre().trim();
-			}
-		}
-
-		// Alternativa si la consulta no encuentra al jugador.
 		String nombreActual = partida.getJugador().getNombre();
 
 		if (nombreActual != null && !nombreActual.isBlank()) {

@@ -67,7 +67,10 @@ public class DaoScoreImplementado implements PartidaDAO {
                     p.puntaje,
                     p.estado,
                     j.nombre AS jugador_nombre,
-                    j.fecha AS fecha_jugador
+                    j.fecha AS fecha_jugador,
+                    (SELECT COUNT(*)
+                     FROM resultado r
+                     WHERE r.partida_id = p.id) AS cantidad_resultados
                 FROM partida p
                 INNER JOIN jugador j ON p.jugador_id = j.id
                 WHERE p.estado = ?
@@ -82,7 +85,11 @@ public class DaoScoreImplementado implements PartidaDAO {
             try (ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
-                    partidas.add(crearPartidaDesdeResultadoSet(rs));
+                    partidas.add(crearPartidaDesdeResultadoSet(
+                            rs,
+                            rs.getInt("cantidad_resultados"),
+                            false
+                    ));
                 }
             }
 
@@ -128,7 +135,7 @@ public class DaoScoreImplementado implements PartidaDAO {
             try (ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
-                    partidas.add(crearPartidaDesdeResultadoSet(rs));
+                    partidas.add(crearPartidaDesdeResultadoSet(rs, 0, false));
                 }
             }
 
@@ -148,10 +155,13 @@ public class DaoScoreImplementado implements PartidaDAO {
      * Crea un objeto Partida a partir de un registro de la base de datos.
      *
      * @param rs resultado de la consulta SQL
-     * @return partida reconstruida con su jugador y sus resultados
+     * @return partida reconstruida con su jugador y, cuando se solicita, sus resultados
      * @throws SQLException si ocurre un error al leer los datos
      */
-    private Partida crearPartidaDesdeResultadoSet(ResultSet rs)
+    private Partida crearPartidaDesdeResultadoSet(
+            ResultSet rs,
+            int cantidadResultados,
+            boolean cargarResultados)
     
             throws SQLException {
                 
@@ -182,20 +192,23 @@ public class DaoScoreImplementado implements PartidaDAO {
                 rs.getInt("puntaje")
         );
 
-        cargarResultados(partida);
+        if (cargarResultados) {
+            cargarResultados(partida);
+        } else {
+            partida.setCantidadResultados(cantidadResultados);
+        }
         partida.setEstado(EstadoPartida.valueOf(rs.getString("estado")));
         jugador.agregarPartida(partida);
 
         return partida;
     }
 
-    /**
-     * Carga los resultados relacionados con una partida.
-     *
-     * @param partida partida a la que se agregarán los resultados
-     */
-    private void cargarResultados(Partida partida) {
+    private Partida crearPartidaDesdeResultadoSet(ResultSet rs)
+            throws SQLException {
+        return crearPartidaDesdeResultadoSet(rs, 0, true);
+    }
 
+    private void cargarResultados(Partida partida) {
         String sql = """
                 SELECT id, partida_id, resultado, dato
                 FROM resultado
@@ -204,28 +217,20 @@ public class DaoScoreImplementado implements PartidaDAO {
                 """;
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-
             ps.setInt(1, partida.getId());
 
             try (ResultSet rs = ps.executeQuery()) {
-
                 while (rs.next()) {
-
-                    Resultado resultado = new Resultado(
+                    partida.agregarResultado(new Resultado(
                             rs.getInt("id"),
                             partida,
                             rs.getString("resultado"),
                             rs.getInt("dato")
-                    );
-
-                    partida.agregarResultado(resultado);
+                    ));
                 }
             }
-
         } catch (SQLException e) {
-            System.out.println(
-                    "Error al cargar resultados: " + e.getMessage()
-            );
+            System.out.println("Error al cargar resultados: " + e.getMessage());
         }
     }
 
@@ -483,4 +488,3 @@ public class DaoScoreImplementado implements PartidaDAO {
         );
     }
 }
-
