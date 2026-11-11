@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import co.edu.poli.dao.DaoJugadorImplementado;
 import co.edu.poli.dao.DaoResultadoImplementado;
@@ -215,6 +217,11 @@ public class CalculadoraControler {
 	 */
 	private final GeneradorEcuaciones generadorEcuaciones = new GeneradorEcuaciones();
 
+	/**
+	 * Ecuaciones alternativas ya puntuadas durante la partida actual.
+	 */
+	private final Set<String> ecuacionesAlternativasUsadas = new HashSet<>();
+
 	private static CalculadoraControler actual;
 
 	/**
@@ -269,6 +276,7 @@ public class CalculadoraControler {
 		}
 
 		puntaje = 0;
+		ecuacionesAlternativasUsadas.clear();
 		lblResultado.setText("0/10");
 
 		calculadora = new Calculadora(new String[9], new int[4], "");
@@ -1051,36 +1059,40 @@ public class CalculadoraControler {
 					boolean yaExisteResultado = daoResultado.existePorPartidaYDato(partidaActual.getId(),
 							resultadoFinal);
 
-					// Comprobar si la ecuación ya fue utilizada.
+					String ecuacionNormalizada = normalizarEcuacion(ecuacionCompleta);
 					boolean yaExisteEcuacion = daoResultado.existePorPartidaYEcuacion(partidaActual.getId(),
-							ecuacionCompleta);
+							ecuacionCompleta)
+							|| ecuacionesAlternativasUsadas.contains(ecuacionNormalizada);
 
-					if (!yaExisteResultado && !yaExisteEcuacion) {
-
-						Resultado nuevoResultado = new Resultado(0, partidaActual, ecuacionCompleta, resultadoFinal);
-
-						boolean resultadoCreado = daoResultado.crear(nuevoResultado);
-
-						if (!resultadoCreado) {
-							lblError.setText("No se pudo guardar el resultado");
-							reiniciarNumeros();
-							return;
-						}
-
-						partidaActual.agregarResultado(nuevoResultado);
-						puntaje++;
-						lblResultado.setText(puntaje + "/10");
-						marcarResultado(resultadoFinal);
-
-					} else {
-
-						lblError.setText("Esta ecuación o resultado ya fue utilizado. " + "No se sumaron puntos.");
+					if (yaExisteEcuacion) {
+						lblError.setText("Esta ecuación ya fue utilizada. No se sumaron puntos.");
 
 						count++;
 
 						if (count >= 10) {
 							ayudaDisponible = true;
 						}
+					} else {
+						if (!yaExisteResultado) {
+							Resultado nuevoResultado = new Resultado(0, partidaActual, ecuacionCompleta,
+									resultadoFinal);
+
+							boolean resultadoCreado = daoResultado.crear(nuevoResultado);
+
+							if (!resultadoCreado) {
+								lblError.setText("No se pudo guardar el resultado");
+								reiniciarNumeros();
+								return;
+							}
+
+							partidaActual.agregarResultado(nuevoResultado);
+						} else {
+							ecuacionesAlternativasUsadas.add(ecuacionNormalizada);
+						}
+
+						puntaje++;
+						lblResultado.setText(puntaje + "/10");
+						marcarResultado(resultadoFinal);
 					}
 
 					partidaActual.setPuntaje(puntaje);
@@ -1111,6 +1123,10 @@ public class CalculadoraControler {
 			reiniciarNumeros();
 			lblError.setText("No se pudo acceder a la base de datos: " + e.getMessage());
 		}
+	}
+
+	private String normalizarEcuacion(String ecuacion) {
+		return ecuacion.replace(" ", "");
 	}
 
 	/**
