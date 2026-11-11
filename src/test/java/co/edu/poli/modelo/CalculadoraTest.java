@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -240,7 +241,6 @@ class CalculadoraTest {
      */
     @Test
     void generadorAvanzadoUsaCadaNumeroUnaSolaVez() {
-        // Avoid counting the generated square exponent as one of the input numbers.
         int[] numeros = {1, 3, 4, 5};
 
         List<String> soluciones = calculadora.buscarSolucionesConRaicesYPotencias(numeros);
@@ -251,14 +251,18 @@ class CalculadoraTest {
 
     private void assertUsaCadaNumeroUnaVez(String solucion, int[] numeros) {
         String expresion = solucion.substring(0, solucion.indexOf(" = "));
+        List<Integer> numerosUsados = new ArrayList<>();
+        var matcher = Pattern.compile("(?<!\\d)\\d+(?!\\d)").matcher(expresion);
 
-        for (int numero : numeros) {
-            long usos = Pattern.compile("(?<!\\d)" + numero + "(?!\\d)")
-                    .matcher(expresion)
-                    .results()
-                    .count();
-            assertEquals(1, usos, () -> "Uso incorrecto de " + numero + " en " + solucion);
+        while (matcher.find()) {
+            numerosUsados.add(Integer.parseInt(matcher.group()));
         }
+
+        assertEquals(
+                java.util.Arrays.stream(numeros).sorted().boxed().toList(),
+                numerosUsados.stream().sorted().toList(),
+                () -> "La ecuación debe usar únicamente los números disponibles una vez: " + solucion
+        );
     }
 
     /**
