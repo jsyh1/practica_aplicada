@@ -589,8 +589,8 @@ public class Calculadora {
 		}
 
 		/*
-		 * Aplicar raíz cuadrada o elevar al cuadrado. Se evita repetir estas
-		 * transformaciones sobre una misma expresión para impedir ciclos recursivos.
+		 * Aplicar raíz cuadrada. Se evita repetir esta transformación sobre una
+		 * misma expresión para impedir ciclos recursivos.
 		 */
 		for (int i = 0; i < valores.size(); i++) {
 
@@ -598,7 +598,7 @@ public class Calculadora {
 
 			if (!actual.expresion.contains("√") && !actual.expresion.contains("^")) {
 
-				// Raíz cuadrada
+				// La raíz transforma el número disponible sin introducir otro número.
 				if (actual.valor >= 0) {
 
 					List<Expresion> nuevos = new ArrayList<>(valores);
@@ -609,25 +609,6 @@ public class Calculadora {
 
 					if (resultado != null) {
 						return resultado;
-					}
-				}
-
-				// Potencia al cuadrado
-				if (actual.valor <= 1000) {
-
-					double potencia = Math.pow(actual.valor, 2);
-
-					if (Double.isFinite(potencia) && potencia <= 1000000) {
-
-						List<Expresion> nuevos = new ArrayList<>(valores);
-
-						nuevos.set(i, new Expresion(potencia, "(" + actual.expresion + "^2)"));
-
-						String resultado = buscarConRaicesYPotencias(nuevos, objetivo);
-
-						if (resultado != null) {
-							return resultado;
-						}
 					}
 				}
 			}
