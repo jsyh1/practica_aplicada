@@ -1105,8 +1105,6 @@ public class CalculadoraControler {
 			}
 
 		} catch (IllegalArgumentException | ArithmeticException e) {
-
-			reiniciarNumeros();
 			lblError.setText(e.getMessage());
 		} catch (IllegalStateException e) {
 
