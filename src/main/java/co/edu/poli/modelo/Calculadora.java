@@ -940,11 +940,11 @@ public class Calculadora {
 			}
 
 			posicion++;
-
+/*
 			if (radicando < 0) {
 				throw new IllegalArgumentException("No se permiten raíces de números negativos");
 			}
-
+*/
 			return Math.sqrt(radicando);
 		}
 
