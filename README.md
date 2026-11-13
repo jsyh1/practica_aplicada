@@ -120,6 +120,5 @@ La interfaz principal está construida con FXML y contiene vistas como:
 mvn test
 ```
 
-## Autor
-
-Proyecto académico desarrollado en Java para la práctica aplicada de programación y lógica. 
+## Autores
+Julian Casitllo && Juan Camilo || !Carlie gepeto(GPT).
