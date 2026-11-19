@@ -8,6 +8,7 @@ import java.util.Map;
 import co.edu.poli.controller.CalculadoraControler;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Rectangle2D;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -15,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
@@ -24,6 +26,8 @@ import javafx.stage.Stage;
 public class App extends Application {
 
 	private static Scene scene;
+	private static final double ANCHO_VENTANA = 480;
+	private static final double ALTO_VENTANA = 720;
 	private static final String[] FUENTES_NUNITO = {
 			"Nunito-Regular.ttf",
 			"Nunito-Bold.ttf"
@@ -53,8 +57,10 @@ public class App extends Application {
 
 		stage.getIcons().add(new Image(App.class.getResourceAsStream("/co/edu/poli/juego/img/logo.jpg")));
 
+		stage.setResizable(false);
 		stage.setScene(scene);
 		stage.show();
+		ajustarVentana(stage, juego);
 	}
 
 	private static void cargarFuentesNunito() {
@@ -112,15 +118,7 @@ public class App extends Application {
 
 	    nuevoJuego.applyCss();
 	    nuevoJuego.requestLayout();
-
-	    if (!stage.isMaximized() && !stage.isFullScreen()) {
-	        double alturaNecesaria = nuevoJuego.prefHeight(scene.getWidth());
-
-	        if (alturaNecesaria > 0) {
-	            double decoracion = stage.getHeight() - scene.getHeight();
-	            stage.setHeight(alturaNecesaria + decoracion);
-	        }
-	    }
+		ajustarVentana(stage, nuevoJuego);
 	}
 	
 	
@@ -147,18 +145,27 @@ public class App extends Application {
 
 		Stage stage = (Stage) scene.getWindow();
 
-		// Ajusta la altura si la ventana está en su tamaño normal
-		boolean ajustarAltura = !stage.isMaximized() && !stage.isFullScreen();
-
-		double decoracion = stage.getHeight() - scene.getHeight();
-
 		scene.setRoot(vista);
 		vista.applyCss();
+		ajustarVentana(stage, vista);
+	}
 
-		if (ajustarAltura) {
-			double alturaNecesaria = vista.prefHeight(scene.getWidth());
-			stage.setHeight(alturaNecesaria + decoracion);
-		}
+	/**
+	 * Usa el mismo tamaño para todas las vistas, limitado al área visible de la
+	 * pantalla principal, y mantiene la ventana centrada.
+	 */
+	public static void ajustarVentana(Stage stage, Parent raiz) {
+		raiz.applyCss();
+
+		Rectangle2D pantalla = Screen.getPrimary().getVisualBounds();
+		double ancho = Math.min(ANCHO_VENTANA, Math.max(1, pantalla.getWidth() - 32));
+		double alto = Math.min(ALTO_VENTANA, Math.max(1, pantalla.getHeight() - 48));
+
+		stage.setResizable(false);
+		stage.setWidth(ancho);
+		stage.setHeight(alto);
+		stage.setX(pantalla.getMinX() + (pantalla.getWidth() - stage.getWidth()) / 2);
+		stage.setY(pantalla.getMinY() + (pantalla.getHeight() - stage.getHeight()) / 2);
 	}
 
 	/**
@@ -191,7 +198,7 @@ public class App extends Application {
 	 * Hace que la tarjeta de la vista se agrande o se encoja junto con la ventana,
 	 * manteniendo sus proporciones.
 	 */
-	private static void habilitarEscalado(Parent raiz) {
+	public static void habilitarEscalado(Parent raiz) {
 
 		if (!(raiz instanceof StackPane contenedor)) {
 			return;

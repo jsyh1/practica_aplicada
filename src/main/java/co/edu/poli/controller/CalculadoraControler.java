@@ -265,6 +265,15 @@ public class CalculadoraControler {
 
 		actual = this;
 
+		try {
+			new DaoScoreImplementado().eliminarPartidasAbandonadas();
+		} catch (IllegalStateException ex) {
+			bloquearControlesDeJuego();
+			lblError.setText("No se pudieron limpiar las partidas abandonadas. No se puede iniciar el juego.");
+			ex.printStackTrace();
+			return;
+		}
+
 		DaoJugadorImplementado daoJugador = new DaoJugadorImplementado();
 
 		jugadorActual = new Jugador(0, "", LocalDate.now());
@@ -381,6 +390,10 @@ public class CalculadoraControler {
 	 * @param dificultadAvanzada true para activar la dificultad avanzada.
 	 */
 	private void recargarPartida(boolean dificultadAvanzada) {
+		if (!abandonarPartida()) {
+			return;
+		}
+
 		if (cronometro != null) {
 			cronometro.stop();
 		}
@@ -401,11 +414,6 @@ public class CalculadoraControler {
 			});
 
 			Parent root = loader.load();
-			// La partida anterior no se terminó: queda abandonada.
-			// Se llama por instancia (no la versión estática), porque tras load()
-			// "actual" ya apunta al controlador nuevo.
-			abandonarPartida();
-			// Actualiza la vista usando la escena que administra App.
 			App.actualizarJuego(root);
 
 		} catch (IOException ex) {
@@ -653,20 +661,25 @@ public class CalculadoraControler {
 	 * está en curso. La usa App al cerrar la ventana.
 	 */
 	public static void abandonarPartidaActual() {
-		if (actual != null) {
-			actual.abandonarPartida();
+		if (actual != null && !actual.abandonarPartida()) {
+			System.err.println("No se pudo guardar la partida como abandonada al cerrar la aplicación.");
 		}
 	}
 
-	private void abandonarPartida() {
+	private boolean abandonarPartida() {
 
 		if (partidaActual == null || partidaActual.getEstado() != EstadoPartida.EN_CURSO) {
-			return;
+			return true;
 		}
 
 		partidaActual.setEstado(EstadoPartida.ABANDONADA);
 
-		new DaoScoreImplementado().actualizar(partidaActual);
+		if (!new DaoScoreImplementado().actualizar(partidaActual)) {
+			partidaActual.setEstado(EstadoPartida.EN_CURSO);
+			lblError.setText("No se pudo guardar la partida como abandonada.");
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -1308,6 +1321,7 @@ public class CalculadoraControler {
 					App.class.getResource("/co/edu/poli/juego/gameOver.fxml"));
 
 			Parent root = loader.load();
+			App.habilitarEscalado(root);
 
 			GameOverControler controlador = loader.getController();
 
@@ -1321,6 +1335,7 @@ public class CalculadoraControler {
 
 			ventana.setResizable(false);
 			ventana.setScene(new Scene(root));
+			ventana.setOnShown(event -> App.ajustarVentana(ventana, root));
 
 			ventana.showAndWait();
 

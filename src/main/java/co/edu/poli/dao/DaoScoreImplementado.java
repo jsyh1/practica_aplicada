@@ -5,13 +5,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import co.edu.poli.modelo.Calculadora;
 import co.edu.poli.modelo.EstadoPartida;
@@ -45,6 +48,122 @@ public class DaoScoreImplementado implements PartidaDAO {
      */
     public DaoScoreImplementado() {
         conexion = ConexionDB.getInstancia().getConexion();
+        if (conexion == null) {
+            throw new IllegalStateException("No hay una conexión activa con la base de datos");
+        }
+    }
+
+    /**
+     * Elimina de forma atómica las partidas abandonadas y sus datos asociados.
+     * Los jugadores solo se eliminan si ya no tienen partidas.
+     *
+     * @return cantidad de partidas eliminadas
+     * @throws IllegalStateException si falla la operación en la base de datos
+     */
+    @Override
+    public int eliminarPartidasAbandonadas() {
+        String consultarAbandonadas = """
+                SELECT id, jugador_id
+                FROM partida
+                WHERE estado = ?
+                """;
+        String eliminarResultados = """
+                DELETE FROM resultado
+                WHERE partida_id IN (
+                    SELECT id FROM partida WHERE estado = ?
+                )
+                """;
+        String eliminarPartidas = """
+                DELETE FROM partida
+                WHERE estado = ?
+                """;
+        String eliminarJugadorSinPartidas = """
+                DELETE FROM jugador
+                WHERE id = ?
+                  AND NOT EXISTS (
+                      SELECT 1 FROM partida WHERE jugador_id = ?
+                  )
+                """;
+
+        boolean autoCommit = true;
+        Savepoint savepoint = null;
+        int partidasEliminadas = 0;
+        SQLException errorOperacion = null;
+
+        try {
+            autoCommit = conexion.getAutoCommit();
+            if (autoCommit) {
+                conexion.setAutoCommit(false);
+            } else {
+                savepoint = conexion.setSavepoint();
+            }
+
+            Set<Integer> jugadoresAEliminar = new HashSet<>();
+            try (PreparedStatement ps = conexion.prepareStatement(consultarAbandonadas)) {
+                ps.setString(1, EstadoPartida.ABANDONADA.name());
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        jugadoresAEliminar.add(rs.getInt("jugador_id"));
+                    }
+                }
+            }
+
+            try (PreparedStatement ps = conexion.prepareStatement(eliminarResultados)) {
+                ps.setString(1, EstadoPartida.ABANDONADA.name());
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = conexion.prepareStatement(eliminarPartidas)) {
+                ps.setString(1, EstadoPartida.ABANDONADA.name());
+                partidasEliminadas = ps.executeUpdate();
+            }
+
+            if (!jugadoresAEliminar.isEmpty()) {
+                try (PreparedStatement ps = conexion.prepareStatement(eliminarJugadorSinPartidas)) {
+                    for (int jugadorId : jugadoresAEliminar) {
+                        ps.setInt(1, jugadorId);
+                        ps.setInt(2, jugadorId);
+                        ps.addBatch();
+                    }
+                    ps.executeBatch();
+                }
+            }
+
+            if (autoCommit) {
+                conexion.commit();
+            } else if (savepoint != null) {
+                conexion.releaseSavepoint(savepoint);
+            }
+
+        } catch (SQLException e) {
+            errorOperacion = e;
+            try {
+                if (autoCommit) {
+                    conexion.rollback();
+                } else if (savepoint != null) {
+                    conexion.rollback(savepoint);
+                }
+            } catch (SQLException errorRollback) {
+                e.addSuppressed(errorRollback);
+            }
+        } finally {
+            try {
+                if (autoCommit) {
+                    conexion.setAutoCommit(true);
+                }
+            } catch (SQLException e) {
+                if (errorOperacion == null) {
+                    errorOperacion = e;
+                } else {
+                    errorOperacion.addSuppressed(e);
+                }
+            }
+        }
+
+        if (errorOperacion != null) {
+            throw new IllegalStateException("No se pudieron eliminar las partidas abandonadas", errorOperacion);
+        }
+        return partidasEliminadas;
     }
 
     /**
