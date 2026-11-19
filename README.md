@@ -10,6 +10,8 @@ La aplicación incluye:
 - historial de partidas y resultados
 - consulta de ayuda, reglas y ranking
 - persistencia de jugadores y puntuaciones en base de datos
+- eliminación automática al iniciar una partida de las partidas abandonadas y sus datos asociados
+- ventanas de tamaño fijo, ajustadas al área disponible de la pantalla
 
 ## Descripción del juego
 
